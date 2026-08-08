@@ -54,21 +54,34 @@ def result():
     rainfall = request.args.get("rainfall")
 
 
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid=361ed44cd513bb31594d424beb00e243&units=metric"
+    url = (f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid=361ed44cd513bb31594d424beb00e243&units=metric")
     response = requests.get(url)
     data = response.json()
     print(data)
 
+    rainfall_valid = True
     try:
         rainfall = int(rainfall)
+    except ValueError:
+        rainfall_valid = False
+
+    if data["cod"] == 200:
+        city_valid = True
+    else:
+        city_valid = False
+
+    if not rainfall_valid and not city_valid:
+        return render_template("check.html", error="Please enter a valid city and rainfall.")
+    elif not rainfall_valid:
+        return render_template("check.html", error="Please enter a valid rainfall.")
+    elif not city_valid:
+        return render_template("check.html", error="Please enter a valid city.")
+    else:
         result = check_risk(rainfall, city)
         return render_template("check.html", city=city, rainfall=rainfall,
         safety_tips=result["safety_tips"], shelter=result["shelter"],
         risk_level=result["risk_level"],
         temp=data["main"]["temp"], description=data["weather"][0]["description"])
-    except ValueError:
-        return render_template("check.html", error= "Please enter a valid number for rainfall.")
     
-
 if __name__ == "__main__":
     app.run(debug=True)
