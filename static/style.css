@@ -8,7 +8,7 @@ body{
     align-items: center;
     min-height: 100vh;
     padding: 60px 60px;
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: #D8F4EF;
 }
 
@@ -23,6 +23,21 @@ form {
     text-align: left;
     max-width: 400px;
     margin: 0 auto;
+    background-color: #F4FBFA;
+    padding: 24px 28px;
+    border-radius: 12px;
+    box-shadow: 0px 6px 20px rgba(15, 84, 89, 0.12);
+}
+
+.results p {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.results h3 {
+    margin-top: 20px;
+    margin-bottom: 8px;
+    color: #0F5459;
 }
 
 input {
@@ -51,6 +66,8 @@ button {
 
 h1 {
     color: #0F5459;
+    text-align: center;
+    font-size: 2rem;
 }
 
 label {
@@ -60,4 +77,92 @@ label {
 
 button:hover {
     background-color: #0F5459;
+}
+
+.risk-badge {
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    text-align: center;
+}
+
+.risk-low {
+    background-color: #D4EDDA;
+    color: #155724;
+    border: 2px solid #28A745;
+}
+
+.risk-medium {
+    background-color: #FFF3CD;
+    color: #856404;
+    border: 2px solid #FFC107;
+}
+
+.risk-high {
+    background-color: #F8D7DA;
+    color: #721C24;
+    border: 2px solid #DC3545;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 24px 16px;
+    }
+
+    .container {
+        max-width: 100%;
+    }
+
+    h1 {
+    font-size: 2rem;
+    }
+
+    form {
+        width: 100%;
+    }
+
+    .results {
+        max-width: 100%;
+    }
+
+    .risk-badge {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 400px) {
+    body {
+        padding: 16px 12px;
+    }
+
+    h1 {
+    font-size: 1.7rem;
+    }
+}
+
+.disclaimer-banner {
+    background-color: #fff3cd;
+    color: #664d03;
+    border: 1px solid #ffe69c;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.terrain-warning {
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #197278;
+    margin-top: 4px;
 }

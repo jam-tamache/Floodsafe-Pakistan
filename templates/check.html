@@ -2,20 +2,36 @@
 
 <html>
 
-<header>
+<head>
     <title>FloodSafe_Pakistan</title>
-</header>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 
 <body>
-    <h1>Flood Safe Pakistan</h1>
+<div class="container">
+    <h1>FloodSafe Pakistan</h1>
+
+    <div class="disclaimer-banner">
+        ⚠ This tool estimates risk from local rainfall totals only. It does <strong>not</strong>
+        account for major river bund failures (Indus, Jhelum, Chenab) or northern Glacial Lake
+        Outburst Floods (GLOFs). For river and glacial flood warnings, check official NDMA/PDMA
+        alerts directly.
+    </div>
+
     <br>
     {% if error %}
     <p>{{ error }}</p>
     <a href="/">Back</a>
 {% else %}
+<div class="results">
     <p>City: {{ city }}</p>
     <p>Rainfall: {{ rainfall }}mm</p>
-    <p>Risk Level: {{ risk_level }}</p>
+    <p>Terrain Profile: {{ terrain_profile }}</p>
+    <div class="risk-badge risk-{{ risk_level.split(' ')[0].lower() }}">
+    ⚠ Risk Level: {{ risk_level }}
+</div>
+    <p class="terrain-warning">{{ terrain_warning }}</p>
     <p>Current Weather: {{ temp }}°C, {{ description }}</p>
     <h3>Nearest Shelter:</h3>
     <ul>
@@ -29,7 +45,9 @@
     <li>{{ tip }}</li>
     {% endfor %}
     </ul>
+</div>
 {% endif %}
+</div>
 </body>
 
 

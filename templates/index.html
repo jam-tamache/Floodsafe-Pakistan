@@ -2,12 +2,15 @@
 
 <html>
 
-<header>
+<head>
     <title>FloodSafe_Pakistan</title>
-</header>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 
 <body>
-    <h1>Flood Safe Pakistan</h1>
+<div class="container">
+    <h1>FloodSafe Pakistan</h1>
     <br>
     <br>
     <form action="/result" method="GET">
@@ -17,7 +20,7 @@
     <input type="text" id="rainfall" name="rainfall" placeholder="Enter rainfall">
     <button type="submit">Check Risk</button>
 </form>
-
+</div>
 </body>
 
 
