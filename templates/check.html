@@ -25,14 +25,14 @@
     <a href="/">Back</a>
 {% else %}
 <div class="results">
-    <p>City: {{ city }}</p>
-    <p>Rainfall: {{ rainfall }}mm</p>
+    <p><strong>City:</strong> {{ city }}</p>
+    <p><strong>Rainfall:</strong> {{ rainfall }}mm</p>
     <p>Terrain Profile: {{ terrain_profile }}</p>
     <div class="risk-badge risk-{{ risk_level.split(' ')[0].lower() }}">
     ⚠ Risk Level: {{ risk_level }}
 </div>
     <p class="terrain-warning">{{ terrain_warning }}</p>
-    <p>Current Weather: {{ temp }}°C, {{ description }}</p>
+    <p><strong>Current Weather:</strong> {{ temp }}°C, {{ description }}</p>
     <h3>Nearest Shelter:</h3>
     <ul>
     {% for tip in shelter %}
