@@ -1,12 +1,17 @@
+import os
 from flask import Flask, jsonify, render_template, request
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()  # reads variables from a .env file in the same folder as this script
+
 app = Flask(__name__)
 
 safety_tips = {
     "Low Risk": [
         "No immediate danger, but keep an eye on local weather updates",
         "Clear roof drains and gutters in case rainfall picks up",
-        "Keep your phone charged and know your nearest shelter location"
+        "Keep your phone charged and stay informed on local advisories"
     ],
     "Medium Risk": [
         "Move important documents (CNIC, land papers) to a high, dry place",
@@ -18,32 +23,23 @@ safety_tips = {
         "Evacuate immediately if local authorities issue a warning",
         "Never walk or drive through moving floodwater, even if it looks shallow",
         "Turn off electricity and gas at the mains before leaving home",
-        "Head to the nearest designated shelter with documents, medicines, and water",
-        "Call 1122 (Pakistan's emergency rescue service) if you're trapped or need help"
+        "Call 1122 (Pakistan's emergency rescue service) if you're trapped or need help",
+        "Follow evacuation guidance from PDMA Sindh / district administration - do not rely on this app for shelter locations"
     ]
 }
 
-# ---- Shelter data (normalized keys: lowercase, stripped) ----
-shelter = {
-    "nawabshah": ["Govt Boys High School"],
-    "sakrand": ["Taluka Hospital"],
-    "moro": ["Degree College Moro"],
-    "kotri": ["Govt Girls High School"],
-    "hyderabad": [
-        "Government College Kali Mori",
-        "Government College for Boys Pretabad",
-        "Government High School Sir Ghulam Hussain Hidayatullah (Pucca Qila)",
-        "Government Girls College Bakra Mandi",
-        "Government City College Hyderabad"
-    ],
-    "karachi": [
-        "Government Degree College Nazimabad",
-        "Government College for Men Nazimabad",
-        "Sindh Government Science College Federal B Area",
-        "Government Boys Degree College North Karachi",
-        "Government College of Commerce and Economics"
-    ],
-}
+# ---- Shelter guidance ----
+# NOTE: There is no publicly available, building-level list of official flood
+# shelters for Sindh cities. PDMA Sindh publishes aggregate damage stats and
+# district-level GIS maps, not named shelter addresses. Rather than guess or
+# invent building names, this app points users to the two channels that
+# actually have real-time, verified shelter info during an active flood.
+SHELTER_FALLBACK_MESSAGE = (
+    "Specific shelter locations are not publicly listed by PDMA Sindh at a "
+    "building level. In an emergency, call 1122 (Rescue Service) or check "
+    "PDMA Sindh (pdma.gos.pk) / your district administration for the "
+    "nearest active shelter."
+)
 
 # ---- Regional terrain-based rainfall risk profiles ----
 # Thresholds based on PMD/NDMA-style regional rainfall classification.
@@ -52,14 +48,19 @@ shelter = {
 # spot-check a handful of placements you know well (e.g. does PMD classify
 # Sargodha as plains or semi-arid in their own docs) - I'm not a verified
 # source for exact zone boundaries.
+#
+# Scope: Sindh-focused. Cities/towns below are Sindh's major population
+# centers plus well-known towns. A handful of major non-Sindh cities are
+# included only for map context (Lahore, Islamabad, Peshawar, Quetta), not
+# as a claim of full national coverage.
 
 REGIONAL_PROFILES = {
     "mega_urban_coastal": {
         "label": "Mega-Urban & Coastal",
         "cities": [
-            "karachi", "hyderabad", "badin", "thatta", "lahore", "rawalpindi",
-            "faisalabad", "multan", "gujranwala", "peshawar", "quetta",
-            "sialkot", "islamabad"
+            "karachi", "hyderabad", "badin", "thatta",
+            # non-Sindh, map-context only:
+            "lahore", "islamabad", "peshawar", "quetta"
         ],
         "low_max": 20, "medium_max": 45,
         "color": "#28a745",
@@ -68,9 +69,7 @@ REGIONAL_PROFILES = {
     "mountainous_rugged": {
         "label": "Mountainous & Rugged Terrain",
         "cities": [
-            "swat", "abbottabad", "mansehra", "chitral", "dir", "gilgit",
-            "skardu", "muzaffarabad", "mirpur", "murree", "gwadar", "pasni",
-            "turbat", "panjgur", "kharan", "kalat", "khuzdar"
+            "gwadar", "pasni", "turbat"
         ],
         "low_max": 15, "medium_max": 40,
         "color": "#ffc107",
@@ -80,8 +79,9 @@ REGIONAL_PROFILES = {
         "label": "Central Agricultural Plains",
         "cities": [
             "sukkur", "larkana", "nawabshah", "khairpur", "dadu", "ghotki",
-            "sahiwal", "sargodha", "jhang", "bahawalpur", "rahim yar khan",
-            "dera ghazi khan", "moro", "sakrand", "kotri"
+            "moro", "sakrand", "kotri", "mirpurkhas", "shikarpur", "jamshoro",
+            "naushahro feroze", "tando allahyar", "tando muhammad khan",
+            "kashmore", "ranipur", "rohri", "shahdadkot", "matiari"
         ],
         "low_max": 25, "medium_max": 55,
         "color": "#28a745",
@@ -136,13 +136,12 @@ def check_risk(rainfall_mm, city):
         risk_level = "High Risk"
 
     color_map = {"Low Risk": "#28a745", "Medium Risk": "#ffc107", "High Risk": "#dc3545"}
-    normalized_city = normalize_city(city)
 
     return {
         "risk_level": risk_level,
         "rainfall": rainfall_mm,
         "safety_tips": safety_tips[risk_level],
-        "shelter": shelter.get(normalized_city, ["No Shelter Information Available"]),
+        "shelter_message": SHELTER_FALLBACK_MESSAGE,
         "terrain_profile": profile["label"],
         "terrain_warning": profile["warning"],
         "risk_color": color_map[risk_level],
@@ -170,7 +169,7 @@ def check(city, rainfall):
     result = check_risk(rainfall, city)
     return render_template(
         "check.html", city=city, rainfall=rainfall,
-        safety_tips=result["safety_tips"], shelter=result["shelter"],
+        safety_tips=result["safety_tips"], shelter_message=result["shelter_message"],
         risk_level=result["risk_level"], terrain_profile=result["terrain_profile"],
         terrain_warning=result["terrain_warning"], risk_color=result["risk_color"]
     )
@@ -181,7 +180,11 @@ def result():
     city = request.args.get("city")
     rainfall_raw = request.args.get("rainfall")
 
-    url = (f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid=361ed44cd513bb31594d424beb00e243&units=metric")
+    api_key = os.environ.get("OPENWEATHER_API_KEY")
+    url = (
+        f"https://api.openweathermap.org/data/2.5/weather"
+        f"?q={city}&appid={api_key}&units=metric"
+    )
     response = requests.get(url)
     data = response.json()
 
@@ -202,7 +205,7 @@ def result():
         result = check_risk(rainfall, city)
         return render_template(
             "check.html", city=city, rainfall=rainfall,
-            safety_tips=result["safety_tips"], shelter=result["shelter"],
+            safety_tips=result["safety_tips"], shelter_message=result["shelter_message"],
             risk_level=result["risk_level"], terrain_profile=result["terrain_profile"],
             terrain_warning=result["terrain_warning"], risk_color=result["risk_color"],
             temp=data["main"]["temp"], description=data["weather"][0]["description"]

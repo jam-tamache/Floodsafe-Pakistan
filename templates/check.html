@@ -33,12 +33,8 @@
 </div>
     <p class="terrain-warning">{{ terrain_warning }}</p>
     <p><strong>Current Weather:</strong> {{ temp }}°C, {{ description }}</p>
-    <h3>Nearest Shelter:</h3>
-    <ul>
-    {% for tip in shelter %}
-    <li>{{ tip }}</li>
-    {% endfor %}
-    </ul>
+    <h3>Shelter Information:</h3>
+    <p>{{ shelter_message }}</p>
     <h3>Safety Tips:</h3>
     <ul>
     {% for tip in safety_tips %}

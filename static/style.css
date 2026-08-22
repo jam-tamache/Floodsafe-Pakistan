@@ -8,8 +8,9 @@ body{
     align-items: center;
     min-height: 100vh;
     padding: 60px 60px;
-    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Segoe UI', -apple-system, Roboto, Helvetica, Arial, sans-serif;
     background-color: #D8F4EF;
+    color: #1F2D2E;
 }
 
 form {
@@ -21,29 +22,42 @@ form {
 
 .results {
     text-align: left;
-    max-width: 400px;
+    max-width: 440px;
     margin: 0 auto;
     background-color: #F4FBFA;
-    padding: 24px 28px;
+    padding: 28px 32px;
     border-radius: 12px;
     box-shadow: 0px 6px 20px rgba(15, 84, 89, 0.12);
 }
 
 .results p {
     margin: 10px 0;
-    line-height: 1.5;
+    line-height: 1.6;
+    font-size: 1rem;
+    color: #2E3A3B;
+}
+
+.results p strong {
+    color: #0F5459;
+    font-weight: 700;
 }
 
 .results h3 {
-    margin-top: 20px;
-    margin-bottom: 8px;
+    margin-top: 24px;
+    margin-bottom: 10px;
     color: #0F5459;
+    font-size: 1.05rem;
+    letter-spacing: 0.2px;
+    border-bottom: 2px solid #D8F4EF;
+    padding-bottom: 6px;
 }
 
 input {
     width: 100%;
     padding: 8px 13px;
     border-radius: 8px;
+    border: 1px solid #B7D9D6;
+    font-size: 1rem;
 }
 
 .container {
@@ -55,7 +69,7 @@ button {
     background-color: #197278;
     color: white;
     border-radius: 5px;
-    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Segoe UI', -apple-system, Roboto, sans-serif;
     transition: background-color 0.2s ease;
     box-shadow: 0px 4px 12px rgba(15, 84, 89, 0.3);
     font-weight: 600;
@@ -68,10 +82,11 @@ h1 {
     color: #0F5459;
     text-align: center;
     font-size: 2rem;
+    letter-spacing: -0.5px;
 }
 
 label {
-    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Segoe UI', -apple-system, Roboto, sans-serif;
     font-weight: 600;
 }
 
@@ -80,12 +95,13 @@ button:hover {
 }
 
 .risk-badge {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    padding: 10px 16px;
+    padding: 12px 16px;
     border-radius: 8px;
-    margin: 16px 0;
+    margin: 18px 0;
     text-align: center;
+    letter-spacing: 0.3px;
 }
 
 .risk-low {
@@ -104,6 +120,19 @@ button:hover {
     background-color: #F8D7DA;
     color: #721C24;
     border: 2px solid #DC3545;
+}
+
+/* Terrain profile line - was getting visually lost between Rainfall and the
+   risk badge. Small pill treatment gives it its own visual weight instead
+   of reading as plain filler text. */
+.results p:has(+ .risk-badge) {
+    display: inline-block;
+    background-color: #E4F3F1;
+    color: #0F5459;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
 @media (max-width: 600px) {
@@ -170,4 +199,5 @@ button:hover {
 .results ul li {
     margin-bottom: 10px;
     line-height: 1.5;
+    color: #2E3A3B;
 }
