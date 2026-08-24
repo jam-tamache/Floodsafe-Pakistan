@@ -178,6 +178,50 @@ button:hover {
     }
 }
 
+.lang-switch {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.lang-switch a {
+    color: #197278;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.lang-switch a:hover {
+    background-color: #E4F3F1;
+}
+
+.lang-switch a.lang-active {
+    background-color: #197278;
+    color: white;
+}
+
+.lang-pending-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #856404;
+    background-color: #FFF3CD;
+    border: 1px solid #FFE69C;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+}
+
+html[dir="rtl"] .results {
+    text-align: right;
+}
+
+html[dir="rtl"] .lang-switch {
+    direction: ltr;
+}
+
 .disclaimer-banner {
     background-color: #fff3cd;
     color: #664d03;

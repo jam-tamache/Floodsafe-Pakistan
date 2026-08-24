@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang in ['ur', 'sd'] else 'ltr' }}">
 
 <head>
     <title>FloodSafe_Pakistan</title>
@@ -10,32 +10,36 @@
 
 <body>
 <div class="container">
-    <h1>FloodSafe Pakistan</h1>
+
+    <div class="lang-switch">
+        <a href="?lang=en{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
+        <a href="?lang=ur{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
+        <a href="?lang=sd{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
+    </div>
+
+    <h1>{{ t.app_title }}</h1>
 
     <div class="disclaimer-banner">
-        ⚠ This tool estimates risk from local rainfall totals only. It does <strong>not</strong>
-        account for major river bund failures (Indus, Jhelum, Chenab) or northern Glacial Lake
-        Outburst Floods (GLOFs). For river and glacial flood warnings, check official NDMA/PDMA
-        alerts directly.
+        ⚠ {{ t.disclaimer_banner }}
     </div>
 
     <br>
     {% if error %}
     <p>{{ error }}</p>
-    <a href="/">Back</a>
+    <a href="{{ url_for('home', lang=lang) }}">{{ t.back_link }}</a>
 {% else %}
 <div class="results">
-    <p><strong>City:</strong> {{ city }}</p>
-    <p><strong>Rainfall:</strong> {{ rainfall }}mm</p>
-    <p>Terrain Profile: {{ terrain_profile }}</p>
-    <div class="risk-badge risk-{{ risk_level.split(' ')[0].lower() }}">
-    ⚠ Risk Level: {{ risk_level }}
-</div>
+    <p><strong>{{ t.city_label }}</strong> {{ city }}</p>
+    <p><strong>{{ t.rainfall_label }}</strong> {{ rainfall }}mm</p>
+    <p>{{ t.terrain_profile_label }} {{ terrain_profile }}</p>
+    <div class="risk-badge risk-{{ risk_level_key.split(' ')[0].lower() }}">
+        ⚠ {{ t.risk_level_label }} {{ risk_level }}
+    </div>
     <p class="terrain-warning">{{ terrain_warning }}</p>
-    <p><strong>Current Weather:</strong> {{ temp }}°C, {{ description }}</p>
-    <h3>Shelter Information:</h3>
+    <p><strong>{{ t.weather_label }}</strong> {{ temp }}°C, {{ description }}</p>
+    <h3>{{ t.shelter_heading }}</h3>
     <p>{{ shelter_message }}</p>
-    <h3>Safety Tips:</h3>
+    <h3>{{ t.safety_tips_heading }}</h3>
     <ul>
     {% for tip in safety_tips %}
     <li>{{ tip }}</li>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang in ['ur', 'sd'] else 'ltr' }}">
 
 <head>
     <title>FloodSafe_Pakistan</title>
@@ -10,16 +10,29 @@
 
 <body>
 <div class="container">
-    <h1>FloodSafe Pakistan</h1>
+
+    <div class="lang-switch">
+        <a href="{{ url_for('home', lang='en') }}" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
+        <a href="{{ url_for('home', lang='ur') }}" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
+        <a href="{{ url_for('home', lang='sd') }}" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
+    </div>
+
+    <h1>{{ t.app_title }}</h1>
+
+    {% if lang == 'sd' %}
+    <div class="lang-pending-note">{{ t.sindhi_pending_note }}</div>
+    {% endif %}
+
     <br>
     <br>
     <form action="/result" method="GET">
-    <label for="city">City:</label>
-    <input type="text" id="city" name="city" placeholder="Enter city">
-    <label for="rainfall">Rainfall (mm):</label>
-    <input type="text" id="rainfall" name="rainfall" placeholder="Enter rainfall">
-    <button type="submit">Check Risk</button>
-</form>
+        <input type="hidden" name="lang" value="{{ lang }}">
+        <label for="city">{{ t.form_city_label }}</label>
+        <input type="text" id="city" name="city" placeholder="{{ t.form_city_placeholder }}">
+        <label for="rainfall">{{ t.form_rainfall_label }}</label>
+        <input type="text" id="rainfall" name="rainfall" placeholder="{{ t.form_rainfall_placeholder }}">
+        <button type="submit">{{ t.form_submit }}</button>
+    </form>
 </div>
 </body>
 
