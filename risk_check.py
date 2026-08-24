@@ -2,57 +2,27 @@ import os
 from flask import Flask, jsonify, render_template, request
 import requests
 from dotenv import load_dotenv
+from translations import get_translation, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 
 load_dotenv()  # reads variables from a .env file in the same folder as this script
 
 app = Flask(__name__)
 
-safety_tips = {
-    "Low Risk": [
-        "No immediate danger, but keep an eye on local weather updates",
-        "Clear roof drains and gutters in case rainfall picks up",
-        "Keep your phone charged and stay informed on local advisories"
-    ],
-    "Medium Risk": [
-        "Move important documents (CNIC, land papers) to a high, dry place",
-        "Keep emergency cash and a charged phone/power bank ready",
-        "Avoid parking vehicles in low-lying or riverside areas",
-        "Check on elderly neighbors and family who may need help evacuating"
-    ],
-    "High Risk": [
-        "Evacuate immediately if local authorities issue a warning",
-        "Never walk or drive through moving floodwater, even if it looks shallow",
-        "Turn off electricity and gas at the mains before leaving home",
-        "Call 1122 (Pakistan's emergency rescue service) if you're trapped or need help",
-        "Follow evacuation guidance from PDMA Sindh / district administration - do not rely on this app for shelter locations"
-    ]
-}
-
-# ---- Shelter guidance ----
-# NOTE: There is no publicly available, building-level list of official flood
-# shelters for Sindh cities. PDMA Sindh publishes aggregate damage stats and
-# district-level GIS maps, not named shelter addresses. Rather than guess or
-# invent building names, this app points users to the two channels that
-# actually have real-time, verified shelter info during an active flood.
-SHELTER_FALLBACK_MESSAGE = (
-    "Specific shelter locations are not publicly listed by PDMA Sindh at a "
-    "building level. In an emergency, call 1122 (Rescue Service) or check "
-    "PDMA Sindh (pdma.gos.pk) / your district administration for the "
-    "nearest active shelter."
-)
-
 # ---- Regional terrain-based rainfall risk profiles ----
 # Thresholds based on PMD/NDMA-style regional rainfall classification.
 # NOTE: city-to-profile placement below is a reasonable approximation, not an
 # authoritative PMD/NDMA zone map. Before submitting for scholarship review,
-# spot-check a handful of placements you know well (e.g. does PMD classify
-# Sargodha as plains or semi-arid in their own docs) - I'm not a verified
+# spot-check a handful of placements you know well - I'm not a verified
 # source for exact zone boundaries.
 #
 # Scope: Sindh-focused. Cities/towns below are Sindh's major population
 # centers plus well-known towns. A handful of major non-Sindh cities are
 # included only for map context (Lahore, Islamabad, Peshawar, Quetta), not
 # as a claim of full national coverage.
+#
+# Internal profile labels below (e.g. "Mega-Urban & Coastal") are used as
+# lookup keys into translations.py's terrain_warnings / terrain_profile_labels
+# dicts - do not rename these without updating translations.py to match.
 
 REGIONAL_PROFILES = {
     "mega_urban_coastal": {
@@ -64,7 +34,6 @@ REGIONAL_PROFILES = {
         ],
         "low_max": 20, "medium_max": 45,
         "color": "#28a745",
-        "warning": "Urban drainage systems can back up quickly - avoid clogged storm drains and underpasses."
     },
     "mountainous_rugged": {
         "label": "Mountainous & Rugged Terrain",
@@ -73,7 +42,6 @@ REGIONAL_PROFILES = {
         ],
         "low_max": 15, "medium_max": 40,
         "color": "#ffc107",
-        "warning": "Steep terrain increases landslide and flash flood risk - avoid hillside roads and dry riverbeds (nullahs) during and after rainfall."
     },
     "central_plains": {
         "label": "Central Agricultural Plains",
@@ -85,7 +53,6 @@ REGIONAL_PROFILES = {
         ],
         "low_max": 25, "medium_max": 55,
         "color": "#28a745",
-        "warning": "Low-lying farmland can pool water for days - keep livestock and stored grain away from field edges."
     },
     "arid_plains_desert": {
         "label": "Arid Plains & Deserts",
@@ -95,7 +62,6 @@ REGIONAL_PROFILES = {
         ],
         "low_max": 35, "medium_max": 65,
         "color": "#dc3545",
-        "warning": "Dry, hard-packed ground sheds water fast - watch for sudden dry riverbed (nullah) overflows even hours after rain stops."
     },
 }
 
@@ -125,26 +91,37 @@ def get_profile(city):
     return REGIONAL_PROFILES[profile_key]
 
 
-def check_risk(rainfall_mm, city):
+def get_lang():
+    """Read ?lang= from the query string, fall back to English if missing/invalid."""
+    lang = request.args.get("lang", DEFAULT_LANGUAGE)
+    if lang not in SUPPORTED_LANGUAGES:
+        lang = DEFAULT_LANGUAGE
+    return lang
+
+
+def check_risk(rainfall_mm, city, t):
+    """t = translation dict for the active language (from translations.py)."""
     profile = get_profile(city)
+    profile_label = profile["label"]  # internal English key, used for lookups
 
     if rainfall_mm <= profile["low_max"]:
-        risk_level = "Low Risk"
+        risk_key = "Low Risk"
     elif rainfall_mm <= profile["medium_max"]:
-        risk_level = "Medium Risk"
+        risk_key = "Medium Risk"
     else:
-        risk_level = "High Risk"
+        risk_key = "High Risk"
 
     color_map = {"Low Risk": "#28a745", "Medium Risk": "#ffc107", "High Risk": "#dc3545"}
 
     return {
-        "risk_level": risk_level,
+        "risk_level_key": risk_key,  # used for CSS class (risk-low/medium/high)
+        "risk_level": t["risk_levels"][risk_key],
         "rainfall": rainfall_mm,
-        "safety_tips": safety_tips[risk_level],
-        "shelter_message": SHELTER_FALLBACK_MESSAGE,
-        "terrain_profile": profile["label"],
-        "terrain_warning": profile["warning"],
-        "risk_color": color_map[risk_level],
+        "safety_tips": t["safety_tips"][risk_key],
+        "shelter_message": t["shelter_message"],
+        "terrain_profile": t["terrain_profile_labels"][profile_label],
+        "terrain_warning": t["terrain_warnings"][profile_label],
+        "risk_color": color_map[risk_key],
     }
 
 
@@ -161,22 +138,16 @@ def sanitize_rainfall(raw_value):
 
 @app.route("/")
 def home():
-    return render_template("index.html")
-
-
-@app.route("/check/<city>/<int:rainfall>")
-def check(city, rainfall):
-    result = check_risk(rainfall, city)
-    return render_template(
-        "check.html", city=city, rainfall=rainfall,
-        safety_tips=result["safety_tips"], shelter_message=result["shelter_message"],
-        risk_level=result["risk_level"], terrain_profile=result["terrain_profile"],
-        terrain_warning=result["terrain_warning"], risk_color=result["risk_color"]
-    )
+    lang = get_lang()
+    t = get_translation(lang)
+    return render_template("index.html", t=t, lang=lang)
 
 
 @app.route("/result")
 def result():
+    lang = get_lang()
+    t = get_translation(lang)
+
     city = request.args.get("city")
     rainfall_raw = request.args.get("rainfall")
 
@@ -196,18 +167,20 @@ def result():
         city_valid = False
 
     if not rainfall_valid and not city_valid:
-        return render_template("check.html", error="Please enter a valid city and rainfall.")
+        return render_template("check.html", error=t["error_both"], t=t, lang=lang)
     elif not rainfall_valid:
-        return render_template("check.html", error="Please enter a valid rainfall (a positive number).")
+        return render_template("check.html", error=t["error_rainfall"], t=t, lang=lang)
     elif not city_valid:
-        return render_template("check.html", error="Please enter a valid city.")
+        return render_template("check.html", error=t["error_city"], t=t, lang=lang)
     else:
-        result = check_risk(rainfall, city)
+        result = check_risk(rainfall, city, t)
         return render_template(
-            "check.html", city=city, rainfall=rainfall,
+            "check.html", t=t, lang=lang,
+            city=city, rainfall=rainfall,
             safety_tips=result["safety_tips"], shelter_message=result["shelter_message"],
-            risk_level=result["risk_level"], terrain_profile=result["terrain_profile"],
-            terrain_warning=result["terrain_warning"], risk_color=result["risk_color"],
+            risk_level=result["risk_level"], risk_level_key=result["risk_level_key"],
+            terrain_profile=result["terrain_profile"], terrain_warning=result["terrain_warning"],
+            risk_color=result["risk_color"],
             temp=data["main"]["temp"], description=data["weather"][0]["description"]
         )
 
