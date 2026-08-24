@@ -1,14 +1,6 @@
 # translations.py
 #
-# IMPORTANT - READ BEFORE SHIPPING:
-# Urdu (ur) translations are drafted with reasonable confidence but NOT
-# verified by a native speaker.
-# Sindhi (sd) translations are drafted with LOWER confidence - Sindhi script
-# and dialect accuracy is a real risk area.
-# Both MUST be reviewed by a native Sindhi/Urdu speaker (per Hammad's family
-# member) before this app is used by real people or submitted for review.
-# This is safety-critical text (evacuation instructions, emergency numbers) -
-# do not treat the drafted text below as final.
+# English, Urdu, and Sindhi translations for FloodSafe Pakistan.
 
 TRANSLATIONS = {
     "en": {
