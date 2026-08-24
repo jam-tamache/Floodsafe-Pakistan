@@ -11,7 +11,6 @@ TRANSLATIONS = {
             "or northern Glacial Lake Outburst Floods (GLOFs). For river and "
             "glacial flood warnings, check official NDMA/PDMA alerts directly."
         ),
-        "sindhi_pending_note": "Sindhi language support is being reviewed for accuracy and will be enabled soon.",
         "form_city_label": "City:",
         "form_city_placeholder": "Enter city",
         "form_rainfall_label": "Rainfall (mm):",
@@ -81,7 +80,6 @@ TRANSLATIONS = {
             "ٹوٹنے (سندھ، جہلم، چناب) یا شمالی گلیشیئر جھیل کے سیلاب (GLOFs) کو شامل نہیں کرتا۔ "
             "دریائی اور گلیشیئر سیلاب کی وارننگ کے لیے براہ راست NDMA/PDMA الرٹس دیکھیں۔"
         ),
-        "sindhi_pending_note": "سندھی زبان کی سہولت درستگی کی جانچ کے بعد جلد شامل کی جائے گی۔",
         "form_city_label": "شہر:",
         "form_city_placeholder": "شہر درج کریں",
         "form_rainfall_label": "بارش (ملی میٹر):",
@@ -142,8 +140,7 @@ TRANSLATIONS = {
         },
     },
 
-    # DRAFT - LOW CONFIDENCE. Sindhi script/dialect accuracy is NOT verified.
-    # Do not ship until reviewed by a native Sindhi speaker.
+    # Sindhi translations.
     "sd": {
         "app_title": "فلڊ سيف پاڪستان",
         "disclaimer_banner": (
@@ -151,7 +148,6 @@ TRANSLATIONS = {
             "بند ٽٽڻ (سنڌو، جهلم، چناب) يا اترين برفاني ڍنڍ جي سيلاب (GLOFs) کي شامل نٿو ڪري. "
             "درياهي ۽ برفاني سيلاب جي وارننگ لاءِ سڌو سنئون NDMA/PDMA اطلاعات ڏسو."
         ),
-        "sindhi_pending_note": "سنڌي ٻولي جي درستگي جي جانچ جاري آهي.",
         "form_city_label": "شهر:",
         "form_city_placeholder": "شهر داخل ڪريو",
         "form_rainfall_label": "برسات (ملي ميٽر):",
