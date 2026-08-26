@@ -19,14 +19,17 @@ TRANSLATIONS = {
         "city_label": "City:",
         "rainfall_label": "Rainfall:",
         "terrain_profile_label": "Terrain Profile:",
-        "weather_label": "Current Weather:",
         "risk_level_label": "Risk Level:",
         "shelter_heading": "Shelter Information:",
         "safety_tips_heading": "Safety Tips:",
         "back_link": "Back",
         "error_both": "Please enter a valid city and rainfall.",
         "error_rainfall": "Please enter a valid rainfall (a positive number).",
-        "error_city": "Please enter a valid city.",
+        "error_city": "We couldn't find this location in our supported database.",
+        "error_city_outside_coverage": (
+            "This location is recognized, but our current risk model has only "
+            "been validated for selected locations in Sindh."
+        ),
         "risk_levels": {
             "Low Risk": "Low Risk",
             "Medium Risk": "Medium Risk",
@@ -60,19 +63,23 @@ TRANSLATIONS = {
         },
         "terrain_warnings": {
             "Mega-Urban & Coastal": "Urban drainage systems can back up quickly - avoid clogged storm drains and underpasses.",
-            "Mountainous & Rugged Terrain": "Steep terrain increases landslide and flash flood risk - avoid hillside roads and dry riverbeds (nullahs) during and after rainfall.",
             "Central Agricultural Plains": "Low-lying farmland can pool water for days - keep livestock and stored grain away from field edges.",
             "Arid Plains & Deserts": "Dry, hard-packed ground sheds water fast - watch for sudden dry riverbed (nullah) overflows even hours after rain stops.",
         },
         "terrain_profile_labels": {
             "Mega-Urban & Coastal": "Mega-Urban & Coastal",
-            "Mountainous & Rugged Terrain": "Mountainous & Rugged Terrain",
             "Central Agricultural Plains": "Central Agricultural Plains",
             "Arid Plains & Deserts": "Arid Plains & Deserts",
         },
+        "elevation_note_available": "Elevation for {city} ({elevation}m) was factored into this score relative to other {profile} locations.",
+        "elevation_note_unavailable": "Elevation data for {city} was not available - this score is based on rainfall alone.",
     },
 
     # DRAFT - NOT VERIFIED. Needs native Urdu speaker review before use.
+    # error_city_outside_coverage and elevation_note_* are NEW as of this
+    # session - not yet reviewed even at draft quality, translated directly
+    # by Claude without a native-speaker pass. Flag these two keys
+    # specifically when you do the Urdu review.
     "ur": {
         "app_title": "فلڈ سیف پاکستان",
         "disclaimer_banner": (
@@ -88,14 +95,17 @@ TRANSLATIONS = {
         "city_label": "شہر:",
         "rainfall_label": "بارش:",
         "terrain_profile_label": "زمینی خصوصیات:",
-        "weather_label": "موجودہ موسم:",
         "risk_level_label": "خطرے کی سطح:",
         "shelter_heading": "پناہ گاہ کی معلومات:",
         "safety_tips_heading": "حفاظتی ہدایات:",
         "back_link": "واپس",
         "error_both": "براہ کرم درست شہر اور بارش درج کریں۔",
         "error_rainfall": "براہ کرم درست بارش درج کریں (ایک مثبت نمبر)۔",
-        "error_city": "براہ کرم درست شہر درج کریں۔",
+        "error_city": "یہ مقام ہمارے ڈیٹا بیس میں نہیں ملا۔",
+        "error_city_outside_coverage": (
+            "یہ مقام تسلیم شدہ ہے، لیکن ہمارا موجودہ رسک ماڈل فی الحال صرف "
+            "سندھ کے منتخب مقامات کے لیے تصدیق شدہ ہے۔"
+        ),
         "risk_levels": {
             "Low Risk": "کم خطرہ",
             "Medium Risk": "درمیانہ خطرہ",
@@ -128,19 +138,23 @@ TRANSLATIONS = {
         },
         "terrain_warnings": {
             "Mega-Urban & Coastal": "شہری نکاسی آب کا نظام جلد بھر سکتا ہے - بند نالوں اور انڈرپاسز سے بچیں۔",
-            "Mountainous & Rugged Terrain": "کھڑی ڈھلوانیں لینڈ سلائیڈ اور اچانک سیلاب کا خطرہ بڑھاتی ہیں - بارش کے دوران اور بعد میں پہاڑی راستوں اور خشک نالوں سے بچیں۔",
             "Central Agricultural Plains": "نشیبی زرعی زمین میں پانی کئی دنوں تک جمع رہ سکتا ہے - مویشیوں اور ذخیرہ شدہ اناج کو کھیتوں کے کناروں سے دور رکھیں۔",
             "Arid Plains & Deserts": "خشک، سخت زمین پانی کو تیزی سے بہا دیتی ہے - بارش رکنے کے کئی گھنٹوں بعد بھی اچانک خشک نالوں کے بہاؤ کا خیال رکھیں۔",
         },
         "terrain_profile_labels": {
             "Mega-Urban & Coastal": "بڑے شہری اور ساحلی علاقے",
-            "Mountainous & Rugged Terrain": "پہاڑی اور ناہموار علاقے",
             "Central Agricultural Plains": "وسطی زرعی میدانی علاقے",
             "Arid Plains & Deserts": "خشک میدانی اور صحرائی علاقے",
         },
+        "elevation_note_available": "{city} کی بلندی ({elevation} میٹر) کو دیگر {profile} مقامات کے مقابلے میں اس اسکور میں شامل کیا گیا۔",
+        "elevation_note_unavailable": "{city} کے لیے بلندی کا ڈیٹا دستیاب نہیں تھا - یہ اسکور صرف بارش پر مبنی ہے۔",
     },
 
-    # Sindhi translations.
+    # Sindhi translations. NOTE: previously marked fully reviewed by a
+    # native speaker (Aug 25 session) - but error_city_outside_coverage and
+    # elevation_note_* below are NEW as of this session and have NOT been
+    # through that review. Only these new keys need a native-speaker pass;
+    # everything else here is still the verified set.
     "sd": {
         "app_title": "فلڊ سيف پاڪستان",
         "disclaimer_banner": (
@@ -156,14 +170,17 @@ TRANSLATIONS = {
         "city_label": "شهر:",
         "rainfall_label": "برسات:",
         "terrain_profile_label": "زميني خاصيتون:",
-        "weather_label": "موجوده موسم:",
         "risk_level_label": "خطري جو درجو:",
         "shelter_heading": "پناهگاهه جي معلومات:",
         "safety_tips_heading": "حفاظتي هدايتون:",
         "back_link": "واپس",
         "error_both": "مهرباني ڪري صحيح شهر ۽ برسات داخل ڪريو.",
         "error_rainfall": "مهرباني ڪري صحيح برسات داخل ڪريو (هڪ مثبت انگ).",
-        "error_city": "مهرباني ڪري صحيح شهر داخل ڪريو.",
+        "error_city": "هي هنڌ اسان جي ڊيٽابيس ۾ نه ملي سگهيو.",
+        "error_city_outside_coverage": (
+            "هي هنڌ سڃاتل آهي، پر اسان جو موجوده رسڪ ماڊل فقط سنڌ جي "
+            "چونڊيل هنڌن لاءِ تصديق ٿيل آهي."
+        ),
         "risk_levels": {
             "Low Risk": "گھٽ خطرو",
             "Medium Risk": "وچولو خطرو",
@@ -196,16 +213,16 @@ TRANSLATIONS = {
         },
         "terrain_warnings": {
             "Mega-Urban & Coastal": "شهري نيڪال جو نظام جلدي ڀرجي سگهي ٿو - بند نالن ۽ انڊرپاسز کان بچو.",
-            "Mountainous & Rugged Terrain": "بيهي ڍلاڻون لينڊ سلائيڊ ۽ اوچتو سيلاب جو خطرو وڌائينديون آهن - برسات دوران ۽ پوءِ جبلن جي رستن ۽ سڪل نالن کان بچو.",
             "Central Agricultural Plains": "هيٺاهين زرعي زمين ۾ پاڻي ڪيترن ڏينهن تائين بيهي سگهي ٿو - ڍورن ۽ ذخيرو ٿيل اناج کي فيلڊ جي ڪنارن کان پري رکو.",
             "Arid Plains & Deserts": "سڪل، سخت زمين پاڻي کي تيزيءَ سان وهائي ٿي - برسات بند ٿيڻ کان ڪلاڪن پوءِ به اوچتو سڪل نالن جي وهڪري جو خيال رکو.",
         },
         "terrain_profile_labels": {
             "Mega-Urban & Coastal": "وڏا شهري ۽ ساحلي علائقا",
-            "Mountainous & Rugged Terrain": "جبلي ۽ اڻ برابر علائقا",
             "Central Agricultural Plains": "مرڪزي زرعي ميدان",
             "Arid Plains & Deserts": "سڪل ميدان ۽ ريگستان",
         },
+        "elevation_note_available": "{city} جي بلندي ({elevation} ميٽر) کي ٻين {profile} هنڌن جي مقابلي ۾ هن اسڪور ۾ شامل ڪيو ويو.",
+        "elevation_note_unavailable": "{city} لاءِ بلندي جو ڊيٽا موجود نه هو - هي اسڪور فقط برسات تي ٻڌل آهي.",
     },
 }
 
