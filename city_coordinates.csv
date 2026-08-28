@@ -1,0 +1,39 @@
+city,profile_key,lat,lon,status
+karachi,mega_urban_coastal,24.8546842,67.0207055,OK
+hyderabad,mega_urban_coastal,25.4075358,68.3613456,OK
+badin,mega_urban_coastal,24.6623289,68.8384724,OK
+thatta,mega_urban_coastal,24.7469,67.9240283,OK
+sukkur,central_plains,27.7007522,68.8663081,OK
+larkana,central_plains,27.5564798,68.2101509,OK
+nawabshah,central_plains,26.2452915,68.4040229,OK
+khairpur,central_plains,27.5204873,68.7383149,OK
+dadu,central_plains,26.7274836,67.7804974,OK
+ghotki,central_plains,27.9940699,69.3134173,OK
+moro,central_plains,26.6636199,68.0024421,OK
+sakrand,central_plains,26.136913,68.2752,OK
+kotri,central_plains,25.366818,68.2982586,OK
+mirpurkhas,central_plains,25.5263882,69.0112387,OK
+shikarpur,central_plains,27.9579085,68.6467484,OK
+jamshoro,central_plains,25.4297172,68.2817288,OK
+naushahro feroze,central_plains,26.8400538,68.1188286,OK
+tando allahyar,central_plains,25.4619907,68.7198264,OK
+tando muhammad khan,central_plains,25.122623,68.5299107,OK
+kashmore,central_plains,28.4322915,69.5814755,OK
+ranipur,central_plains,27.287029,68.50438,OK
+rohri,central_plains,27.6776538,68.9124229,OK
+shahdadkot,central_plains,27.8468014,67.908116,OK
+matiari,central_plains,25.5971858,68.4454874,OK
+jacobabad,arid_plains_desert,28.2813094,68.4364361,OK
+mithi,arid_plains_desert,24.736412,69.7973419,OK
+umerkot,arid_plains_desert,25.3655302,69.7401257,OK
+sanghar,arid_plains_desert,26.0470447,68.9492402,OK
+lahore,map_only_cities,31.5656822,74.3141829,OK
+islamabad,map_only_cities,33.6938118,73.0651511,OK
+peshawar,map_only_cities,34.0123846,71.5787458,OK
+quetta,map_only_cities,30.1916268,67.0007561,OK
+gwadar,map_only_cities,25.1479816,62.3254553,OK
+pasni,map_only_cities,25.264384,63.4723455,OK
+turbat,map_only_cities,26.0027894,63.0505609,OK
+sibi,map_only_cities,29.5500097,67.8833398,OK
+chaman,map_only_cities,30.9249448,66.4405297,OK
+cholistan,map_only_cities,28.6912946,71.686642,OK

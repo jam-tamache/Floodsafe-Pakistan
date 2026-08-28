@@ -1,0 +1,39 @@
+city,profile_key,lat,lon,status,elevation_m,elevation_source
+karachi,mega_urban_coastal,24.8546842,67.0207055,OK,9.0,open-elevation
+hyderabad,mega_urban_coastal,25.4075358,68.3613456,OK,26.0,open-elevation
+badin,mega_urban_coastal,24.6623289,68.8384724,OK,12.0,open-elevation
+thatta,mega_urban_coastal,24.7469,67.9240283,OK,16.0,open-elevation
+sukkur,central_plains,27.7007522,68.8663081,OK,64.0,open-elevation
+larkana,central_plains,27.5564798,68.2101509,OK,55.0,open-elevation
+nawabshah,central_plains,26.2452915,68.4040229,OK,31.0,open-elevation
+khairpur,central_plains,27.5204873,68.7383149,OK,61.0,open-elevation
+dadu,central_plains,26.7274836,67.7804974,OK,45.0,open-elevation
+ghotki,central_plains,27.9940699,69.3134173,OK,71.0,open-elevation
+moro,central_plains,26.6636199,68.0024421,OK,46.0,open-elevation
+sakrand,central_plains,26.136913,68.2752,OK,37.0,open-elevation
+kotri,central_plains,25.366818,68.2982586,OK,23.0,open-elevation
+mirpurkhas,central_plains,25.5263882,69.0112387,OK,17.0,open-elevation
+shikarpur,central_plains,27.9579085,68.6467484,OK,68.0,open-elevation
+jamshoro,central_plains,25.4297172,68.2817288,OK,23.0,open-elevation
+naushahro feroze,central_plains,26.8400538,68.1188286,OK,48.0,open-elevation
+tando allahyar,central_plains,25.4619907,68.7198264,OK,26.0,open-elevation
+tando muhammad khan,central_plains,25.122623,68.5299107,OK,18.0,open-elevation
+kashmore,central_plains,28.4322915,69.5814755,OK,83.0,open-elevation
+ranipur,central_plains,27.287029,68.50438,OK,56.0,open-elevation
+rohri,central_plains,27.6776538,68.9124229,OK,64.0,open-elevation
+shahdadkot,central_plains,27.8468014,67.908116,OK,52.0,open-elevation
+matiari,central_plains,25.5971858,68.4454874,OK,31.0,open-elevation
+jacobabad,arid_plains_desert,28.2813094,68.4364361,OK,63.0,open-elevation
+mithi,arid_plains_desert,24.736412,69.7973419,OK,39.0,open-elevation
+umerkot,arid_plains_desert,25.3655302,69.7401257,OK,17.0,open-elevation
+sanghar,arid_plains_desert,26.0470447,68.9492402,OK,26.0,open-elevation
+lahore,map_only_cities,31.5656822,74.3141829,OK,215.0,open-elevation
+islamabad,map_only_cities,33.6938118,73.0651511,OK,540.0,open-elevation
+peshawar,map_only_cities,34.0123846,71.5787458,OK,340.0,open-elevation
+quetta,map_only_cities,30.1916268,67.0007561,OK,1676.0,open-elevation
+gwadar,map_only_cities,25.1479816,62.3254553,OK,10.0,open-elevation
+pasni,map_only_cities,25.264384,63.4723455,OK,7.0,open-elevation
+turbat,map_only_cities,26.0027894,63.0505609,OK,144.0,open-elevation
+sibi,map_only_cities,29.5500097,67.8833398,OK,141.0,open-elevation
+chaman,map_only_cities,30.9249448,66.4405297,OK,1308.0,open-elevation
+cholistan,map_only_cities,28.6912946,71.686642,OK,108.0,open-elevation
