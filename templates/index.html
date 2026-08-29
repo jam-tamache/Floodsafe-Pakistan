@@ -12,25 +12,40 @@
 <div class="container">
 
     <div class="lang-switch">
-        <a href="{{ url_for('home', lang='en') }}" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
-        <a href="{{ url_for('home', lang='ur') }}" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
-        <a href="{{ url_for('home', lang='sd') }}" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
+        <a href="?lang=en" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
+        <a href="?lang=ur" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
+        <a href="?lang=sd" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
     </div>
 
     <h1>{{ t.app_title }}</h1>
 
+    <div class="disclaimer-banner">
+        ⚠ {{ t.disclaimer_banner }}
+    </div>
+
     <br>
-    <br>
-    <form action="/result" method="GET">
+    <form action="{{ url_for('forecast') }}" method="GET">
         <input type="hidden" name="lang" value="{{ lang }}">
         <label for="city">{{ t.form_city_label }}</label>
         <input type="text" id="city" name="city" placeholder="{{ t.form_city_placeholder }}">
-        <label for="rainfall">{{ t.form_rainfall_label }}</label>
-        <input type="text" id="rainfall" name="rainfall" placeholder="{{ t.form_rainfall_placeholder }}">
-        <button type="submit">{{ t.form_submit }}</button>
+        <button type="submit">{{ t.forecast_form_submit }}</button>
     </form>
+
+    <br>
+    <details class="scenario-toggle">
+        <summary>{{ t.scenario_toggle_label }}</summary>
+        <p>{{ t.scenario_form_intro }}</p>
+        <form action="{{ url_for('result') }}" method="GET">
+            <input type="hidden" name="lang" value="{{ lang }}">
+            <label for="scenario-city">{{ t.form_city_label }}</label>
+            <input type="text" id="scenario-city" name="city" placeholder="{{ t.form_city_placeholder }}">
+            <label for="rainfall">{{ t.form_rainfall_label }}</label>
+            <input type="text" id="rainfall" name="rainfall" placeholder="{{ t.form_rainfall_placeholder }}">
+            <button type="submit">{{ t.form_submit }}</button>
+        </form>
+    </details>
+
 </div>
 </body>
-
 
 </html>
