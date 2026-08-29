@@ -16,6 +16,9 @@ TRANSLATIONS = {
         "form_rainfall_label": "Rainfall (mm):",
         "form_rainfall_placeholder": "Enter rainfall",
         "form_submit": "Check Risk",
+        "forecast_form_submit": "Check Forecast Risk",
+        "scenario_toggle_label": "Explore a scenario instead",
+        "scenario_form_intro": "Enter a hypothetical rainfall amount to see how risk would change.",
         "city_label": "City:",
         "rainfall_label": "Rainfall:",
         "terrain_profile_label": "Terrain Profile:",
@@ -30,6 +33,15 @@ TRANSLATIONS = {
             "This location is recognized, but our current risk model has only "
             "been validated for selected locations in Sindh."
         ),
+        "forecast_error_unavailable": "We couldn't fetch a rainfall forecast right now. Try exploring a scenario instead.",
+        "source_forecast": "Based on forecasted rainfall for the next {hours}h: {mm}mm expected.",
+        "source_scenario": "Based on your hypothetical scenario of {mm}mm rainfall — not a real forecast.",
+        "score_breakdown": "Score: {score}/100 (rainfall {rain}/70, elevation {elev}/30)",
+        "how_calculated_toggle": "How is this calculated?",
+        "explanation_with_elevation": "With {rainfall}mm of rain and {city} sitting on {elevation_position} compared to nearby areas, this adds up to {risk_level}.",
+        "explanation_without_elevation": "With {rainfall}mm of rain expected for {city}, this adds up to {risk_level}.",
+        "elevation_position_low": "lower ground",
+        "elevation_position_high": "higher ground",
         "risk_levels": {
             "Low Risk": "Low Risk",
             "Medium Risk": "Medium Risk",
@@ -76,10 +88,14 @@ TRANSLATIONS = {
     },
 
     # DRAFT - NOT VERIFIED. Needs native Urdu speaker review before use.
-    # error_city_outside_coverage and elevation_note_* are NEW as of this
-    # session - not yet reviewed even at draft quality, translated directly
-    # by Claude without a native-speaker pass. Flag these two keys
-    # specifically when you do the Urdu review.
+    # error_city_outside_coverage and elevation_note_* were added in an
+    # earlier session and still need review. forecast_form_submit,
+    # scenario_toggle_label, scenario_form_intro, forecast_error_unavailable,
+    # source_forecast, source_scenario, score_breakdown, how_calculated_toggle,
+    # explanation_with_elevation, explanation_without_elevation, and
+    # elevation_position_low/high are all NEW - also not yet reviewed,
+    # translated directly by Claude without a native-speaker pass. Flag ALL
+    # of these when you do the Urdu review.
     "ur": {
         "app_title": "فلڈ سیف پاکستان",
         "disclaimer_banner": (
@@ -92,6 +108,9 @@ TRANSLATIONS = {
         "form_rainfall_label": "بارش (ملی میٹر):",
         "form_rainfall_placeholder": "بارش درج کریں",
         "form_submit": "خطرہ چیک کریں",
+        "forecast_form_submit": "پیشگوئی خطرہ چیک کریں",
+        "scenario_toggle_label": "بجائے اس کے ایک منظرنامہ آزمائیں",
+        "scenario_form_intro": "خطرے میں تبدیلی دیکھنے کے لیے ایک فرضی بارش کی مقدار درج کریں۔",
         "city_label": "شہر:",
         "rainfall_label": "بارش:",
         "terrain_profile_label": "زمینی خصوصیات:",
@@ -106,6 +125,15 @@ TRANSLATIONS = {
             "یہ مقام تسلیم شدہ ہے، لیکن ہمارا موجودہ رسک ماڈل فی الحال صرف "
             "سندھ کے منتخب مقامات کے لیے تصدیق شدہ ہے۔"
         ),
+        "forecast_error_unavailable": "ہم اس وقت بارش کی پیشگوئی حاصل نہیں کر سکے۔ براہ کرم اس کے بجائے ایک منظرنامہ آزمائیں۔",
+        "source_forecast": "اگلے {hours} گھنٹوں کی پیشگوئی شدہ بارش پر مبنی: متوقع {mm} ملی میٹر۔",
+        "source_scenario": "آپ کے فرضی منظرنامے پر مبنی جس میں {mm} ملی میٹر بارش شامل ہے - یہ حقیقی پیشگوئی نہیں ہے۔",
+        "score_breakdown": "اسکور: {score}/100 (بارش {rain}/70، بلندی {elev}/30)",
+        "how_calculated_toggle": "یہ کیسے شمار کیا جاتا ہے؟",
+        "explanation_with_elevation": "{rainfall} ملی میٹر بارش اور {city} کا آس پاس کے علاقوں کے مقابلے میں {elevation_position} پر ہونا، یہ مل کر {risk_level} بنتا ہے۔",
+        "explanation_without_elevation": "{city} کے لیے متوقع {rainfall} ملی میٹر بارش کے ساتھ، یہ {risk_level} بنتا ہے۔",
+        "elevation_position_low": "نچلی زمین",
+        "elevation_position_high": "اونچی زمین",
         "risk_levels": {
             "Low Risk": "کم خطرہ",
             "Medium Risk": "درمیانہ خطرہ",
@@ -151,10 +179,14 @@ TRANSLATIONS = {
     },
 
     # Sindhi translations. NOTE: previously marked fully reviewed by a
-    # native speaker (Aug 25 session) - but error_city_outside_coverage and
-    # elevation_note_* below are NEW as of this session and have NOT been
-    # through that review. Only these new keys need a native-speaker pass;
-    # everything else here is still the verified set.
+    # native speaker - but error_city_outside_coverage and elevation_note_*
+    # were added in an earlier session and were never reviewed either.
+    # forecast_form_submit, scenario_toggle_label, scenario_form_intro,
+    # forecast_error_unavailable, source_forecast, source_scenario,
+    # score_breakdown, how_calculated_toggle, explanation_with_elevation,
+    # explanation_without_elevation, and elevation_position_low/high are
+    # all NEW - also not yet reviewed. Flag ALL of these (not just the
+    # newest batch) for native-speaker review.
     "sd": {
         "app_title": "فلڊ سيف پاڪستان",
         "disclaimer_banner": (
@@ -167,6 +199,9 @@ TRANSLATIONS = {
         "form_rainfall_label": "برسات (ملي ميٽر):",
         "form_rainfall_placeholder": "برسات داخل ڪريو",
         "form_submit": "خطرو چيڪ ڪريو",
+        "forecast_form_submit": "اڳڪٿي خطرو چيڪ ڪريو",
+        "scenario_toggle_label": "ان جي بدران هڪ منظرنامو آزمايو",
+        "scenario_form_intro": "خطري ۾ تبديلي ڏسڻ لاءِ هڪ فرضي برسات جي مقدار داخل ڪريو.",
         "city_label": "شهر:",
         "rainfall_label": "برسات:",
         "terrain_profile_label": "زميني خاصيتون:",
@@ -181,6 +216,15 @@ TRANSLATIONS = {
             "هي هنڌ سڃاتل آهي، پر اسان جو موجوده رسڪ ماڊل فقط سنڌ جي "
             "چونڊيل هنڌن لاءِ تصديق ٿيل آهي."
         ),
+        "forecast_error_unavailable": "اسان هن وقت برسات جي اڳڪٿي حاصل نه ڪري سگهياسين. مهرباني ڪري ان جي بدران هڪ منظرنامو آزمايو.",
+        "source_forecast": "ايندڙ {hours} ڪلاڪن جي اڳڪٿي ٿيل برسات تي ٻڌل: متوقع {mm} ملي ميٽر.",
+        "source_scenario": "توهان جي فرضي منظرنامي تي ٻڌل جنهن ۾ {mm} ملي ميٽر برسات شامل آهي - هي حقيقي اڳڪٿي ناهي.",
+        "score_breakdown": "اسڪور: {score}/100 (برسات {rain}/70، بلندي {elev}/30)",
+        "how_calculated_toggle": "هي ڪيئن ڳڻيو ويندو آهي؟",
+        "explanation_with_elevation": "{rainfall} ملي ميٽر برسات ۽ {city} جو ڀرپاسي وارن علائقن جي مقابلي ۾ {elevation_position} تي هجڻ، هي گڏجي {risk_level} ٿو ٺاهي.",
+        "explanation_without_elevation": "{city} لاءِ متوقع {rainfall} ملي ميٽر برسات سان، هي {risk_level} ٿو ٺاهي.",
+        "elevation_position_low": "هيٺاهين زمين",
+        "elevation_position_high": "مٿاهين زمين",
         "risk_levels": {
             "Low Risk": "گھٽ خطرو",
             "Medium Risk": "وچولو خطرو",
