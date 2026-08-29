@@ -26,17 +26,28 @@
     <br>
     {% if error %}
     <p>{{ error }}</p>
+    {% if forecast_failed %}
+    <p>{{ t.forecast_error_unavailable }}</p>
+    {% endif %}
     <a href="{{ url_for('home', lang=lang) }}">{{ t.back_link }}</a>
 {% else %}
 <div class="results">
     <p><strong>{{ t.city_label }}</strong> {{ city }}</p>
     <p><strong>{{ t.rainfall_label }}</strong> {{ rainfall }}mm</p>
+    <p class="source-note source-{{ mode }}">{{ source_note }}</p>
     <p>{{ t.terrain_profile_label }} {{ terrain_profile }}</p>
     <div class="risk-badge risk-{{ risk_level_key.split(' ')[0].lower() }}">
         ⚠ {{ t.risk_level_label }} {{ risk_level }}
     </div>
+    <p class="plain-explanation">{{ plain_explanation }}</p>
     <p class="terrain-warning">{{ terrain_warning }}</p>
-    <p><strong>{{ t.weather_label }}</strong> {{ temp }}°C, {{ description }}</p>
+    <details class="how-calculated">
+        <summary>{{ t.how_calculated_toggle }}</summary>
+        <p class="score-breakdown">
+            {{ t.score_breakdown.format(score=score, rain=rainfall_points, elev=elevation_points) }}
+        </p>
+        <p class="elevation-note">{{ elevation_note }}</p>
+    </details>
     <h3>{{ t.shelter_heading }}</h3>
     <p>{{ shelter_message }}</p>
     <h3>{{ t.safety_tips_heading }}</h3>
@@ -45,10 +56,10 @@
     <li>{{ tip }}</li>
     {% endfor %}
     </ul>
+    <a href="{{ url_for('home', lang=lang) }}">{{ t.back_link }}</a>
 </div>
 {% endif %}
 </div>
 </body>
-
 
 </html>
