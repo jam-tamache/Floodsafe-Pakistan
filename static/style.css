@@ -23,6 +23,7 @@ form {
 .results {
     text-align: left;
     max-width: 440px;
+    width: 100%;
     margin: 0 auto;
     background-color: #F4FBFA;
     padding: 28px 32px;
@@ -60,9 +61,22 @@ input {
     font-size: 1rem;
 }
 
+/* Root fix for the "form stuck on the left" issue: .container is a flex
+   item of body (which has align-items:center). Flex items with
+   align-items:center shrink-wrap to their content's natural width instead
+   of filling out to max-width - so max-width:600px was never actually
+   being reached, and everything inside looked off-center because the box
+   itself was narrower than intended. width:100% forces it to actually
+   claim the space up to max-width; display:flex + align-items:center here
+   centers each child (form, disclaimer-banner, results, scenario-toggle)
+   within that properly-sized box. */
 .container {
     max-width: 600px;
+    width: 100%;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 button {
@@ -135,6 +149,135 @@ button:hover {
     font-weight: 600;
 }
 
+/* Score breakdown (rainfall + elevation points) - sits right under the
+   terrain warning. Monospace-ish numeric feel via letter-spacing, small
+   and quiet since it's supplementary detail, not the headline result. */
+.score-breakdown {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0F5459;
+    background-color: #E4F3F1;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-top: 10px;
+    letter-spacing: 0.2px;
+}
+
+/* Elevation note - explains whether elevation actually contributed to the
+   score or the result fell back to rainfall-only. Kept visually quiet
+   (italic, muted) to match .terrain-warning's supplementary tone, but a
+   distinct color so it doesn't read as the same sentence. */
+.elevation-note {
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #4A5B5C;
+    margin-top: 6px;
+    margin-bottom: 4px;
+}
+
+/* Plain-language explanation - the sentence an ordinary person actually
+   reads (e.g. "With 22mm of rain and Karachi sitting on lower ground..."),
+   as opposed to the raw score math which is now tucked behind the
+   "How is this calculated?" toggle below. Given visual weight (bordered,
+   slightly larger) since this is the answer to "why", not a footnote. */
+.plain-explanation {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.6;
+    color: #0F5459;
+    background-color: #E4F3F1;
+    border: 1px solid #B7D9D6;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 14px 0;
+}
+
+/* Raw score breakdown + elevation note - kept for methodology transparency
+   (useful for a scholarship reviewer checking your work) but hidden by
+   default behind a toggle so it doesn't compete with .plain-explanation
+   for an ordinary user's attention. */
+.how-calculated {
+    margin-top: 12px;
+    border-top: 1px solid #D8F4EF;
+    padding-top: 10px;
+}
+
+.how-calculated summary {
+    cursor: pointer;
+    color: #197278;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.how-calculated summary:hover {
+    color: #0F5459;
+}
+
+/* Source note - tells the user whether the rainfall behind their score was
+   forecasted or a hypothetical scenario. Deliberately kept LOW visual
+   weight (no box, no fill - just a thin accent rule + colored text) since
+   this was previously styled almost identically to .plain-explanation
+   right below it: two similar pale-teal boxes sandwiching the risk badge
+   made the page look like a stack of near-duplicate cards, and buried the
+   one thing that should stand out (why the score is what it is) under
+   metadata (where the number came from). This is a caption, not a
+   headline - border-inline-start (not border-left) so it flips sides
+   correctly under RTL (Urdu/Sindhi) automatically. */
+.source-note {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 6px 0;
+    padding-inline-start: 10px;
+    border-inline-start: 3px solid #197278;
+}
+
+.source-forecast {
+    color: #0F5459;
+    border-inline-start-color: #197278;
+}
+
+.source-scenario {
+    color: #856404;
+    border-inline-start-color: #B7950B;
+}
+
+/* Scenario toggle (collapsed secondary form on the home page) - given its
+   own light card treatment so it doesn't read as a stray bullet under the
+   main form, but stays visually quieter than the primary Check Forecast
+   Risk button so it doesn't compete with it. */
+.scenario-toggle {
+    width: 300px;
+    margin-top: 8px;
+    background-color: #F4FBFA;
+    border: 1px solid #B7D9D6;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+.scenario-toggle summary {
+    cursor: pointer;
+    color: #197278;
+    font-weight: 600;
+    font-size: 0.95rem;
+    list-style-position: inside;
+}
+
+.scenario-toggle summary:hover {
+    color: #0F5459;
+}
+
+.scenario-toggle p {
+    font-size: 0.85rem;
+    color: #4A5B5C;
+    margin: 10px 0;
+}
+
+.scenario-toggle form {
+    width: 100%;
+    margin-top: 8px;
+}
+
 @media (max-width: 600px) {
     body {
         padding: 24px 16px;
@@ -154,6 +297,10 @@ button:hover {
 
     .results {
         max-width: 100%;
+    }
+
+    .scenario-toggle {
+        width: 100%;
     }
 
     .risk-badge {
@@ -231,6 +378,7 @@ html[dir="rtl"] .lang-switch {
     font-size: 0.9rem;
     margin-bottom: 16px;
     text-align: left;
+    width: 100%;
 }
 
 .terrain-warning {
