@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloodSafe Pakistan — Map</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Leaflet CSS/JS via CDN — no npm needed for this -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+    ></script>
+
+    <style>
+        /* Leaflet maps render as a blank grey box without an explicit
+           height on the container — this is the single most common
+           "why is my map not showing" bug, so it's set here explicitly
+           rather than relying on style.css to happen to cover it. */
+        #map {
+            height: 500px;
+            width: 100%;
+            max-width: 900px;
+            margin: 2rem auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FloodSafe Pakistan — Map</h1>
+        <p>Step 1: bare map skeleton. No markers yet — this only proves the map itself renders correctly.</p>
+        <div id="map"></div>
+    </div>
+
+    <script>
+        // Centered roughly on Sindh, zoom 7 captures Sukkur down to Karachi.
+        // These numbers are a starting point, not final — adjust once
+        // markers are added and you can see how well the bounds fit.
+        const map = L.map('map').setView([26.5, 68.5], 7);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        const cities = {{ cities | tojson }};
+
+        cities.forEach(function (c) {
+            L.marker([c.lat, c.lon])
+                .addTo(map)
+                .bindTooltip(c.city, { permanent: false });
+        });
+    </script>
+</body>
+</html>
