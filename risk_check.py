@@ -2,6 +2,32 @@ import os
 import time
 from flask import Flask, jsonify, render_template, request
 import requests
+import csv
+
+def load_city_coordinates():
+    """Loads city_coordinates.csv into a list of dicts for the Leaflet map.
+    Kept separate from elevation_data.py's loading since this is purely
+    display data (name/lat/lon/profile), not used in any risk calculation.
+    """
+    cities = []
+    try:
+        with open("city_coordinates.csv", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row.get("status") != "OK":
+                    continue  # skip any row not marked OK, don't guess
+                cities.append({
+                    "city": row["city"],
+                    "profile_key": row["profile_key"],
+                    "lat": float(row["lat"]),
+                    "lon": float(row["lon"]),
+                })
+    except FileNotFoundError:
+        pass  # map route below handles an empty list gracefully
+    return cities
+
+
+CITY_COORDINATES = load_city_coordinates()
 from dotenv import load_dotenv
 from translations import get_translation, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 import elevation_data
@@ -38,7 +64,7 @@ REGIONAL_PROFILES = {
         "cities": [
             "karachi", "hyderabad", "badin", "thatta"
         ],
-        "low_max": 20, "medium_max": 45,
+        "low_max": 40, "medium_max": 100,
         "color": "#28a745",
     },
     "central_plains": {
@@ -49,7 +75,7 @@ REGIONAL_PROFILES = {
             "naushahro feroze", "tando allahyar", "tando muhammad khan",
             "kashmore", "ranipur", "rohri", "shahdadkot", "matiari"
         ],
-        "low_max": 25, "medium_max": 55,
+        "low_max": 50, "medium_max": 120,
         "color": "#28a745",
     },
     "arid_plains_desert": {
@@ -57,7 +83,7 @@ REGIONAL_PROFILES = {
         "cities": [
             "jacobabad", "mithi", "umerkot", "sanghar"
         ],
-        "low_max": 35, "medium_max": 65,
+        "low_max": 70, "medium_max": 140,
         "color": "#dc3545",
     },
 }
@@ -438,6 +464,13 @@ def home():
     lang = get_lang()
     t = get_translation(lang)
     return render_template("index.html", t=t, lang=lang)
+
+
+@app.route("/map")
+def map_view():
+    lang = get_lang()
+    t = get_translation(lang)
+    return render_template("map.html", t=t, lang=lang, cities=CITY_COORDINATES)
 
 
 @app.route("/result")
