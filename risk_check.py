@@ -28,6 +28,13 @@ def load_city_coordinates():
 
 
 CITY_COORDINATES = load_city_coordinates()
+
+# Flat city -> (lat, lon) lookup, built once at startup, so the result page
+# can place a single marker for the checked city without re-reading the CSV
+# or re-deriving anything. Keys are normalized (lowercase) to match
+# normalize_city()'s output, since city names arrive from user input /
+# query strings in inconsistent casing.
+_CITY_COORDS_LOOKUP = {c["city"]: (c["lat"], c["lon"]) for c in CITY_COORDINATES}
 from dotenv import load_dotenv
 from translations import get_translation, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 import elevation_data
@@ -240,13 +247,99 @@ def rainfall_component(rainfall_mm, profile):
         return round(60 + 10 * fraction, 1)
 
 
-def score_to_risk_key(score):
-    if score <= 35:
+# ---- Risk tiers: 4-tier, 0-1 normalized scale ----
+#
+# CHANGED this session: was 3-tier (Low/Medium/High) on the raw 0-100
+# score. Now 4-tier (Low/Moderate/High/Very High) on a 0-1 normalized
+# score, to match the mockup's gauge design Hammad approved.
+#
+# IMPORTANT: this does NOT change the underlying rainfall/elevation point
+# math above (still 0-70 / 0-30) - only the labeling and the scale shown
+# to the user changed. The METHODOLOGY.md reasoning behind low_max/
+# medium_max thresholds is still valid and does not need to be redone.
+#
+# RISK_SLUGS exists to fix a real bug: check.html previously derived its
+# CSS class via risk_level_key.split(' ')[0].lower(), which silently broke
+# for "Very High Risk" (-> "risk-very", matching no CSS class, badge
+# renders uncolored). The slug is now computed once here, in Python, and
+# passed straight to the template - no more guessing from a label string.
+RISK_SLUGS = {
+    "Low Risk": "low",
+    "Moderate Risk": "moderate",
+    "High Risk": "high",
+    "Very High Risk": "very-high",
+}
+
+# FIX (this session): RISK_COLORS is now module-level and used by BOTH
+# check_risk() (scenario/forecast result pages) AND _compute_risk_core()
+# (the map cache, via get_all_city_risk_data()). Previously the color map
+# was a local dict defined only inside check_risk() - the language-
+# independent map-cache path (_compute_risk_core) never got a color at
+# all, so every scored city on the map rendered with no color value,
+# which the frontend fell back to grey for (indistinguishable from the
+# genuinely-unscored MAP_ONLY_CITIES grey markers). One dict, one place,
+# used everywhere a risk_key needs a color - this class of bug can't
+# reoccur if a 5th tier is ever added.
+RISK_COLORS = {
+    "Low Risk": "#28a745",
+    "Moderate Risk": "#ffc107",
+    "High Risk": "#fd7e14",
+    "Very High Risk": "#dc3545",
+}
+
+
+def score_to_risk_key(score_0_1):
+    if score_0_1 <= 0.25:
         return "Low Risk"
-    elif score <= 65:
-        return "Medium Risk"
-    else:
+    elif score_0_1 <= 0.50:
+        return "Moderate Risk"
+    elif score_0_1 <= 0.75:
         return "High Risk"
+    else:
+        return "Very High Risk"
+
+def _compute_risk_core(city, rainfall_mm):
+    """Language-independent scoring only - no translation dict involved.
+    Exists so results can be cached once and reused across all three
+    languages, instead of caching a specific language's rendered text.
+    Raises MapOnlyCityError / UnsupportedCityError, same as get_profile().
+    """
+    normalized = normalize_city(city)
+    profile = get_profile(city)
+    profile_label = profile["label"]
+    profile_key = _CITY_TO_PROFILE[normalized]
+
+    rain_pts = rainfall_component(rainfall_mm, profile)
+    elev_pts, elevation_used, elevation_m = elevation_component(city, profile_key)
+    total_score = round(rain_pts + elev_pts, 1)      # 0-100, methodology unchanged
+    score_0_1 = round(total_score / 100, 2)           # NEW - normalized, drives the gauge/4-tier
+    risk_key = score_to_risk_key(score_0_1)
+
+    return {
+        "profile_key": profile_key,
+        "profile_label": profile_label,
+        "rainfall_mm": rainfall_mm,
+        "rainfall_points": rain_pts,
+        "elevation_points": elev_pts,
+        "elevation_used": elevation_used,
+        "elevation_m": elevation_m,
+        "score": total_score,                # 0-100 - still shown in "How is this calculated?"
+        "score_0_1": score_0_1,              # NEW - drives the gauge
+        "risk_level_key": risk_key,
+        "risk_slug": RISK_SLUGS[risk_key],    # fixes the CSS-class bug described above
+        "risk_color": RISK_COLORS[risk_key],  # FIX (this session) - see RISK_COLORS note above
+    }
+
+
+# Sorted, display-cased list of every scored city, for the home page's
+# city dropdown - built once at startup from REGIONAL_PROFILES itself, so
+# it can never drift out of sync with what the model actually supports.
+# Deliberately excludes MAP_ONLY_CITIES - those aren't scoreable, so
+# offering them in a form whose whole point is getting a score would just
+# recreate the error path a dropdown is supposed to eliminate.
+SUPPORTED_CITY_DISPLAY_NAMES = sorted({
+    city.title() for profile in REGIONAL_PROFILES.values() for city in profile["cities"]
+})
 
 
 def get_lang():
@@ -286,17 +379,16 @@ def check_risk(rainfall_mm, city, t):
     Raises MapOnlyCityError / UnsupportedCityError - callers must catch
     both before rendering a result.
     """
-    normalized = normalize_city(city)
-    profile = get_profile(city)  # raises MapOnlyCityError / UnsupportedCityError
-    profile_label = profile["label"]  # internal English key, used for lookups
-    profile_key = _CITY_TO_PROFILE[normalized]
-
-    rain_pts = rainfall_component(rainfall_mm, profile)
-    elev_pts, elevation_used, elevation_m = elevation_component(city, profile_key)
-    total_score = round(rain_pts + elev_pts, 1)
-    risk_key = score_to_risk_key(total_score)
-
-    color_map = {"Low Risk": "#28a745", "Medium Risk": "#ffc107", "High Risk": "#dc3545"}
+    core = _compute_risk_core(city, rainfall_mm)
+    profile_label = core["profile_label"]
+    rain_pts = core["rainfall_points"]
+    elev_pts = core["elevation_points"]
+    elevation_used = core["elevation_used"]
+    elevation_m = core["elevation_m"]
+    total_score = core["score"]
+    score_0_1 = core["score_0_1"]
+    risk_key = core["risk_level_key"]
+    risk_slug = core["risk_slug"]
 
     if elevation_used:
         elevation_note = t["elevation_note_available"].format(
@@ -311,11 +403,13 @@ def check_risk(rainfall_mm, city, t):
     )
 
     return {
-        "risk_level_key": risk_key,  # used for CSS class (risk-low/medium/high)
+        "risk_level_key": risk_key,   # used for translation lookups
+        "risk_slug": risk_slug,       # used for CSS class (risk-low/moderate/high/very-high)
         "risk_level": risk_level_display,
         "plain_explanation": plain_explanation,
         "rainfall": rainfall_mm,
         "score": total_score,
+        "score_0_1": score_0_1,
         "rainfall_points": rain_pts,
         "elevation_points": elev_pts,
         "elevation_used": elevation_used,
@@ -324,7 +418,7 @@ def check_risk(rainfall_mm, city, t):
         "shelter_message": t["shelter_message"],
         "terrain_profile": t["terrain_profile_labels"][profile_label],
         "terrain_warning": t["terrain_warnings"][profile_label],
-        "risk_color": color_map[risk_key],
+        "risk_color": core["risk_color"],  # FIX (this session) - pulled from shared RISK_COLORS via core
     }
 
 
@@ -357,9 +451,8 @@ def check_city_exists_in_pakistan(city):
 
     url = (
         "https://api.openweathermap.org/data/2.5/weather"
-        f"?q={city}&appid={api_key}&units=metric"
+        f"?q={city},PK&appid={api_key}&units=metric"
     )
-
     try:
         response = requests.get(url, timeout=8)
     except requests.exceptions.Timeout:
@@ -384,10 +477,15 @@ def check_city_exists_in_pakistan(city):
 
 def get_forecast_rainfall(city, hours=72):
     """Fetches forecasted rainfall total (mm) over the next `hours` hours
-    using OpenWeatherMap's free 5-day/3-hour forecast endpoint. Also
-    validates the city exists in Pakistan - no need to call OpenWeatherMap
-    twice for forecast mode, unlike scenario mode which validates separately
-    via check_city_exists_in_pakistan.
+    using OpenWeatherMap's free 5-day/3-hour forecast endpoint, by CITY
+    NAME. Also validates the city exists in Pakistan - no need to call
+    OpenWeatherMap twice for forecast mode, unlike scenario mode which
+    validates separately via check_city_exists_in_pakistan.
+
+    This is the right choice when the city name is arbitrary user input
+    (the /forecast route) - there's no coordinate to fall back on for a
+    city typed by a visitor. For the 38 known map cities, use
+    get_forecast_rainfall_by_coords() instead (see note there for why).
 
     Returns (is_valid, rainfall_mm_or_None, error_reason_or_None).
     error_reason mirrors check_city_exists_in_pakistan's reasons.
@@ -403,7 +501,7 @@ def get_forecast_rainfall(city, hours=72):
 
     url = (
         "https://api.openweathermap.org/data/2.5/forecast"
-        f"?q={city}&appid={api_key}&units=metric"
+        f"?q={city},PK&appid={api_key}&units=metric"
     )
 
     try:
@@ -436,6 +534,65 @@ def get_forecast_rainfall(city, hours=72):
     return True, round(total_rainfall, 1), None
 
 
+def get_forecast_rainfall_by_coords(lat, lon, hours=72):
+    """Same as get_forecast_rainfall(), but queries OpenWeatherMap by
+    coordinates instead of city name. Used for the map cache
+    (get_all_city_risk_data) - every city in CITY_COORDINATES was already
+    validated once via Nominatim at CSV-build time, so re-validating by
+    name through OWM's separate, less complete geocoder was redundant AND
+    the actual cause of a real bug: OWM's city-name search doesn't
+    reliably index smaller Sindh towns (Mirpurkhas, Naushahro Feroze,
+    Kashmore, Umerkot all returned "not_found" by name despite being real,
+    correctly-coordinated cities). Querying by lat/lon sidesteps that
+    entire class of failure.
+
+    No country check here - CITY_COORDINATES only contains Pakistani
+    cities by construction, so a "not_pakistan" result isn't a meaningful
+    failure mode on this path.
+
+    Scope note: this does NOT replace get_forecast_rainfall() or
+    check_city_exists_in_pakistan() - /result and /forecast still take
+    arbitrary user-typed city names with no known coordinate, so they
+    still need name-based lookup and validation.
+
+    Returns (is_valid, rainfall_mm_or_None, error_reason_or_None), same
+    shape as get_forecast_rainfall() for drop-in use in the cache loop.
+    """
+    api_key = os.environ.get("OPENWEATHER_API_KEY")
+    if not api_key:
+        return False, None, "missing_api_key"
+
+    url = (
+        "https://api.openweathermap.org/data/2.5/forecast"
+        f"?lat={lat}&lon={lon}&appid={api_key}&units=metric"
+    )
+
+    try:
+        response = requests.get(url, timeout=8)
+    except requests.exceptions.Timeout:
+        return False, None, "timeout"
+    except requests.exceptions.RequestException:
+        return False, None, "network_error"
+
+    try:
+        data = response.json()
+    except ValueError:
+        return False, None, "malformed_response"
+
+    if str(data.get("cod")) != "200":
+        return False, None, "not_found"
+
+    cutoff = time.time() + hours * 3600
+    total_rainfall = 0.0
+    for entry in data.get("list", []):
+        entry_time = entry.get("dt")
+        if entry_time is None or entry_time > cutoff:
+            continue
+        total_rainfall += entry.get("rain", {}).get("3h", 0.0)
+
+    return True, round(total_rainfall, 1), None
+
+
 def _render_risk_result(result, city, rainfall, mode, t, lang, forecast_hours=None):
     """Shared render for both /result (scenario) and /forecast - mode
     controls which source-note copy is shown, so the user always knows
@@ -446,16 +603,28 @@ def _render_risk_result(result, city, rainfall, mode, t, lang, forecast_hours=No
     else:
         source_note = t["source_scenario"].format(mm=rainfall)
 
+    # Look up this city's coordinates for the single-marker result-page map.
+    # Not every checked city is guaranteed to be in CITY_COORDINATES (e.g. a
+    # real, correctly-scored city whose name doesn't exactly match the CSV
+    # row for some reason) - city_lat/city_lon come through as None in that
+    # case, and check.html must skip rendering the map rather than guess a
+    # location or crash on a missing value.
+    coords = _CITY_COORDS_LOOKUP.get(normalize_city(city))
+    city_lat, city_lon = coords if coords else (None, None)
+
     return render_template(
         "check.html", t=t, lang=lang,
         city=city, rainfall=rainfall, mode=mode, source_note=source_note,
         plain_explanation=result["plain_explanation"],
         safety_tips=result["safety_tips"], shelter_message=result["shelter_message"],
         risk_level=result["risk_level"], risk_level_key=result["risk_level_key"],
+        risk_slug=result["risk_slug"],
         terrain_profile=result["terrain_profile"], terrain_warning=result["terrain_warning"],
         risk_color=result["risk_color"],
-        score=result["score"], rainfall_points=result["rainfall_points"],
+        score=result["score"], score_0_1=result["score_0_1"],
+        rainfall_points=result["rainfall_points"],
         elevation_points=result["elevation_points"], elevation_note=result["elevation_note"],
+        city_lat=city_lat, city_lon=city_lon,
     )
 
 
@@ -463,14 +632,84 @@ def _render_risk_result(result, city, rainfall, mode, t, lang, forecast_hours=No
 def home():
     lang = get_lang()
     t = get_translation(lang)
-    return render_template("index.html", t=t, lang=lang)
+    return render_template("index.html", t=t, lang=lang, cities=SUPPORTED_CITY_DISPLAY_NAMES)
+
+
+@app.route("/about")
+def about():
+    lang = get_lang()
+    t = get_translation(lang)
+    return render_template("about.html", t=t, lang=lang)
+
+
+@app.route("/how-it-works")
+def how_it_works():
+    lang = get_lang()
+    t = get_translation(lang)
+    return render_template("how_it_works.html", t=t, lang=lang)
+
+
+_city_risk_cache = {}
+_cache_last_refreshed = None
+CACHE_TTL_SECONDS = 3600  # refresh hourly - forecast rainfall doesn't meaningfully shift minute to minute
+
+
+def get_all_city_risk_data(force_refresh=False):
+    """Numeric-only risk data for all map cities, cached and refreshed on a
+    TTL rather than fetched live per page view or per click.
+
+    Uses get_forecast_rainfall_by_coords() (not the name-based
+    get_forecast_rainfall()) since every entry in CITY_COORDINATES already
+    has a verified lat/lon - see that function's docstring for why the
+    name-based lookup was actually the bug for several Sindh towns.
+    """
+    global _city_risk_cache, _cache_last_refreshed
+    now = time.time()
+    if force_refresh or _cache_last_refreshed is None or (now - _cache_last_refreshed) > CACHE_TTL_SECONDS:
+        fresh = {}
+        for coord in CITY_COORDINATES:
+            city = coord["city"]
+            entry = {**coord, "scored": False}
+            try:
+                forecast_valid, rainfall_mm, error_reason = get_forecast_rainfall_by_coords(
+                    coord["lat"], coord["lon"]
+                )
+                if not forecast_valid:
+                    entry["error"] = error_reason
+                else:
+                    entry.update(_compute_risk_core(city, rainfall_mm))
+                    entry["scored"] = True
+            except MapOnlyCityError:
+                pass
+            except UnsupportedCityError:
+                entry["error"] = "unsupported_city"
+            fresh[city] = entry
+
+            if not entry.get("scored") and city.lower() not in MAP_ONLY_CITIES:
+                print(f"UNSCORED: {city} -> {entry.get('error')}")
+        _city_risk_cache = fresh
+        _cache_last_refreshed = now
+    return _city_risk_cache
 
 
 @app.route("/map")
 def map_view():
     lang = get_lang()
     t = get_translation(lang)
-    return render_template("map.html", t=t, lang=lang, cities=CITY_COORDINATES)
+    city_data = get_all_city_risk_data()
+
+    cities_for_template = []
+    for city, entry in city_data.items():
+        item = dict(entry)
+        if entry.get("scored"):
+            item["risk_level"] = t["risk_levels"][entry["risk_level_key"]]
+            item["plain_explanation"] = build_plain_explanation(
+                entry["rainfall_mm"], entry["elevation_used"], entry["elevation_points"],
+                city, item["risk_level"], t
+            )
+        cities_for_template.append(item)
+
+    return render_template("map.html", t=t, lang=lang, cities=cities_for_template)
 
 
 @app.route("/result")
