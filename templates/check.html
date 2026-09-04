@@ -1,65 +1,186 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html lang="{{ lang }}" dir="{{ 'rtl' if lang in ['ur', 'sd'] else 'ltr' }}">
+{% block title %}FloodSafe Pakistan &mdash; Result{% endblock %}
 
-<head>
-    <title>FloodSafe_Pakistan</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block head_extra %}
+{% if city_lat and city_lon %}
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+/>
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+></script>
+<style>
+    #result-map {
+        height: 220px;
+        width: 100%;
+        border-radius: 8px;
+    }
+</style>
+{% endif %}
+{% endblock %}
 
-<body>
-<div class="container">
+{% block lang_switch %}
+<div class="lang-switch">
+    <a href="?lang=en{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
+    <a href="?lang=ur{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
+    <a href="?lang=sd{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
+</div>
+{% endblock %}
 
-    <div class="lang-switch">
-        <a href="?lang=en{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
-        <a href="?lang=ur{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
-        <a href="?lang=sd{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
-    </div>
-
+{% block content %}
+<div class="result-page">
     <h1>{{ t.app_title }}</h1>
 
     <div class="disclaimer-banner">
-        ⚠ {{ t.disclaimer_banner }}
+        &#9888; {{ t.disclaimer_banner }}
     </div>
 
-    <br>
     {% if error %}
-    <p>{{ error }}</p>
-    {% if forecast_failed %}
-    <p>{{ t.forecast_error_unavailable }}</p>
-    {% endif %}
-    <a href="{{ url_for('home', lang=lang) }}">{{ t.back_link }}</a>
-{% else %}
-<div class="results">
-    <p><strong>{{ t.city_label }}</strong> {{ city }}</p>
-    <p><strong>{{ t.rainfall_label }}</strong> {{ rainfall }}mm</p>
-    <p class="source-note source-{{ mode }}">{{ source_note }}</p>
-    <p>{{ t.terrain_profile_label }} {{ terrain_profile }}</p>
-    <div class="risk-badge risk-{{ risk_level_key.split(' ')[0].lower() }}">
-        ⚠ {{ t.risk_level_label }} {{ risk_level }}
+    <div class="container">
+        <br>
+        <p>{{ error }}</p>
+        {% if forecast_failed %}
+        <p>{{ t.forecast_error_unavailable }}</p>
+        {% endif %}
+        <a href="{{ url_for('home', lang=lang) }}">{{ t.back_link }}</a>
     </div>
-    <p class="plain-explanation">{{ plain_explanation }}</p>
-    <p class="terrain-warning">{{ terrain_warning }}</p>
-    <details class="how-calculated">
-        <summary>{{ t.how_calculated_toggle }}</summary>
-        <p class="score-breakdown">
-            {{ t.score_breakdown.format(score=score, rain=rainfall_points, elev=elevation_points) }}
-        </p>
-        <p class="elevation-note">{{ elevation_note }}</p>
-    </details>
-    <h3>{{ t.shelter_heading }}</h3>
-    <p>{{ shelter_message }}</p>
-    <h3>{{ t.safety_tips_heading }}</h3>
-    <ul>
-    {% for tip in safety_tips %}
-    <li>{{ tip }}</li>
-    {% endfor %}
-    </ul>
-    <a href="{{ url_for('home', lang=lang) }}">{{ t.back_link }}</a>
-</div>
-{% endif %}
-</div>
-</body>
+    {% else %}
 
-</html>
+    <!-- Row 1: Your Input / Risk Result (gauge) / Risk Map (single marker,
+         same one-marker-per-city model as before - the mockup's multiple
+         colored sub-city points are deliberately not built, per Hammad's
+         explicit instruction. -->
+    <div class="result-grid">
+        <div class="result-card">
+            <h3 class="result-card-heading">1. {{ t.city_label }} / {{ t.rainfall_label }}</h3>
+            <p><strong>{{ t.city_label }}</strong> {{ city.title() }}</p>
+            <p><strong>{{ t.rainfall_label }}</strong> {{ rainfall }}mm</p>
+            <p class="source-note source-{{ mode }}">{{ source_note }}</p>
+            <p>{{ t.terrain_profile_label }} {{ terrain_profile }}</p>
+        </div>
+
+        <div class="result-card result-gauge-card">
+            <h3 class="result-card-heading">2. {{ t.risk_level_label }}</h3>
+            <div class="gauge-wrap">
+                <svg viewBox="0 0 140 140" class="gauge-svg">
+                    <circle cx="70" cy="70" r="54" class="gauge-track" />
+                    <circle
+                        cx="70" cy="70" r="54"
+                        class="gauge-progress"
+                        style="stroke: {{ risk_color }}; stroke-dasharray: {{ (score_0_1 * 339.292)|round(1) }} 339.292;"
+                    />
+                    <text x="70" y="66" class="gauge-score-text">{{ score_0_1 }}</text>
+                    <text x="70" y="84" class="gauge-scale-text">0 &ndash; 1</text>
+                </svg>
+                <div class="risk-badge risk-{{ risk_slug }}">
+                    &#9888; {{ risk_level }}
+                </div>
+            </div>
+            <p class="plain-explanation">{{ plain_explanation }}</p>
+        </div>
+
+        <div class="result-card">
+            <h3 class="result-card-heading">3. Risk Map</h3>
+            {% if city_lat and city_lon %}
+            <div id="result-map"></div>
+            {% else %}
+            <p class="elevation-note">Map unavailable for this location.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Row 2: reorganized from what check.html already had (terrain
+         warning, safety tips, shelter message) - no new copy invented for
+         this row. The mockup's "Risk at Selected Points" sample table
+         (its section 9) is NOT built here - it needs the sub-city point
+         model Hammad rejected, so there's no real data to put in it. -->
+    <div class="result-grid result-grid-secondary">
+        <div class="result-card">
+            <h3 class="result-card-heading">4. Why is the risk {{ risk_level }}?</h3>
+            <p class="terrain-warning">{{ terrain_warning }}</p>
+            <div class="impact-bar-row">
+                <span class="impact-bar-label">Rainfall</span>
+                <div class="impact-bar-track">
+                    <div class="impact-bar-fill" style="width: {{ ((rainfall_points / 70) * 100)|round(0) }}%;"></div>
+                </div>
+                <span class="impact-bar-value">{{ rainfall_points }}/70</span>
+            </div>
+            {% if elevation_used %}
+            <div class="impact-bar-row">
+                <span class="impact-bar-label">Elevation</span>
+                <div class="impact-bar-track">
+                    <div class="impact-bar-fill" style="width: {{ ((elevation_points / 30) * 100)|round(0) }}%;"></div>
+                </div>
+                <span class="impact-bar-value">{{ elevation_points }}/30</span>
+            </div>
+            {% endif %}
+            <p class="elevation-note">{{ elevation_note }}</p>
+        </div>
+
+        <div class="result-card">
+            <h3 class="result-card-heading">5. {{ t.safety_tips_heading }}</h3>
+            <ul>
+            {% for tip in safety_tips %}
+                <li>{{ tip }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+
+        <!-- FIX (this session): this panel previously repeated city,
+             rainfall, and terrain profile verbatim from panel 1 ("Your
+             Input") - same values, same page, no new information. Only
+             Assessment Type and the shelter heading/message were unique
+             to this panel, so those are the only two things left here
+             now. If a future redesign wants this panel to carry
+             something else entirely (data source, timestamp, etc. from
+             the mockup), that's a real content decision to make
+             deliberately - not a reason to bring the duplicate fields
+             back by default. -->
+        <div class="result-card">
+            <h3 class="result-card-heading">6. Key Information</h3>
+            <p><strong>Assessment Type:</strong> {{ 'Forecast (72h)' if mode == 'forecast' else 'Scenario (not current rainfall)' }}</p>
+            <h3 class="result-card-heading" style="margin-top: 20px;">{{ t.shelter_heading }}</h3>
+            <p>{{ shelter_message }}</p>
+        </div>
+    </div>
+
+    <div class="container" style="margin-top: 20px;">
+        <details class="how-calculated">
+            <summary>{{ t.how_calculated_toggle }}</summary>
+            <p class="score-breakdown">
+                {{ t.score_breakdown.format(score=score, rain=rainfall_points, elev=elevation_points) }}
+            </p>
+        </details>
+        <br>
+        <a href="{{ url_for('home', lang=lang) }}">{{ t.back_link }}</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if city_lat and city_lon %}
+<script>
+    const resultMap = L.map('result-map').setView([{{ city_lat }}, {{ city_lon }}], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(resultMap);
+
+    L.circleMarker([{{ city_lat }}, {{ city_lon }}], {
+        radius: 10,
+        fillColor: "{{ risk_color }}",
+        color: '#fff',
+        weight: 2,
+        fillOpacity: 0.95
+    }).addTo(resultMap);
+</script>
+{% endif %}
+{% endblock %}
