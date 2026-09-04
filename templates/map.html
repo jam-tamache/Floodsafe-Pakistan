@@ -1,64 +1,81 @@
-<!DOCTYPE html>
-<html lang="{{ lang }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FloodSafe Pakistan — Map</title>
+{% extends "base.html" %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% block title %}FloodSafe Pakistan &mdash; Map{% endblock %}
 
-    <!-- Leaflet CSS/JS via CDN — no npm needed for this -->
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossorigin=""
-    />
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""
-    ></script>
+{% block head_extra %}
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+/>
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+></script>
+<style>
+    #map {
+        height: 600px;
+        width: 100%;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
 
-    <style>
-        /* Leaflet maps render as a blank grey box without an explicit
-           height on the container — this is the single most common
-           "why is my map not showing" bug, so it's set here explicitly
-           rather than relying on style.css to happen to cover it. */
-        #map {
-            height: 500px;
-            width: 100%;
-            max-width: 900px;
-            margin: 2rem auto;
-            border-radius: 8px;
+{% block content %}
+<h1>FloodSafe Pakistan &mdash; Map</h1>
+<p>Color-coded by current risk level &mdash; click a marker for details. Grey pins are shown for map context only (outside Sindh, not risk-scored).</p>
+<div id="map"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const map = L.map('map').setView([26.5, 68.5], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    const MAP_ONLY_COLOR = '#7f8c8d';
+
+    const cities = {{ cities | tojson }};
+
+    cities.forEach(function (c) {
+        if (!c.scored) {
+            L.circleMarker([c.lat, c.lon], {
+                radius: 8,
+                fillColor: MAP_ONLY_COLOR,
+                color: '#fff',
+                weight: 2,
+                fillOpacity: 0.85
+            })
+            .addTo(map)
+            .bindPopup(`<strong>${c.city}</strong><br>Outside Sindh — not risk-scored`)
+            .bindTooltip(c.city, { permanent: false });
+            return;
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>FloodSafe Pakistan — Map</h1>
-        <p>Step 1: bare map skeleton. No markers yet — this only proves the map itself renders correctly.</p>
-        <div id="map"></div>
-    </div>
-
-    <script>
-        // Centered roughly on Sindh, zoom 7 captures Sukkur down to Karachi.
-        // These numbers are a starting point, not final — adjust once
-        // markers are added and you can see how well the bounds fit.
-        const map = L.map('map').setView([26.5, 68.5], 7);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        const cities = {{ cities | tojson }};
-
-        cities.forEach(function (c) {
-            L.marker([c.lat, c.lon])
-                .addTo(map)
-                .bindTooltip(c.city, { permanent: false });
-        });
-    </script>
-</body>
-</html>
+        // FIX (this session): previously recomputed color here via a
+        // stale 3-tier { high, medium, low } object keyed off
+        // risk_level_key.split(' ')[0].toLowerCase() — broke for
+        // "Moderate Risk" (-> "moderate", no match) and "Very High Risk"
+        // (-> "very", no match), both silently falling back to the same
+        // grey used for non-Sindh MAP_ONLY_CITIES. risk_color is computed
+        // once, correctly, server-side in risk_check.py's RISK_COLORS
+        // dict and already sent per city — use it directly instead of
+        // re-deriving it here. Do not reintroduce a second color mapping
+        // in this file; if the tiers ever change again, RISK_COLORS in
+        // risk_check.py is the only place that should need an update.
+        L.circleMarker([c.lat, c.lon], {
+            radius: 8,
+            fillColor: c.risk_color,
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 0.95
+        })
+        .addTo(map)
+        .bindPopup(`<strong>${c.city}</strong><br>${c.risk_level}<br>${c.plain_explanation}`);
+    });
+</script>
+{% endblock %}
