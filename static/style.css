@@ -2,15 +2,215 @@
     box-sizing: border-box;
 }
 
-body{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+html, body {
+    overflow-x: hidden; /* stops any overflowing element from being clipped/hidden oddly */
+}
+
+body {
+    margin: 0;
     min-height: 100vh;
-    padding: 60px 60px;
     font-family: 'Segoe UI', -apple-system, Roboto, Helvetica, Arial, sans-serif;
     background-color: #D8F4EF;
     color: #1F2D2E;
+}
+
+/* ---- Top bar ---- */
+
+.topbar {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #D8F4EF;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.topbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap; /* NEW - was overflowing off-screen at narrow widths
+                        instead of wrapping, and overflow-x:hidden on
+                        html/body was silently clipping the hamburger
+                        toggle (the last flex child) out of view entirely
+                        rather than showing a scrollbar. Wrapping puts
+                        .topbar-right on its own line when it doesn't fit
+                        next to the brand, so nothing gets clipped. */
+    row-gap: 8px;
+    gap: 24px;
+    padding: 14px 24px;
+}
+
+.topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.topbar-logo {
+    font-size: 1.4rem;
+}
+
+.topbar-title {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #0F5459;
+}
+
+.topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+}
+
+.topbar-link {
+    color: #2E3A3B;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.topbar-link:hover {
+    background-color: #E4F3F1;
+    color: #0F5459;
+}
+
+.topbar-link-active {
+    color: #0F5459;
+    background-color: #E4F3F1;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.topbar-toggle {
+    display: none; /* shown only under the mobile breakpoint below */
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    color: #0F5459;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+/* Mobile dropdown menu - hidden by default, shown as a block below the
+   bar when .topbar-menu-open is toggled on .topbar via the inline script
+   in base.html. This is a dropdown, not a full-height side drawer, since
+   the top-bar nav only ever has a handful of short links. */
+.topbar-mobile-menu {
+    display: none;
+    flex-direction: column;
+    padding: 8px 16px 16px;
+    border-top: 1px solid #D8F4EF;
+}
+
+.topbar-mobile-menu .topbar-link {
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.topbar.topbar-menu-open .topbar-mobile-menu {
+    display: flex;
+}
+
+@media (max-width: 900px) {
+    .topbar-nav {
+        display: none; /* replaced by .topbar-mobile-menu */
+    }
+
+    .topbar-toggle {
+        display: block;
+    }
+
+    .topbar-inner {
+        padding: 14px 16px;
+    }
+}
+
+.page-content {
+    width: 100%;
+    padding: 32px 24px;
+}
+
+/* ---- Existing page/component styles below, unchanged ---- */
+
+/* ---- Home page hero (index.html) ---- */
+
+.home-hero {
+    max-width: 1000px;
+    margin: 20px auto 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.home-intro {
+    flex: 1 1 320px;
+    min-width: 280px;
+}
+
+.home-title {
+    text-align: left;
+    font-size: 2.2rem;
+}
+
+.home-subtitle {
+    font-size: 1.05rem;
+    color: #4A5B5C;
+    line-height: 1.5;
+}
+
+.home-card {
+    flex: 1 1 340px;
+    min-width: 300px;
+    background-color: #F4FBFA;
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0px 6px 20px rgba(15, 84, 89, 0.12);
+}
+
+.home-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.home-card select {
+    width: 100%;
+    padding: 8px 13px;
+    border-radius: 8px;
+    border: 1px solid #B7D9D6;
+    font-size: 1rem;
+    background-color: #fff;
+}
+
+.field-hint {
+    font-size: 0.8rem;
+    color: #4A5B5C;
+    margin-top: -6px;
+}
+
+@media (max-width: 700px) {
+    .home-title {
+        text-align: center;
+    }
+
+    .home-intro {
+        text-align: center;
+    }
 }
 
 form {
@@ -61,15 +261,6 @@ input {
     font-size: 1rem;
 }
 
-/* Root fix for the "form stuck on the left" issue: .container is a flex
-   item of body (which has align-items:center). Flex items with
-   align-items:center shrink-wrap to their content's natural width instead
-   of filling out to max-width - so max-width:600px was never actually
-   being reached, and everything inside looked off-center because the box
-   itself was narrower than intended. width:100% forces it to actually
-   claim the space up to max-width; display:flex + align-items:center here
-   centers each child (form, disclaimer-banner, results, scenario-toggle)
-   within that properly-sized box. */
 .container {
     max-width: 600px;
     width: 100%;
@@ -113,32 +304,169 @@ button:hover {
     font-weight: 700;
     padding: 12px 16px;
     border-radius: 8px;
-    margin: 18px 0;
+    margin: 12px 0;
     text-align: center;
     letter-spacing: 0.3px;
 }
 
+/* Classes below now match risk_slug from app.py's RISK_SLUGS dict
+   (low/moderate/high/very-high) instead of being derived in the template
+   via risk_level_key.split(' ')[0].lower() - that string-split silently
+   broke for "Very High Risk" (-> "risk-very", no matching class). Renamed
+   .risk-medium -> .risk-moderate to match the new tier name, and added
+   .risk-very-high as a real 4th tier, not a fallback of .risk-high. */
 .risk-low {
     background-color: #D4EDDA;
     color: #155724;
     border: 2px solid #28A745;
 }
 
-.risk-medium {
+.risk-moderate {
     background-color: #FFF3CD;
     color: #856404;
     border: 2px solid #FFC107;
 }
 
 .risk-high {
+    background-color: #FFE3CC;
+    color: #7A3E0A;
+    border: 2px solid #FD7E14;
+}
+
+.risk-very-high {
     background-color: #F8D7DA;
     color: #721C24;
     border: 2px solid #DC3545;
 }
 
-/* Terrain profile line - was getting visually lost between Rainfall and the
-   risk badge. Small pill treatment gives it its own visual weight instead
-   of reading as plain filler text. */
+/* ---- Result page grid (check.html) ---- */
+
+.result-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.result-grid-secondary {
+    margin-top: 20px;
+}
+
+.result-card {
+    background-color: #F4FBFA;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-shadow: 0px 6px 20px rgba(15, 84, 89, 0.12);
+}
+
+.result-card-heading {
+    margin: 0 0 14px 0;
+    color: #0F5459;
+    font-size: 0.95rem;
+    letter-spacing: 0.2px;
+    border-bottom: 2px solid #D8F4EF;
+    padding-bottom: 8px;
+}
+
+.result-card p {
+    margin: 8px 0;
+    line-height: 1.5;
+    font-size: 0.95rem;
+    color: #2E3A3B;
+}
+
+/* ---- Gauge (0-1 score ring, SVG-based, no chart library) ---- */
+
+.gauge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.gauge-svg {
+    width: 140px;
+    height: 140px;
+}
+
+.gauge-track {
+    fill: none;
+    stroke: #E4F3F1;
+    stroke-width: 12;
+}
+
+.gauge-progress {
+    fill: none;
+    stroke-width: 12;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 70px 70px;
+    transition: stroke-dasharray 0.4s ease;
+}
+
+.gauge-score-text {
+    font-size: 1.6rem;
+    font-weight: 700;
+    fill: #0F5459;
+    text-anchor: middle;
+}
+
+.gauge-scale-text {
+    font-size: 0.65rem;
+    fill: #4A5B5C;
+    text-anchor: middle;
+}
+
+/* ---- Impact bars (rainfall/elevation contribution, "Why is risk X") ---- */
+
+.impact-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.impact-bar-label {
+    width: 70px;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0F5459;
+}
+
+.impact-bar-track {
+    flex: 1;
+    height: 8px;
+    background-color: #E4F3F1;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.impact-bar-fill {
+    height: 100%;
+    background-color: #197278;
+    border-radius: 4px;
+}
+
+.impact-bar-value {
+    width: 48px;
+    flex-shrink: 0;
+    text-align: right;
+    font-size: 0.8rem;
+    color: #4A5B5C;
+}
+
+@media (max-width: 900px) {
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .results p:has(+ .risk-badge) {
     display: inline-block;
     background-color: #E4F3F1;
@@ -149,9 +477,6 @@ button:hover {
     font-weight: 600;
 }
 
-/* Score breakdown (rainfall + elevation points) - sits right under the
-   terrain warning. Monospace-ish numeric feel via letter-spacing, small
-   and quiet since it's supplementary detail, not the headline result. */
 .score-breakdown {
     font-size: 0.85rem;
     font-weight: 600;
@@ -164,10 +489,6 @@ button:hover {
     letter-spacing: 0.2px;
 }
 
-/* Elevation note - explains whether elevation actually contributed to the
-   score or the result fell back to rainfall-only. Kept visually quiet
-   (italic, muted) to match .terrain-warning's supplementary tone, but a
-   distinct color so it doesn't read as the same sentence. */
 .elevation-note {
     font-style: italic;
     font-size: 0.85rem;
@@ -176,11 +497,6 @@ button:hover {
     margin-bottom: 4px;
 }
 
-/* Plain-language explanation - the sentence an ordinary person actually
-   reads (e.g. "With 22mm of rain and Karachi sitting on lower ground..."),
-   as opposed to the raw score math which is now tucked behind the
-   "How is this calculated?" toggle below. Given visual weight (bordered,
-   slightly larger) since this is the answer to "why", not a footnote. */
 .plain-explanation {
     font-size: 1rem;
     font-weight: 600;
@@ -193,10 +509,6 @@ button:hover {
     margin: 14px 0;
 }
 
-/* Raw score breakdown + elevation note - kept for methodology transparency
-   (useful for a scholarship reviewer checking your work) but hidden by
-   default behind a toggle so it doesn't compete with .plain-explanation
-   for an ordinary user's attention. */
 .how-calculated {
     margin-top: 12px;
     border-top: 1px solid #D8F4EF;
@@ -214,16 +526,6 @@ button:hover {
     color: #0F5459;
 }
 
-/* Source note - tells the user whether the rainfall behind their score was
-   forecasted or a hypothetical scenario. Deliberately kept LOW visual
-   weight (no box, no fill - just a thin accent rule + colored text) since
-   this was previously styled almost identically to .plain-explanation
-   right below it: two similar pale-teal boxes sandwiching the risk badge
-   made the page look like a stack of near-duplicate cards, and buried the
-   one thing that should stand out (why the score is what it is) under
-   metadata (where the number came from). This is a caption, not a
-   headline - border-inline-start (not border-left) so it flips sides
-   correctly under RTL (Urdu/Sindhi) automatically. */
 .source-note {
     font-size: 0.85rem;
     font-weight: 600;
@@ -242,10 +544,6 @@ button:hover {
     border-inline-start-color: #B7950B;
 }
 
-/* Scenario toggle (collapsed secondary form on the home page) - given its
-   own light card treatment so it doesn't read as a stray bullet under the
-   main form, but stays visually quieter than the primary Check Forecast
-   Risk button so it doesn't compete with it. */
 .scenario-toggle {
     width: 300px;
     margin-top: 8px;
@@ -278,65 +576,17 @@ button:hover {
     margin-top: 8px;
 }
 
-@media (max-width: 600px) {
-    body {
-        padding: 24px 16px;
-    }
-
-    .container {
-        max-width: 100%;
-    }
-
-    h1 {
-    font-size: 2rem;
-    }
-
-    form {
-        width: 100%;
-    }
-
-    .results {
-        max-width: 100%;
-    }
-
-    .scenario-toggle {
-        width: 100%;
-    }
-
-    .risk-badge {
-        font-size: 0.95rem;
-        padding: 10px 12px;
-    }
-
-    button {
-        width: 100%;
-        padding: 10px;
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 400px) {
-    body {
-        padding: 16px 12px;
-    }
-
-    h1 {
-    font-size: 1.7rem;
-    }
-}
-
 .lang-switch {
     display: flex;
     justify-content: center;
-    gap: 16px;
-    margin-bottom: 8px;
+    gap: 12px;
 }
 
 .lang-switch a {
     color: #197278;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     padding: 4px 10px;
     border-radius: 6px;
 }
@@ -392,4 +642,196 @@ html[dir="rtl"] .lang-switch {
     margin-bottom: 10px;
     line-height: 1.5;
     color: #2E3A3B;
+}
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    form {
+        width: 100%;
+    }
+
+    .results {
+        max-width: 100%;
+    }
+
+    .scenario-toggle {
+        width: 100%;
+    }
+
+    .risk-badge {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 400px) {
+    h1 {
+        font-size: 1.7rem;
+    }
+}
+
+/* ---- Premium back button ----
+   NEW (this session). Used everywhere {{ t.back_link }} appears
+   (check.html, about.html, how_it_works.html) via one shared class,
+   instead of each template's plain unstyled <a> - so a future style
+   change to "the back button" only ever needs to happen here, once.
+   Deliberately a ghost/outline pill (not a solid-teal button like
+   .home-form's submit button) so it doesn't visually compete with
+   primary call-to-action buttons on the same page. */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    border: 1.5px solid #197278;
+    background-color: #FFFFFF;
+    color: #197278;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: 0px 4px 12px rgba(15, 84, 89, 0.12);
+    transition: background-color 0.2s ease, color 0.2s ease,
+                transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.back-link::before {
+    content: "\2190"; /* ← */
+    font-size: 1rem;
+    transition: transform 0.15s ease;
+}
+
+html[dir="rtl"] .back-link::before {
+    content: "\2192"; /* → - arrow flips direction to match reading order */
+}
+
+.back-link:hover {
+    background-color: #197278;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0px 6px 16px rgba(15, 84, 89, 0.22);
+}
+
+.back-link:hover::before {
+    transform: translateX(-3px);
+}
+
+html[dir="rtl"] .back-link:hover::before {
+    transform: translateX(3px);
+}
+
+.back-link:active {
+    transform: translateY(0);
+    box-shadow: 0px 4px 12px rgba(15, 84, 89, 0.12);
+}
+
+/* ---- Info pages (about.html / how_it_works.html) ----
+   NEW (this session). Replaces the narrow 440px .results block those two
+   pages were borrowing from check.html's error state - too cramped for
+   prose, and gave both pages the same generic look. Reuses the site's
+   existing card visual language (#F4FBFA background, teal headings,
+   0px 6px 20px shadow) already established by .result-card/.home-card,
+   rather than inventing a new style. */
+.info-page {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.info-lede {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #2E3A3B;
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 28px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.info-card {
+    background-color: #F4FBFA;
+    border-radius: 12px;
+    padding: 24px 26px;
+    box-shadow: 0px 6px 20px rgba(15, 84, 89, 0.12);
+}
+
+.info-card-icon {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.info-card h3 {
+    margin: 0 0 10px 0;
+    color: #0F5459;
+    font-size: 1.05rem;
+}
+
+.info-card p {
+    margin: 0 0 10px 0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    color: #2E3A3B;
+}
+
+.info-card p:last-child {
+    margin-bottom: 0;
+}
+
+.info-card-full {
+    grid-column: 1 / -1;
+}
+
+.info-tier-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.info-tier-row .risk-badge {
+    margin: 0;
+    font-size: 0.85rem;
+    padding: 8px 14px;
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+.info-callout {
+    background-color: #E4F3F1;
+    border: 1px solid #B7D9D6;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 4px;
+    color: #0F5459;
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.info-note {
+    font-size: 0.85rem;
+    color: #4A5B5C;
+    font-style: italic;
+    margin-top: 6px;
+}
+
+@media (max-width: 700px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
 }
