@@ -189,8 +189,14 @@ def _build_region_ranges():
 
 _build_region_ranges()
 
-ELEVATION_COMPONENT_MAX = 30  # points out of 100 contributed by elevation
-RAINFALL_COMPONENT_MAX = 70   # points out of 100 contributed by rainfall
+ELEVATION_COMPONENT_MAX = 30  # points contributed by elevation, unchanged this session
+# RAINFALL_COMPONENT_MAX below is DOCUMENTATION ONLY (not read by
+# rainfall_component() itself, which hardcodes its own band values) - kept
+# in sync manually. Real achievable ceiling is ~54, not 70 - see
+# rainfall_component()'s docstring for why. Combined with
+# ELEVATION_COMPONENT_MAX=30, true max total score is ~84/100, not 100 -
+# Very High Risk (75-100) is reachable but only near its low end.
+RAINFALL_COMPONENT_MAX = 54
 
 
 def elevation_component(city, profile_key):
@@ -224,39 +230,54 @@ def elevation_component(city, profile_key):
 
 
 def rainfall_component(rainfall_mm, profile):
-    """Returns points 0-70, scaled against this region's own low_max/medium_max.
+    """Returns rainfall's contribution to the 0-100 total score, scaled
+    against this region's own low_max/medium_max.
 
-    <= low_max scales 0-35 (still "low" territory but shows gradation).
-    low_max..medium_max scales 35-60.
-    > medium_max scales 60-70, capped at 70 for very extreme scenarios.
+    Bands aligned to the 4-tier boundaries (Low 0-25, Moderate 25-50,
+    High 50-75, Very High 75-100):
+    - <= low_max scales 0-25 (Low/Moderate boundary)
+    - low_max..medium_max scales 25-50 (Moderate/High boundary)
+    - > medium_max scales 50 upward, saturating as rainfall approaches
+      2x medium_max - preserves the DELIBERATE "dead zone" documented in
+      METHODOLOGY.md and covered by test_risk_scoring.py: crossing
+      medium_max does NOT by itself flip a city to High Risk.
+
+    NOTE: this function's own rounding (to 1 decimal, for display) is
+    fine on its own - the bug that actually caused boundary
+    misclassifications (e.g. nawabshah @ 51mm scoring Low instead of
+    Moderate) was NOT here, it was in _compute_risk_core() rounding
+    score_0_1 to 2 decimals BEFORE classifying it, which silently erased
+    small-but-real excesses past a boundary (25.4/100 = 0.254, correctly
+    Moderate, rounded to display-precision 0.25 BEFORE classification,
+    which incorrectly read as Low). Classification now happens on the
+    unrounded value in _compute_risk_core - see the comment there. Do not
+    "fix" boundary issues by adjusting the numbers here; verify first
+    whether the actual bug is downstream rounding, as it was here twice.
     """
     low_max = profile["low_max"]
     medium_max = profile["medium_max"]
 
     if rainfall_mm <= low_max:
         fraction = rainfall_mm / low_max if low_max > 0 else 0
-        return round(35 * fraction, 1)
+        return round(25 * fraction, 1)
     elif rainfall_mm <= medium_max:
         fraction = (rainfall_mm - low_max) / (medium_max - low_max)
-        return round(35 + 25 * fraction, 1)
+        return round(25 + 25 * fraction, 1)
     else:
         # Extreme scenarios: approach but do not exceed RAINFALL_COMPONENT_MAX.
-        # Anything 2x medium_max or beyond is treated as maximal.
-        excess_range = medium_max  # somewhat arbitrary saturation distance, documented in METHODOLOGY.md
+        # excess_range=medium_max is the same somewhat-arbitrary saturation
+        # distance as before (full saturation at 2x medium_max), documented
+        # in METHODOLOGY.md.
+        excess_range = medium_max
         fraction = min((rainfall_mm - medium_max) / excess_range, 1) if excess_range > 0 else 1
-        return round(60 + 10 * fraction, 1)
+        return round(50 + 4 * fraction, 1)
 
 
 # ---- Risk tiers: 4-tier, 0-1 normalized scale ----
 #
-# CHANGED this session: was 3-tier (Low/Medium/High) on the raw 0-100
-# score. Now 4-tier (Low/Moderate/High/Very High) on a 0-1 normalized
-# score, to match the mockup's gauge design Hammad approved.
-#
-# IMPORTANT: this does NOT change the underlying rainfall/elevation point
-# math above (still 0-70 / 0-30) - only the labeling and the scale shown
-# to the user changed. The METHODOLOGY.md reasoning behind low_max/
-# medium_max thresholds is still valid and does not need to be redone.
+# 4-tier (Low/Moderate/High/Very High) on a 0-1 normalized score, to match
+# the mockup's gauge design Hammad approved (changed from the original
+# 3-tier Low/Medium/High on a raw 0-100 score).
 #
 # RISK_SLUGS exists to fix a real bug: check.html previously derived its
 # CSS class via risk_level_key.split(' ')[0].lower(), which silently broke
@@ -270,16 +291,15 @@ RISK_SLUGS = {
     "Very High Risk": "very-high",
 }
 
-# FIX (this session): RISK_COLORS is now module-level and used by BOTH
-# check_risk() (scenario/forecast result pages) AND _compute_risk_core()
-# (the map cache, via get_all_city_risk_data()). Previously the color map
-# was a local dict defined only inside check_risk() - the language-
-# independent map-cache path (_compute_risk_core) never got a color at
-# all, so every scored city on the map rendered with no color value,
-# which the frontend fell back to grey for (indistinguishable from the
-# genuinely-unscored MAP_ONLY_CITIES grey markers). One dict, one place,
-# used everywhere a risk_key needs a color - this class of bug can't
-# reoccur if a 5th tier is ever added.
+# FIX (earlier this session): RISK_COLORS is now module-level and used by
+# BOTH check_risk() (scenario/forecast result pages) AND
+# _compute_risk_core() (the map cache, via get_all_city_risk_data()).
+# Previously the color map was a local dict defined only inside
+# check_risk() - the language-independent map-cache path never got a
+# color at all, so every scored city on the map rendered with no color
+# value, indistinguishable from the genuinely-unscored MAP_ONLY_CITIES
+# grey markers. One dict, one place, used everywhere a risk_key needs a
+# color - this class of bug can't reoccur if a 5th tier is ever added.
 RISK_COLORS = {
     "Low Risk": "#28a745",
     "Moderate Risk": "#ffc107",
@@ -298,11 +318,25 @@ def score_to_risk_key(score_0_1):
     else:
         return "Very High Risk"
 
+
 def _compute_risk_core(city, rainfall_mm):
     """Language-independent scoring only - no translation dict involved.
     Exists so results can be cached once and reused across all three
     languages, instead of caching a specific language's rendered text.
     Raises MapOnlyCityError / UnsupportedCityError, same as get_profile().
+
+    FIXED this session (real bug #2 of the same underlying class): the
+    risk tier used to be classified using score_0_1 AFTER it had already
+    been rounded to 2 decimal places for display. That rounding could
+    erase a genuine, real excess past a tier boundary - e.g. total_score
+    25.4 (nawabshah @ 51.0mm, correctly past the Low/Moderate line at 25)
+    produces score_0_1 = 25.4/100 = 0.254, which rounds to 0.25 for
+    display - and 0.25 satisfies score_to_risk_key's "<= 0.25" Low Risk
+    branch, silently reclassifying a Moderate-Risk city as Low. Fixed by
+    classifying on the UNROUNDED total_score/100, and only rounding
+    afterward for the value actually shown to the user (the gauge, the
+    "Score: X/100" text). Classification precision and display precision
+    are two different concerns - conflating them is what broke this.
     """
     normalized = normalize_city(city)
     profile = get_profile(city)
@@ -311,9 +345,11 @@ def _compute_risk_core(city, rainfall_mm):
 
     rain_pts = rainfall_component(rainfall_mm, profile)
     elev_pts, elevation_used, elevation_m = elevation_component(city, profile_key)
-    total_score = round(rain_pts + elev_pts, 1)      # 0-100, methodology unchanged
-    score_0_1 = round(total_score / 100, 2)           # NEW - normalized, drives the gauge/4-tier
-    risk_key = score_to_risk_key(score_0_1)
+    total_score = round(rain_pts + elev_pts, 1)   # 0-100, methodology unchanged
+
+    raw_score_0_1 = total_score / 100             # UNROUNDED - used for classification
+    risk_key = score_to_risk_key(raw_score_0_1)
+    score_0_1 = round(raw_score_0_1, 2)           # rounded only for display (gauge, etc.)
 
     return {
         "profile_key": profile_key,
@@ -324,10 +360,10 @@ def _compute_risk_core(city, rainfall_mm):
         "elevation_used": elevation_used,
         "elevation_m": elevation_m,
         "score": total_score,                # 0-100 - still shown in "How is this calculated?"
-        "score_0_1": score_0_1,              # NEW - drives the gauge
+        "score_0_1": score_0_1,              # display-rounded - drives the gauge
         "risk_level_key": risk_key,
         "risk_slug": RISK_SLUGS[risk_key],    # fixes the CSS-class bug described above
-        "risk_color": RISK_COLORS[risk_key],  # FIX (this session) - see RISK_COLORS note above
+        "risk_color": RISK_COLORS[risk_key],  # FIX (earlier this session) - see RISK_COLORS note above
     }
 
 
@@ -418,7 +454,7 @@ def check_risk(rainfall_mm, city, t):
         "shelter_message": t["shelter_message"],
         "terrain_profile": t["terrain_profile_labels"][profile_label],
         "terrain_warning": t["terrain_warnings"][profile_label],
-        "risk_color": core["risk_color"],  # FIX (this session) - pulled from shared RISK_COLORS via core
+        "risk_color": core["risk_color"],
     }
 
 
