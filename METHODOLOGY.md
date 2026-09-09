@@ -34,30 +34,59 @@ explicit to the user, not just to the code.)
 ## The risk score
 
 ```
-total_score (0-100) = rainfall_component (0-70) + elevation_component (0-30)
+total_score (0-100) = rainfall_component (0-54, saturating)
+                     + elevation_component (0-30)
 
-Low Risk:    0-35
-Medium Risk: 36-65
-High Risk:   66-100
+score_0_1 = total_score / 100
+
+Low Risk:       0.00 - 0.25
+Moderate Risk:  0.25 - 0.50
+High Risk:      0.50 - 0.75
+Very High Risk: 0.75 - 1.00
 ```
 
-### Rainfall component (0-70 points)
+Because the rainfall component saturates at ~54 rather than 70, the true
+achievable ceiling on `total_score` is **~84/100, not 100**. Very High
+Risk (0.75-1.00) is reachable but only near the low end of that range.
+This is a real trade-off of the current design, not a bug — a
+non-linear-tail alternative that reclaims the full 0-100 range is a
+documented option if the compressed ceiling turns out to matter.
+
+Classification always happens on the **unrounded** `score_0_1` value,
+before any display rounding. An earlier bug rounded `score_0_1` to 2
+decimals before classifying it, which could erase a real, small excess
+past a tier boundary (e.g. 0.254 rounding to 0.25, incorrectly satisfying
+the "≤ 0.25 Low Risk" branch). Display rounding now happens strictly
+after classification — see `_compute_risk_core()` in `risk_check.py`.
+
+### Rainfall component (0 to ~54 points)
 
 Each of Sindh's regional profiles (Mega-Urban & Coastal, Central
 Agricultural Plains, Arid Plains & Deserts) has a `low_max` and
-`medium_max` rainfall threshold in millimeters, scaled into 0-70 points
-(see `rainfall_component()` in `risk_check.py` for the exact piecewise
-scaling).
+`medium_max` rainfall threshold in millimeters. Rainfall is scaled into
+points in three bands, aligned to the classification boundaries above:
+
+- **`rainfall_mm ≤ low_max`** — scales linearly from 0 to 25 points.
+- **`low_max < rainfall_mm ≤ medium_max`** — scales linearly from 25 to
+  50 points.
+- **`rainfall_mm > medium_max`** — scales from 50 toward a ceiling of 54,
+  saturating as rainfall approaches **2× `medium_max`**. This is the
+  deliberate "dead zone": crossing `medium_max` does not, by itself, push
+  the rainfall component's contribution much past 50 — see below.
+
+(See `rainfall_component()` in `risk_check.py` for the exact piecewise
+scaling.)
 
 **Sourcing.** Pakistan's Flood Forecasting Division (FFD, under PMD
 Lahore) publishes an official 24-hour rainfall intensity classification:
 Light ≤10mm, Moderate 10.1–30mm, Heavy 30.1–70mm, Very Heavy 70.1–150mm,
-Extremely Heavy >150mm (ffd.pmd.gov.pk/bulletin). This app's Low/Medium/
-High risk categories are anchored to that scale as follows:
+Extremely Heavy >150mm (ffd.pmd.gov.pk/bulletin). This app's tier
+categories are anchored to that scale as follows:
 
-- **Low Risk** ≈ FFD's Light + Moderate rain (up to 30mm/24h)
-- **Medium Risk** ≈ FFD's Heavy rain (30.1–70mm/24h)
-- **High Risk** begins where FFD's Very Heavy category begins (>70mm/24h)
+- **Low/Moderate boundary** ≈ FFD's Light + Moderate rain (up to 30mm/24h)
+- **Moderate/High territory** ≈ FFD's Heavy rain (30.1–70mm/24h)
+- **High/Very High territory** begins near where FFD's Very Heavy category
+  begins (>70mm/24h)
 
 Because this app scores 72-hour totals, not 24-hour totals, those FFD
 boundaries are scaled up using a depth-duration relationship: the
@@ -96,27 +125,29 @@ stronger source than this and is a reasonable post-V1 improvement.
 ### Worked example: Karachi, 25mm forecast over 72 hours
 
 - `low_max` for Mega-Urban & Coastal = 40mm. 25mm ≤ 40mm, so:
-  `rainfall_points = 35 × (25 / 40) = 21.9`
-- Karachi is the lowest-elevation city in its region, so it gets the full
-  30 elevation points: `elevation_points = 30.0`
-- `total_score = 21.9 + 30.0 = 51.9` → **Medium Risk**
-  (rainfall 21.9/70, elevation 30.0/30)
+  `rainfall_points = 25 × (25 / 40) = 15.6`
+- Assuming Karachi is the lowest-elevation city in its region, it gets
+  the full 30 elevation points: `elevation_points = 30.0`
+- `total_score = 15.6 + 30.0 = 45.6` → `score_0_1 = 0.456` →
+  **Moderate Risk** (0.25 - 0.50 range)
 
-### A previously-documented gap, now fixed: the "dead zone"
+### The "dead zone" past `medium_max`
 
-An earlier version of `rainfall_component()`'s extreme-tail formula
-saturated slowly — a rainfall value up to **50% past** a region's
-`medium_max` could still classify Medium Risk, not High. For the old
-Nawabshah thresholds (`medium_max=55mm`), that meant 56mm through 82.5mm
-all scored Medium Risk despite being past the region's own documented
-medium-risk ceiling. Found via `test_risk_scoring.py`'s dead-zone test,
-not observed in production.
+Once rainfall exceeds a region's `medium_max`, the rainfall component
+does not jump straight to its 54-point ceiling — it ramps up gradually,
+reaching full saturation only once rainfall reaches **2× `medium_max`**.
+For `central_plains` (`medium_max = 120mm`), that means rainfall between
+120mm and 240mm all maps to rainfall points somewhere between 50 and 54 —
+a genuine, deliberate flattening near the top of the scale, not a bug.
 
-Fixed by tightening the saturation range from 100% of `medium_max` to
-15%: crossing `medium_max` now reaches High Risk classification within
-roughly 15% past it, not 50%. A small dead zone still exists structurally
-(the formula ramps rather than jumps), but it's now narrow enough that
-`medium_max` means approximately what it says.
+This is a real design trade-off, not a validated finding: the saturation
+distance (100% of `medium_max`) is a somewhat arbitrary choice, not
+independently sourced, and directly caps how much the rainfall component
+alone can push a city toward Very High Risk. `test_risk_scoring.py`'s
+dead-zone test locks in the current 100%-of-`medium_max` saturation
+distance; if that distance is ever narrowed (e.g. to make the tail more
+responsive to extreme rainfall), this section and that test both need to
+be updated together — the two must never drift apart again.
 
 ### Elevation component (0-30 points)
 
@@ -166,11 +197,12 @@ full 30 points; the highest scores 0.
 "Validated" in this document means the thresholds are anchored to an
 official Pakistani rainfall classification (FFD) via a stated, simplified
 scaling method, and the scoring code has automated tests covering
-Low/Medium/High classification, elevation edge cases, and forecast
-aggregation (`test_risk_scoring.py`). It does **not** mean this model has
-been tested against historical flood outcomes in Sindh — that is
-explicitly a post-V1 item (comparing model output against 2-3 documented
-real flood events, including cases where the model would be wrong).
+Low/Moderate/High/Very High classification, elevation edge cases, and
+forecast aggregation (`test_risk_scoring.py`, 15/15 passing). It does
+**not** mean this model has been tested against historical flood outcomes
+in Sindh — that is explicitly a post-V1 item (comparing model output
+against 2-3 documented real flood events, including cases where the
+model would be wrong).
 
 ## Open items
 
@@ -178,4 +210,8 @@ real flood events, including cases where the model would be wrong).
   not independently sourced — a real improvement target post-V1.
 - Update the scenario-mode rainfall input label to say "72 hours"
   explicitly, matching forecast mode.
+- Whether to narrow the dead-zone saturation distance (currently 100% of
+  `medium_max`) is an open design decision, not yet made — see "The dead
+  zone" section above. If changed, it must be changed in code and this
+  doc together, with `test_risk_scoring.py` updated to match.
 - Historical validation against real flood events (post-V1, per roadmap).
