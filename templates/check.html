@@ -48,7 +48,7 @@
         {% if forecast_failed %}
         <p>{{ t.forecast_error_unavailable }}</p>
         {% endif %}
-        <a href="{{ url_for('home', lang=lang) }}">{{ t.back_link }}</a>
+        <a href="{{ url_for('home', lang=lang) }}" class="back-link">{{ t.back_link }}</a>
     </div>
     {% else %}
 
@@ -86,11 +86,11 @@
         </div>
 
         <div class="result-card">
-            <h3 class="result-card-heading">3. Risk Map</h3>
+            <h3 class="result-card-heading">3. {{ t.risk_map_heading }}</h3>
             {% if city_lat and city_lon %}
             <div id="result-map"></div>
             {% else %}
-            <p class="elevation-note">Map unavailable for this location.</p>
+            <p class="elevation-note">{{ t.map_unavailable }}</p>
             {% endif %}
         </div>
     </div>
@@ -102,10 +102,10 @@
          model Hammad rejected, so there's no real data to put in it. -->
     <div class="result-grid result-grid-secondary">
         <div class="result-card">
-            <h3 class="result-card-heading">4. Why is the risk {{ risk_level }}?</h3>
+            <h3 class="result-card-heading">4. {{ t.why_risk_heading.format(risk_level=risk_level) }}</h3>
             <p class="terrain-warning">{{ terrain_warning }}</p>
             <div class="impact-bar-row">
-                <span class="impact-bar-label">Rainfall</span>
+                <span class="impact-bar-label">{{ t.impact_rainfall_label }}</span>
                 <div class="impact-bar-track">
                     <div class="impact-bar-fill" style="width: {{ ((rainfall_points / 70) * 100)|round(0) }}%;"></div>
                 </div>
@@ -113,7 +113,7 @@
             </div>
             {% if elevation_used %}
             <div class="impact-bar-row">
-                <span class="impact-bar-label">Elevation</span>
+                <span class="impact-bar-label">{{ t.impact_elevation_label }}</span>
                 <div class="impact-bar-track">
                     <div class="impact-bar-fill" style="width: {{ ((elevation_points / 30) * 100)|round(0) }}%;"></div>
                 </div>
@@ -132,19 +132,15 @@
             </ul>
         </div>
 
-        <!-- FIX (this session): this panel previously repeated city,
+        <!-- FIX (earlier session): this panel previously repeated city,
              rainfall, and terrain profile verbatim from panel 1 ("Your
              Input") - same values, same page, no new information. Only
              Assessment Type and the shelter heading/message were unique
              to this panel, so those are the only two things left here
-             now. If a future redesign wants this panel to carry
-             something else entirely (data source, timestamp, etc. from
-             the mockup), that's a real content decision to make
-             deliberately - not a reason to bring the duplicate fields
-             back by default. -->
+             now. -->
         <div class="result-card">
-            <h3 class="result-card-heading">6. Key Information</h3>
-            <p><strong>Assessment Type:</strong> {{ 'Forecast (72h)' if mode == 'forecast' else 'Scenario (not current rainfall)' }}</p>
+            <h3 class="result-card-heading">6. {{ t.key_information_heading }}</h3>
+            <p><strong>{{ t.assessment_type_label }}</strong> {{ t.assessment_type_forecast if mode == 'forecast' else t.assessment_type_scenario }}</p>
             <h3 class="result-card-heading" style="margin-top: 20px;">{{ t.shelter_heading }}</h3>
             <p>{{ shelter_message }}</p>
         </div>
@@ -158,7 +154,7 @@
             </p>
         </details>
         <br>
-        <a href="{{ url_for('home', lang=lang) }}">{{ t.back_link }}</a>
+        <a href="{{ url_for('home', lang=lang) }}" class="back-link">{{ t.back_link }}</a>
     </div>
     {% endif %}
 </div>
