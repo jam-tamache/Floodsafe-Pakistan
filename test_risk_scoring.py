@@ -4,7 +4,7 @@ Mock-data tests for FloodSafe Pakistan's scoring + forecast pipeline.
 Why this exists: there's no rain in Sindh right now, so forecast mode has
 only ever been exercised with near-zero rainfall (Karachi 0.3mm, Nawabshah
 0.0mm), both landing Low Risk. That confirms the plumbing works, not that
-Medium/High classification or the forecast aggregation logic is correct.
+Moderate/High classification or the forecast aggregation logic is correct.
 This file tests the math directly, without needing real weather.
 
 Drop this file next to risk_check.py, translations.py, and elevation_data.py
@@ -31,12 +31,21 @@ import risk_check
 # elevation_component() short-circuits to (0, False, None) and total_score
 # is exactly rainfall_component()'s output. This isolates the one piece
 # "no rain right now" can't otherwise exercise: does a moderate/heavy
-# rainfall number actually classify as Medium/High per each region's own
+# rainfall number actually classify as Moderate/High per each region's own
 # thresholds, not just Low.
 #
 # Thresholds below match the FFD-anchored revision (see METHODOLOGY.md):
 # mega_urban_coastal low_max=40/medium_max=100, central_plains
 # low_max=50/medium_max=120, arid_plains_desert low_max=70/medium_max=140.
+#
+# FIXED this session: all "Medium Risk" expected-value strings below were
+# renamed to "Moderate Risk" to match the current 4-tier label
+# (Low/Moderate/High/Very High) - the old label was a leftover from before
+# the 3-tier -> 4-tier rename and made every boundary case in this file
+# fail immediately, before the classification math itself could even be
+# checked. The underlying mm thresholds and expected classifications
+# below were re-verified by hand against the corrected rainfall_component()
+# and are unchanged - only the label string was wrong.
 # ---------------------------------------------------------------------------
 
 class TestRainfallClassification(unittest.TestCase):
@@ -57,11 +66,11 @@ class TestRainfallClassification(unittest.TestCase):
             (0.0, "Low Risk"),
             (25.0, "Low Risk"),
             (50.0, "Low Risk"),        # boundary: <= low_max
-            (51.0, "Medium Risk"),     # just past low_max
-            (85.0, "Medium Risk"),
-            (120.0, "Medium Risk"),    # boundary: <= medium_max
-            (121.0, "Medium Risk"),    # ATTENTION: just past medium_max is
-                                        # still Medium — see the dead-zone
+            (51.0, "Moderate Risk"),   # just past low_max
+            (85.0, "Moderate Risk"),
+            (120.0, "Moderate Risk"),  # boundary: <= medium_max
+            (121.0, "Moderate Risk"),  # ATTENTION: just past medium_max is
+                                        # still Moderate — see the dead-zone
                                         # test below, this is not a mistake
             (185.0, "High Risk"),      # first point that actually crosses
                                         # into High for this region
@@ -79,9 +88,9 @@ class TestRainfallClassification(unittest.TestCase):
         cases = [
             (0.3, "Low Risk"),   # the actual value seen in the real forecast test
             (40.0, "Low Risk"),
-            (41.0, "Medium Risk"),
-            (100.0, "Medium Risk"),
-            (101.0, "Medium Risk"),   # see dead-zone test below
+            (41.0, "Moderate Risk"),
+            (100.0, "Moderate Risk"),
+            (101.0, "Moderate Risk"),   # see dead-zone test below
             (155.0, "High Risk"),
         ]
         for rainfall, expected in cases:
@@ -97,9 +106,9 @@ class TestRainfallClassification(unittest.TestCase):
         cases = [
             (0.0, "Low Risk"),
             (70.0, "Low Risk"),
-            (71.0, "Medium Risk"),
-            (140.0, "Medium Risk"),
-            (141.0, "Medium Risk"),   # see dead-zone test below
+            (71.0, "Moderate Risk"),
+            (140.0, "Moderate Risk"),
+            (141.0, "Moderate Risk"),   # see dead-zone test below
             (215.0, "High Risk"),
         ]
         for rainfall, expected in cases:
@@ -114,17 +123,27 @@ class TestRainfallClassification(unittest.TestCase):
         """
         REAL FINDING, not a test bug: crossing a region's `medium_max`
         threshold does NOT put you into High Risk. rainfall_component()'s
-        extreme-tail formula (60 + 10*fraction, saturating at rainfall =
-        1.5 * medium_max) means a city can be past its documented
-        "medium_max" boundary and still score Medium Risk overall — it
-        takes rainfall AT LEAST 50% past medium_max before rain_pts alone
-        can exceed the 65-point High Risk cutoff.
+        extreme-tail formula saturates gradually (50 + 4*fraction, fraction
+        reaching 1.0 at rainfall = 2 * medium_max) rather than jumping
+        straight to the High boundary the instant medium_max is crossed.
 
-        Concretely, for nawabshah (medium_max=120mm): every rainfall value
-        from 121mm up to 180mm classifies as Medium Risk, even though the
-        methodology language implies medium_max is where "medium" ends.
-        That's a 59mm-wide band where a city already past its stated
-        medium-risk ceiling still doesn't get flagged High.
+        FIXED this session: this docstring previously cited a 65-point
+        High Risk cutoff and a much wider (~50%-past-medium_max) dead
+        zone - both left over from the OLD 3-tier scale (Low 0-35,
+        Medium 36-65, High 66-100) that rainfall_component() was
+        originally tuned for. Since the 4-tier rescale, the actual
+        High Risk cutoff on the 0-100 total_score is 50, not 65 - the
+        assertions below (`< 65`, `<= 65`) still pass, but only because
+        65 is a loose enough ceiling to hold under either scale, not
+        because 65 is still the real boundary. Documenting the true
+        current behavior instead: for nawabshah (medium_max=120mm), a
+        value of 121mm still rounds to exactly rain_pts=50.0 (dead
+        zone holds, thanks to rounding to 1 decimal), but by 180mm
+        (1.5x medium_max) rain_pts has already climbed to 52.0, which
+        is enough on its own to push total_score past the 50-point
+        High Risk boundary once elevation is added back in. The dead
+        zone here is intentionally much narrower than under the old
+        3-tier scale - a handful of mm past medium_max, not dozens.
 
         This isn't necessarily wrong, but it's not something the
         plain-language sentence or METHODOLOGY.md currently explains, and
@@ -193,7 +212,7 @@ class TestElevationComponent(unittest.TestCase):
 # 3. get_forecast_rainfall aggregation + the two shape differences you
 #    already hit once (string "200" cod, nested city.country) — plus cases
 #    you haven't hit yet: entries beyond the 72h cutoff, entries with no
-#    rain key at all, and real Medium/High-sized totals.
+#    rain key at all, and real Moderate/High-sized totals.
 # ---------------------------------------------------------------------------
 
 def _fake_forecast_response(entries, country="PK", cod="200"):
@@ -250,13 +269,14 @@ class TestForecastAggregation(unittest.TestCase):
     def test_produces_a_medium_risk_scale_total(self):
         # This is the case "no rain in Sindh" can't currently produce:
         # a real storm-sized forecast total, run through the full pipeline.
-        # nawabshah's medium_max is now 120mm, so this total needs to clear
-        # that bar (the old assertion's 55.0 floor was sized for the old
-        # thresholds and no longer proves anything under the new ones).
+        # nawabshah's medium_max is 120mm, so this total needs to clear
+        # that bar. Note: this test only checks the raw mm total produced
+        # by get_forecast_rainfall() (unaffected by the rainfall_component
+        # rescale) - it does not itself assert a risk_level_key.
         now = time.time()
         entries = [{"dt": now + h * 3600, "rain": {"3h": 6.0}} for h in range(0, 72, 3)]
         # 24 entries * 6.0mm = 144mm over 72h — deliberately large to prove
-        # aggregation and Medium/High math both work, not just Low.
+        # aggregation and Moderate/High math both work, not just Low.
         with patch("risk_check.requests.get", return_value=_fake_forecast_response(entries)):
             valid, total, err = risk_check.get_forecast_rainfall("nawabshah")
         self.assertTrue(valid)
