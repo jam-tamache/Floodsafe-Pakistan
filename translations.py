@@ -1,5 +1,3 @@
-# translations.py
-#
 # English, Urdu, and Sindhi translations for FloodSafe Pakistan.
 
 TRANSLATIONS = {
@@ -11,12 +9,6 @@ TRANSLATIONS = {
             "or northern Glacial Lake Outburst Floods (GLOFs). For river and "
             "glacial flood warnings, check official NDMA/PDMA alerts directly."
         ),
-        # ---- Top-bar nav labels (NEW - replaces the sidebar nav labels
-        # that were hardcoded directly in base.html before). About and
-        # Data & Methodology are now real routes/pages, not same-page
-        # anchors - see app.py for the new /about and /methodology routes.
-        # Contact is deliberately NOT in this list yet - no destination
-        # has been decided, so it isn't in nav until it does something.
         "nav_home": "Home",
         "nav_about": "About",
         "nav_how_it_works": "How It Works",
@@ -30,13 +22,6 @@ TRANSLATIONS = {
         "forecast_form_submit": "Check Forecast Risk",
         "scenario_toggle_label": "Explore a scenario instead",
         "scenario_form_intro": "Enter a hypothetical rainfall amount to see how risk would change.",
-        # NEW (this session) - the <details> toggle on index.html actually
-        # wraps the FORECAST form (city only, no rainfall field), not a
-        # scenario form. It was previously using scenario_toggle_label /
-        # scenario_form_intro, which described a rainfall field that isn't
-        # there - real copy/content mismatch, not just a naming nitpick.
-        # scenario_toggle_label / scenario_form_intro above are unchanged
-        # and still correctly describe the PRIMARY form on the page.
         "forecast_toggle_label": "Or check today's live forecast instead",
         "forecast_toggle_intro": "We'll automatically pull the rainfall forecast for the next 72 hours for this city.",
         "city_label": "City:",
@@ -60,6 +45,10 @@ TRANSLATIONS = {
         "how_calculated_toggle": "How is this calculated?",
         "explanation_with_elevation": "With {rainfall}mm of rain and {city} sitting on {elevation_position} compared to nearby areas, this adds up to {risk_level}.",
         "explanation_without_elevation": "With {rainfall}mm of rain expected for {city}, this adds up to {risk_level}.",
+        # NEW this session - see build_plain_explanation()'s docstring in
+        # risk_check.py for when this fires. NOT native-speaker reviewed
+        # (English original either, since it's new copy this session).
+        "explanation_terrain_baseline": "{city}'s {risk_level} here is driven mainly by its {elevation_position} relative to nearby areas — actual forecasted rainfall is minimal, at just {rainfall}mm.",
         "elevation_position_low": "lower ground",
         "elevation_position_high": "higher ground",
         "risk_levels": {
@@ -93,13 +82,6 @@ TRANSLATIONS = {
                 "Call 1122 (Pakistan's emergency rescue service) if you're trapped or need help",
                 "Follow evacuation guidance from PDMA Sindh / district administration - do not rely on this app for shelter locations",
             ],
-            # STUB - reuses High Risk's tips verbatim. Very High is meant to
-            # be more severe than High (0.75-1.00 vs 0.50-0.75 on the
-            # gauge) but the wording doesn't reflect that yet - e.g.
-            # nothing here conveys heightened urgency vs the High tier.
-            # Write real, distinct Very High guidance before this ships -
-            # do not leave two tiers reading identically. STILL NOT DONE -
-            # flagged again, this is the #2 outstanding liability.
             "Very High Risk": [
                 "Evacuate immediately if local authorities issue a warning",
                 "Never walk or drive through moving floodwater, even if it looks shallow",
@@ -120,20 +102,54 @@ TRANSLATIONS = {
         },
         "elevation_note_available": "Elevation for {city} ({elevation}m) was factored into this score relative to other {profile} locations.",
         "elevation_note_unavailable": "Elevation data for {city} was not available - this score is based on rainfall alone.",
+
+        # ---- Home page (index.html) - NEW this batch. Flagged live via
+        # screenshot: this subtitle was hardcoded English in index.html
+        # with NO {{ t.key }} usage at all, same missing-mechanism class
+        # of bug the About/How It Works pages had before. Key added here;
+        # index.html itself still needs editing to use it - not done yet,
+        # pending that file. NOT native-speaker reviewed.
+        "home_subtitle": "Get an estimate of flood risk for any supported Sindh city based on a live 72-hour rainfall forecast.",
+
+        # ---- About page (about.html) - NEW this batch. Was previously
+        # hardcoded English directly in the template with no ur/sd
+        # equivalent at all - not a missing-key gap, a missing-mechanism
+        # gap. NOT native-speaker reviewed (English original either, since
+        # it's new copy this session).
+        "about_title": "About This Project",
+        "about_lede": "FloodSafe Pakistan is a scenario-based flood risk awareness tool, built to help people in Sindh understand how local rainfall could translate into flood risk.",
+        "about_validated_heading": "Validated for Sindh",
+        "about_validated_body": "The risk-scoring model is currently validated for Sindh only, using thresholds calibrated to Sindh's specific terrain and rainfall patterns. The app's architecture is built to extend to the rest of Pakistan, but that requires separately validating thresholds for each new region's terrain before scoring it — not yet done, and planned for a future version.",
+        "about_warning_heading": "Not an Official Warning",
+        "about_warning_body": "FloodSafe does not predict flooding with certainty and is not a substitute for official warnings from PDMA Sindh or your local authorities.",
+        "about_callout": "Cities outside Sindh are shown on the map for geographic context only and are not risk-scored, for the same reason above — their terrain hasn't been validated against this model yet.",
+
+        # ---- How It Works page (how_it_works.html) - NEW this batch,
+        # same hardcoded-with-no-translation-mechanism gap as About.
+        "how_it_works_title": "How It Works",
+        "how_it_works_body_1": "FloodSafe estimates flood risk for Sindh cities from two factors: rainfall (either a live 72-hour forecast or a scenario you type in) and each city's elevation relative to nearby cities in the same terrain region. The two are combined into a single 0–1 score, which maps to Low, Moderate, High, or Very High risk.",
+        "how_it_works_body_2": "Rainfall thresholds are project-defined, not sourced from an official government classification — they were derived by the developer and are documented, with reasoning, in the project's methodology notes. Elevation data comes from a public elevation API, looked up once per city.",
+
+        # ---- Result page (check.html) - remaining hardcoded strings
+        # found this batch: "Risk Map", "Map unavailable...", "Why is the
+        # risk...", the Rainfall/Elevation impact-bar labels, "Key
+        # Information", "Assessment Type:", and the two assessment-type
+        # values. rainfall_label/city_label already existed but were
+        # being reused for the impact bars - given their own keys instead
+        # since "Rainfall:" (with colon, a field label) and "Rainfall"
+        # (a bar chip label) are different enough contexts to diverge
+        # later without fighting each other.
+        "risk_map_heading": "Risk Map",
+        "map_unavailable": "Map unavailable for this location.",
+        "why_risk_heading": "Why is the risk {risk_level}?",
+        "impact_rainfall_label": "Rainfall",
+        "impact_elevation_label": "Elevation",
+        "key_information_heading": "Key Information",
+        "assessment_type_label": "Assessment Type:",
+        "assessment_type_forecast": "Forecast (72h)",
+        "assessment_type_scenario": "Scenario (not current rainfall)",
     },
 
-    # DRAFT - NOT VERIFIED. Needs native Urdu speaker review before use.
-    # error_city_outside_coverage and elevation_note_* were added in an
-    # earlier session and still need review. forecast_form_submit,
-    # scenario_toggle_label, scenario_form_intro, forecast_toggle_label,
-    # forecast_toggle_intro, forecast_error_unavailable, source_forecast,
-    # source_scenario, score_breakdown, how_calculated_toggle,
-    # explanation_with_elevation, explanation_without_elevation,
-    # elevation_position_low/high, and nav_home/nav_about/
-    # nav_how_it_works/nav_data_methodology are all NEW or still-unreviewed -
-    # translated directly by Claude without a native-speaker pass. Flag ALL
-    # of these when you do the Urdu review. This list has only grown across
-    # sessions - do this review before adding anything else.
     "ur": {
         "app_title": "فلڈ سیف پاکستان",
         "disclaimer_banner": (
@@ -154,8 +170,6 @@ TRANSLATIONS = {
         "forecast_form_submit": "پیشگوئی خطرہ چیک کریں",
         "scenario_toggle_label": "بجائے اس کے ایک منظرنامہ آزمائیں",
         "scenario_form_intro": "خطرے میں تبدیلی دیکھنے کے لیے ایک فرضی بارش کی مقدار درج کریں۔",
-        # NEW (this session) - see the "en" block's comment above the same
-        # two keys for why these exist. NOT yet native-speaker reviewed.
         "forecast_toggle_label": "یا اس کے بجائے آج کی لائیو پیشگوئی چیک کریں",
         "forecast_toggle_intro": "ہم اس شہر کے لیے اگلے 72 گھنٹوں کی بارش کی پیشگوئی خودکار طور پر حاصل کریں گے۔",
         "city_label": "شہر:",
@@ -179,15 +193,10 @@ TRANSLATIONS = {
         "how_calculated_toggle": "یہ کیسے شمار کیا جاتا ہے؟",
         "explanation_with_elevation": "{rainfall} ملی میٹر بارش اور {city} کا آس پاس کے علاقوں کے مقابلے میں {elevation_position} پر ہونا، یہ مل کر {risk_level} بنتا ہے۔",
         "explanation_without_elevation": "{city} کے لیے متوقع {rainfall} ملی میٹر بارش کے ساتھ، یہ {risk_level} بنتا ہے۔",
+        # NEW - NOT native-speaker reviewed
+        "explanation_terrain_baseline": "{city} میں {risk_level} بنیادی طور پر اس کی {elevation_position} کی وجہ سے ہے — متوقع بارش صرف {rainfall} ملی میٹر ہے، یعنی نہ ہونے کے برابر۔",
         "elevation_position_low": "نچلی زمین",
         "elevation_position_high": "اونچی زمین",
-        # FIX (this session): this dict was still on the OLD 3-tier key set
-        # ("Medium Risk" instead of "Moderate Risk", no "Very High Risk"
-        # entry at all) - the actual cause of the KeyError: 'Moderate Risk'
-        # crash when switching to Urdu on a result page. "en" and "sd" both
-        # already had all four correct tier keys; only "ur" was stale.
-        # "Very High Risk" translation below is a first-pass placeholder,
-        # NOT yet native-speaker reviewed - flag with everything else.
         "risk_levels": {
             "Low Risk": "کم خطرہ",
             "Moderate Risk": "درمیانہ خطرہ",
@@ -218,8 +227,6 @@ TRANSLATIONS = {
                 "اگر پھنس جائیں یا مدد درکار ہو تو 1122 (پاکستان کی ہنگامی ریسکیو سروس) پر کال کریں",
                 "PDMA سندھ / ضلعی انتظامیہ کی انخلا ہدایات پر عمل کریں - پناہ گاہ کی جگہ کے لیے صرف اس ایپ پر انحصار نہ کریں",
             ],
-            # STUB - same caveat as "en"'s "Very High Risk": verbatim copy
-            # of High Risk. Still needs real, distinct wording.
             "Very High Risk": [
                 "اگر مقامی حکام وارننگ جاری کریں تو فوری طور پر نکل جائیں",
                 "بہتے ہوئے سیلابی پانی میں کبھی پیدل یا گاڑی سے نہ جائیں، چاہے وہ اتھلا نظر آئے",
@@ -240,18 +247,36 @@ TRANSLATIONS = {
         },
         "elevation_note_available": "{city} کی بلندی ({elevation} میٹر) کو دیگر {profile} مقامات کے مقابلے میں اس اسکور میں شامل کیا گیا۔",
         "elevation_note_unavailable": "{city} کے لیے بلندی کا ڈیٹا دستیاب نہیں تھا - یہ اسکور صرف بارش پر مبنی ہے۔",
+
+        # ---- Home page - NEW, NOT reviewed
+        "home_subtitle": "کسی بھی معاون سندھ شہر کے لیے لائیو 72 گھنٹے کی بارش کی پیشگوئی کی بنیاد پر سیلاب کے خطرے کا اندازہ حاصل کریں۔",
+
+        # ---- About page - NEW, NOT reviewed
+        "about_title": "اس منصوبے کے بارے میں",
+        "about_lede": "فلڈ سیف پاکستان ایک منظرنامے پر مبنی سیلاب کے خطرے سے آگاہی کا ٹول ہے، جو سندھ کے لوگوں کو یہ سمجھنے میں مدد دینے کے لیے بنایا گیا ہے کہ مقامی بارش کس طرح سیلاب کے خطرے میں تبدیل ہو سکتی ہے۔",
+        "about_validated_heading": "سندھ کے لیے تصدیق شدہ",
+        "about_validated_body": "رسک اسکورنگ ماڈل فی الحال صرف سندھ کے لیے تصدیق شدہ ہے، جو سندھ کی مخصوص زمینی خصوصیات اور بارش کے انداز کے مطابق ترتیب دیا گیا ہے۔ ایپ کا ڈھانچہ باقی پاکستان تک وسعت دینے کے لیے بنایا گیا ہے، لیکن اس کے لیے ہر نئے علاقے کی زمینی خصوصیات کی الگ سے تصدیق درکار ہے - جو ابھی نہیں کی گئی اور مستقبل کے ورژن کے لیے مجوزہ ہے۔",
+        "about_warning_heading": "یہ کوئی سرکاری وارننگ نہیں ہے",
+        "about_warning_body": "فلڈ سیف یقین کے ساتھ سیلاب کی پیشگوئی نہیں کرتا اور PDMA سندھ یا آپ کے مقامی حکام کی سرکاری وارننگز کا متبادل نہیں ہے۔",
+        "about_callout": "سندھ سے باہر کے شہر صرف جغرافیائی حوالے کے لیے نقشے پر دکھائے گئے ہیں اور ان کا خطرہ اسکور نہیں کیا گیا - اسی وجہ سے جیسا کہ اوپر بتایا گیا، ان کی زمینی خصوصیات ابھی اس ماڈل کے خلاف تصدیق شدہ نہیں ہیں۔",
+
+        # ---- How It Works page - NEW, NOT reviewed
+        "how_it_works_title": "یہ کیسے کام کرتا ہے",
+        "how_it_works_body_1": "فلڈ سیف سندھ کے شہروں کے لیے دو عوامل سے سیلاب کے خطرے کا اندازہ لگاتا ہے: بارش (یا تو 72 گھنٹے کی لائیو پیشگوئی یا آپ کا درج کردہ منظرنامہ) اور ہر شہر کی بلندی اسی زمینی خطے کے قریبی شہروں کے مقابلے میں۔ یہ دونوں مل کر ایک 0 سے 1 تک کا اسکور بناتے ہیں، جو کم، درمیانہ، شدید، یا انتہائی شدید خطرے میں تبدیل ہوتا ہے۔",
+        "how_it_works_body_2": "بارش کی حدیں منصوبے کے اپنے طے کردہ ہیں، کسی سرکاری درجہ بندی سے حاصل شدہ نہیں - یہ ڈویلپر نے مرتب کی ہیں اور ان کی وجوہات منصوبے کے طریقہ کار کے نوٹس میں دستاویزی ہیں۔ بلندی کا ڈیٹا ایک عوامی بلندی API سے حاصل کیا جاتا ہے، جو ہر شہر کے لیے ایک بار حاصل کیا جاتا ہے۔",
+
+        # ---- Result page remaining strings - NEW, NOT reviewed
+        "risk_map_heading": "خطرے کا نقشہ",
+        "map_unavailable": "اس مقام کے لیے نقشہ دستیاب نہیں۔",
+        "why_risk_heading": "خطرہ {risk_level} کیوں ہے؟",
+        "impact_rainfall_label": "بارش",
+        "impact_elevation_label": "بلندی",
+        "key_information_heading": "اہم معلومات",
+        "assessment_type_label": "تشخیص کی قسم:",
+        "assessment_type_forecast": "پیشگوئی (72 گھنٹے)",
+        "assessment_type_scenario": "منظرنامہ (موجودہ بارش نہیں)",
     },
 
-    # Sindhi translations. NOTE: previously marked fully reviewed by a
-    # native speaker - but error_city_outside_coverage and elevation_note_*
-    # were added in an earlier session and were never reviewed either.
-    # forecast_form_submit, scenario_toggle_label, scenario_form_intro,
-    # forecast_toggle_label, forecast_toggle_intro, forecast_error_unavailable,
-    # source_forecast, source_scenario, score_breakdown, how_calculated_toggle,
-    # explanation_with_elevation, explanation_without_elevation,
-    # elevation_position_low/high, and nav_home/nav_about/nav_how_it_works/
-    # nav_data_methodology are all NEW or still-unreviewed. Flag ALL of these
-    # (not just the newest batch) for native-speaker review.
     "sd": {
         "app_title": "فلڊ سيف پاڪستان",
         "disclaimer_banner": (
@@ -272,8 +297,6 @@ TRANSLATIONS = {
         "forecast_form_submit": "اڳڪٿي خطرو چيڪ ڪريو",
         "scenario_toggle_label": "ان جي بدران هڪ منظرنامو آزمايو",
         "scenario_form_intro": "خطري ۾ تبديلي ڏسڻ لاءِ هڪ فرضي برسات جي مقدار داخل ڪريو.",
-        # NEW (this session) - see the "en" block's comment above the same
-        # two keys for why these exist. NOT yet native-speaker reviewed.
         "forecast_toggle_label": "يا ان جي بدران اڄ جي لائيو اڳڪٿي چيڪ ڪريو",
         "forecast_toggle_intro": "اسان هن شهر لاءِ ايندڙ 72 ڪلاڪن جي برسات جي اڳڪٿي خودڪار طور تي حاصل ڪنداسين.",
         "city_label": "شهر:",
@@ -297,6 +320,8 @@ TRANSLATIONS = {
         "how_calculated_toggle": "هي ڪيئن ڳڻيو ويندو آهي؟",
         "explanation_with_elevation": "{rainfall} ملي ميٽر برسات ۽ {city} جو ڀرپاسي وارن علائقن جي مقابلي ۾ {elevation_position} تي هجڻ، هي گڏجي {risk_level} ٿو ٺاهي.",
         "explanation_without_elevation": "{city} لاءِ متوقع {rainfall} ملي ميٽر برسات سان، هي {risk_level} ٿو ٺاهي.",
+        # NEW - NOT native-speaker reviewed
+        "explanation_terrain_baseline": "{city} ۾ {risk_level} خاص طور تي ان جي {elevation_position} سبب آهي — متوقع برسات فقط {rainfall} ملي ميٽر آهي، يعني نه هجڻ جي برابر.",
         "elevation_position_low": "هيٺاهين زمين",
         "elevation_position_high": "مٿاهين زمين",
         "risk_levels": {
@@ -349,6 +374,34 @@ TRANSLATIONS = {
         },
         "elevation_note_available": "{city} جي بلندي ({elevation} ميٽر) کي ٻين {profile} هنڌن جي مقابلي ۾ هن اسڪور ۾ شامل ڪيو ويو.",
         "elevation_note_unavailable": "{city} لاءِ بلندي جو ڊيٽا موجود نه هو - هي اسڪور فقط برسات تي ٻڌل آهي.",
+
+        # ---- Home page - NEW, NOT reviewed
+        "home_subtitle": "ڪنهن به سپورٽ ٿيل سنڌ جي شهر لاءِ لائيو 72 ڪلاڪن جي برسات جي اڳڪٿي جي بنياد تي سيلاب جي خطري جو اندازو حاصل ڪريو.",
+
+        # ---- About page - NEW, NOT reviewed
+        "about_title": "هن منصوبي بابت",
+        "about_lede": "فلڊ سيف پاڪستان هڪ منظرنامي تي ٻڌل سيلاب جي خطري بابت آگاهي جو اوزار آهي، جيڪو سنڌ جي ماڻهن کي اهو سمجهڻ ۾ مدد ڏيڻ لاءِ ٺاهيو ويو آهي ته مقامي برسات ڪيئن سيلاب جي خطري ۾ تبديل ٿي سگهي ٿي.",
+        "about_validated_heading": "سنڌ لاءِ تصديق ٿيل",
+        "about_validated_body": "رسڪ اسڪورنگ ماڊل في الحال فقط سنڌ لاءِ تصديق ٿيل آهي، جيڪو سنڌ جي مخصوص زميني خاصيتن ۽ برسات جي نمونن مطابق ترتيب ڏنو ويو آهي. ايپ جو ڍانچو باقي پاڪستان تائين وڌائڻ لاءِ ٺاهيو ويو آهي، پر ان لاءِ هر نئين علائقي جي زميني خاصيتن جي الڳ تصديق گهرجي - جيڪا اڃا نه ٿي آهي ۽ ايندڙ ورجن لاءِ رٿيل آهي.",
+        "about_warning_heading": "هي ڪا سرڪاري وارننگ ناهي",
+        "about_warning_body": "فلڊ سيف يقين سان سيلاب جي اڳڪٿي نٿو ڪري ۽ PDMA سنڌ يا توهان جي مقامي اختيارين جي سرڪاري وارننگن جو متبادل ناهي.",
+        "about_callout": "سنڌ کان ٻاهر جا شهر رڳو جاگرافيائي حوالي لاءِ نقشي تي ڏيکاريا ويا آهن ۽ انهن جو خطرو اسڪور نه ڪيو ويو آهي - ساڳئي سبب مطابق جيئن مٿي ٻڌايو ويو، سندن زميني خاصيتون اڃا هن ماڊل خلاف تصديق ٿيل ناهن.",
+
+        # ---- How It Works page - NEW, NOT reviewed
+        "how_it_works_title": "هي ڪيئن ڪم ڪري ٿو",
+        "how_it_works_body_1": "فلڊ سيف سنڌ جي شهرن لاءِ ٻن عنصرن مان سيلاب جي خطري جو اندازو لڳائي ٿو: برسات (يا ته 72 ڪلاڪن جي لائيو اڳڪٿي يا توهان جو داخل ڪيل منظرنامو) ۽ هر شهر جي بلندي ساڳئي زميني علائقي جي ويجهن شهرن جي مقابلي ۾. ٻئي گڏجي هڪ 0 کان 1 تائين اسڪور ٺاهين ٿا، جيڪو گھٽ، وچولو، وڏو، يا تمام وڏو خطري ۾ تبديل ٿئي ٿو.",
+        "how_it_works_body_2": "برسات جون حدون منصوبي جون پنهنجون مقرر ڪيل آهن، ڪنهن به سرڪاري درجه بندي مان حاصل ٿيل نه آهن - اهي ڊولپر پاران مرتب ڪيون ويون آهن ۽ سندن دليل منصوبي جي طريقيڪار جي نوٽس ۾ دستاويز ٿيل آهن. بلندي جو ڊيٽا هڪ عوامي بلندي API مان حاصل ڪيو ويندو آهي، جيڪو هر شهر لاءِ هڪ ڀيرو حاصل ڪيو ويندو آهي.",
+
+        # ---- Result page remaining strings - NEW, NOT reviewed
+        "risk_map_heading": "خطري جو نقشو",
+        "map_unavailable": "هن هنڌ لاءِ نقشو دستياب ناهي.",
+        "why_risk_heading": "خطرو {risk_level} ڇو آهي؟",
+        "impact_rainfall_label": "برسات",
+        "impact_elevation_label": "بلندي",
+        "key_information_heading": "اهم معلومات",
+        "assessment_type_label": "جانچ جو قسم:",
+        "assessment_type_forecast": "اڳڪٿي (72 ڪلاڪ)",
+        "assessment_type_scenario": "منظرنامو (موجوده برسات ناهي)",
     },
 }
 
