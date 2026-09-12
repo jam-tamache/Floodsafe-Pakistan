@@ -1,51 +1,64 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html lang="{{ lang }}" dir="{{ 'rtl' if lang in ['ur', 'sd'] else 'ltr' }}">
+{% block title %}FloodSafe Pakistan{% endblock %}
 
-<head>
-    <title>FloodSafe_Pakistan</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-
-<body>
-<div class="container">
-
-    <div class="lang-switch">
-        <a href="?lang=en" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
-        <a href="?lang=ur" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
-        <a href="?lang=sd" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
+{% block content %}
+<div class="home-hero">
+    <div class="home-intro">
+        <h1 class="home-title">{{ t.app_title }}</h1>
+        <p class="home-subtitle">{{ t.home_subtitle }}</p>
     </div>
 
-    <h1>{{ t.app_title }}</h1>
+    <div class="home-card">
+        <div class="disclaimer-banner">
+            &#9888; {{ t.disclaimer_banner }}
+        </div>
 
-    <div class="disclaimer-banner">
-        ⚠ {{ t.disclaimer_banner }}
-    </div>
-
-    <br>
-    <form action="{{ url_for('forecast') }}" method="GET">
-        <input type="hidden" name="lang" value="{{ lang }}">
-        <label for="city">{{ t.form_city_label }}</label>
-        <input type="text" id="city" name="city" placeholder="{{ t.form_city_placeholder }}">
-        <button type="submit">{{ t.forecast_form_submit }}</button>
-    </form>
-
-    <br>
-    <details class="scenario-toggle">
-        <summary>{{ t.scenario_toggle_label }}</summary>
-        <p>{{ t.scenario_form_intro }}</p>
-        <form action="{{ url_for('result') }}" method="GET">
+        <!-- Primary flow: 72h forecast (city only). Swapped to primary
+             per Hammad's explicit request (Sep 4) - forecast reflects
+             what's actually about to happen, scenario is the
+             hypothetical "what if" case and now sits below it. -->
+        <form action="{{ url_for('forecast') }}" method="GET" class="home-form">
             <input type="hidden" name="lang" value="{{ lang }}">
-            <label for="scenario-city">{{ t.form_city_label }}</label>
-            <input type="text" id="scenario-city" name="city" placeholder="{{ t.form_city_placeholder }}">
-            <label for="rainfall">{{ t.form_rainfall_label }}</label>
-            <input type="text" id="rainfall" name="rainfall" placeholder="{{ t.form_rainfall_placeholder }}">
-            <button type="submit">{{ t.form_submit }}</button>
+
+            <label for="forecast-city">{{ t.form_city_label }}</label>
+            <select id="forecast-city" name="city" required>
+                <option value="" disabled selected>{{ t.form_city_placeholder }}</option>
+                {% for c in cities %}
+                <option value="{{ c }}">{{ c }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">{{ t.forecast_form_submit }}</button>
         </form>
-    </details>
 
+        <!-- Secondary flow: scenario (city + hypothetical rainfall).
+             Now correctly uses scenario_toggle_label / scenario_form_intro
+             - these already describe a typed rainfall amount, matching
+             what's actually in this form. forecast_toggle_label /
+             forecast_toggle_intro are now unused (were only correct while
+             this toggle wrapped the forecast form). -->
+        <details class="scenario-toggle">
+            <summary>{{ t.scenario_toggle_label }}</summary>
+            <p>{{ t.scenario_form_intro }}</p>
+            <form action="{{ url_for('result') }}" method="GET">
+                <input type="hidden" name="lang" value="{{ lang }}">
+
+                <label for="scenario-city">{{ t.form_city_label }}</label>
+                <select id="scenario-city" name="city" required>
+                    <option value="" disabled selected>{{ t.form_city_placeholder }}</option>
+                    {% for c in cities %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="rainfall">{{ t.form_rainfall_label }}</label>
+                <input type="number" id="rainfall" name="rainfall" min="0" step="0.1" placeholder="{{ t.form_rainfall_placeholder }}" required>
+                <span class="field-hint">{{ t.form_rainfall_hint }}</span>
+
+                <button type="submit">{{ t.form_submit }}</button>
+            </form>
+        </details>
+    </div>
 </div>
-</body>
-
-</html>
+{% endblock %}
