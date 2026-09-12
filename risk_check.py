@@ -4,6 +4,9 @@ from flask import Flask, jsonify, render_template, request
 import requests
 import csv
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
 def load_city_coordinates():
     """Loads city_coordinates.csv into a list of dicts for the Leaflet map.
     Kept separate from elevation_data.py's loading since this is purely
@@ -11,7 +14,7 @@ def load_city_coordinates():
     """
     cities = []
     try:
-        with open("city_coordinates.csv", newline="", encoding="utf-8") as f:
+        with open(os.path.join(BASE_DIR, "city_coordinates.csv"), newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 if row.get("status") != "OK":
@@ -198,6 +201,16 @@ ELEVATION_COMPONENT_MAX = 30  # points contributed by elevation, unchanged this 
 # Very High Risk (75-100) is reachable but only near its low end.
 RAINFALL_COMPONENT_MAX = 54
 
+# NEW this session: threshold below which rainfall's contribution to the
+# score is considered "negligible" for messaging purposes only - it does
+# NOT change the score itself, only which sentence build_plain_explanation()
+# picks. 2.0 out of the 25-point Low/Moderate rainfall band was chosen as
+# "close enough to zero that a lay reader would call this dry" - e.g. the
+# Sep 11 case of 1.5mm rainfall still contributing ~0.9 points. Revisit
+# this number if it ever produces a false terrain-baseline message for a
+# rainfall total that a reader would actually consider real rain.
+RAINFALL_NEGLIGIBLE_THRESHOLD = 2.0
+
 
 def elevation_component(city, profile_key):
     """Returns (points_0_to_30, elevation_was_used: bool, elevation_m_or_None).
@@ -291,7 +304,7 @@ RISK_SLUGS = {
     "Very High Risk": "very-high",
 }
 
-# FIX (earlier this session): RISK_COLORS is now module-level and used by
+# FIX (earlier session): RISK_COLORS is now module-level and used by
 # BOTH check_risk() (scenario/forecast result pages) AND
 # _compute_risk_core() (the map cache, via get_all_city_risk_data()).
 # Previously the color map was a local dict defined only inside
@@ -325,7 +338,7 @@ def _compute_risk_core(city, rainfall_mm):
     languages, instead of caching a specific language's rendered text.
     Raises MapOnlyCityError / UnsupportedCityError, same as get_profile().
 
-    FIXED this session (real bug #2 of the same underlying class): the
+    FIXED earlier session (real bug #2 of the same underlying class): the
     risk tier used to be classified using score_0_1 AFTER it had already
     been rounded to 2 decimal places for display. That rounding could
     erase a genuine, real excess past a tier boundary - e.g. total_score
@@ -363,7 +376,7 @@ def _compute_risk_core(city, rainfall_mm):
         "score_0_1": score_0_1,              # display-rounded - drives the gauge
         "risk_level_key": risk_key,
         "risk_slug": RISK_SLUGS[risk_key],    # fixes the CSS-class bug described above
-        "risk_color": RISK_COLORS[risk_key],  # FIX (earlier this session) - see RISK_COLORS note above
+        "risk_color": RISK_COLORS[risk_key],  # FIX (earlier session) - see RISK_COLORS note above
     }
 
 
@@ -386,15 +399,34 @@ def get_lang():
     return lang
 
 
-def build_plain_explanation(rainfall_mm, elevation_used, elev_pts, city, risk_level_display, t):
+def build_plain_explanation(rainfall_mm, elevation_used, elev_pts, rain_pts, risk_key, city, risk_level_display, t):
     """One always-visible sentence explaining WHY the score came out the way
     it did, in plain language - the raw "Score: 67.0/100 (rainfall 37.0/70,
     elevation 30.0/30)" breakdown means nothing to someone deciding whether
     to evacuate. That breakdown still exists (moved behind a "How is this
     calculated?" toggle in check.html) for people who want the methodology
     transparency, but this sentence is the thing an ordinary person reads.
+
+    NEW this session: a third branch, "terrain baseline", for the case a
+    city is scored Moderate+ almost entirely off low-lying terrain while
+    rainfall is negligible (e.g. Badin @ 1.5mm during a dry spell still
+    reading Moderate Risk off elevation alone). Without this, that reads
+    to a lay user as "the app is warning about a storm that isn't
+    happening." Gated on rain_pts < RAINFALL_NEGLIGIBLE_THRESHOLD AND
+    risk_key != "Low Risk" - a Low Risk city with negligible rain doesn't
+    need a special caveat, that's just the expected/reassuring case.
     """
-    if elevation_used:
+    if elevation_used and rain_pts < RAINFALL_NEGLIGIBLE_THRESHOLD and risk_key != "Low Risk":
+        position_key = (
+            "elevation_position_low"
+            if elev_pts >= (ELEVATION_COMPONENT_MAX / 2)
+            else "elevation_position_high"
+        )
+        return t["explanation_terrain_baseline"].format(
+            rainfall=rainfall_mm, city=city.title(),
+            elevation_position=t[position_key], risk_level=risk_level_display,
+        )
+    elif elevation_used:
         position_key = (
             "elevation_position_low"
             if elev_pts >= (ELEVATION_COMPONENT_MAX / 2)
@@ -435,7 +467,7 @@ def check_risk(rainfall_mm, city, t):
 
     risk_level_display = t["risk_levels"][risk_key]
     plain_explanation = build_plain_explanation(
-        rainfall_mm, elevation_used, elev_pts, city, risk_level_display, t
+        rainfall_mm, elevation_used, elev_pts, rain_pts, risk_key, city, risk_level_display, t
     )
 
     return {
@@ -741,7 +773,7 @@ def map_view():
             item["risk_level"] = t["risk_levels"][entry["risk_level_key"]]
             item["plain_explanation"] = build_plain_explanation(
                 entry["rainfall_mm"], entry["elevation_used"], entry["elevation_points"],
-                city, item["risk_level"], t
+                entry["rainfall_points"], entry["risk_level_key"], city, item["risk_level"], t
             )
         cities_for_template.append(item)
 
@@ -820,4 +852,4 @@ def forecast():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
