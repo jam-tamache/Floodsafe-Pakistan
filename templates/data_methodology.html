@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.methodology_title }} - FloodSafe Pakistan{% endblock %}
+
+{% block content %}
+<div class="info-page">
+    <h1>{{ t.methodology_title }}</h1>
+    <p class="info-lede">{{ t.methodology_lede }}</p>
+
+    <div class="info-grid">
+        <div class="info-card">
+            <span class="info-card-icon">&#128205;</span>
+            <h3>{{ t.methodology_scope_heading }}</h3>
+            <p>{{ t.methodology_scope_body }}</p>
+        </div>
+
+        <div class="info-card">
+            <span class="info-card-icon">&#9888;</span>
+            <h3>{{ t.methodology_not_prediction_heading }}</h3>
+            <p>{{ t.methodology_not_prediction_body }}</p>
+        </div>
+
+        <div class="info-card info-card-full">
+            <span class="info-card-icon">&#129518;</span>
+            <h3>{{ t.methodology_how_heading }}</h3>
+            <p>{{ t.methodology_how_body }}</p>
+            <div class="info-tier-row">
+                <span class="risk-badge risk-low">{{ t.risk_levels["Low Risk"] }}</span>
+                <span class="risk-badge risk-moderate">{{ t.risk_levels["Moderate Risk"] }}</span>
+                <span class="risk-badge risk-high">{{ t.risk_levels["High Risk"] }}</span>
+                <span class="risk-badge risk-very-high">{{ t.risk_levels["Very High Risk"] }}</span>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h3>{{ t.methodology_72h_heading }}</h3>
+            <p>{{ t.methodology_72h_body }}</p>
+        </div>
+
+        <div class="info-card info-card-full">
+            <h3>{{ t.methodology_rainfall_heading }}</h3>
+            <p>{{ t.methodology_rainfall_body_1 }}</p>
+            <p>{{ t.methodology_rainfall_body_2 }}</p>
+
+            <div class="methodology-table-wrap">
+                <table class="methodology-table">
+                    <thead>
+                        <tr>
+                            <th>{{ t.methodology_table_region_header }}</th>
+                            <th>{{ t.methodology_table_low_header }}</th>
+                            <th>{{ t.methodology_table_medium_header }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for region in regions %}
+                        <tr>
+                            <td>{{ t.terrain_profile_labels[region.label] }}</td>
+                            <td>{{ region.low_max }}mm</td>
+                            <td>{{ region.medium_max }}mm</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- NEW: clarifies that Very High Risk isn't a missing 4th
+                 column - it's not a rainfall threshold at all, it comes
+                 from the combined score, explained in the dead-zone /
+                 ceiling cards below. Without this, the table alone reads
+                 as if the model only has 3 tiers. -->
+            <p class="info-note">{{ t.methodology_table_tier_note }}</p>
+            <p class="info-note">{{ t.methodology_rainfall_note }}</p>
+        </div>
+
+        <div class="info-card info-card-full">
+            <h3>{{ t.methodology_example_heading }}</h3>
+            <p>{{ t.methodology_example_body }}</p>
+        </div>
+
+        <div class="info-card">
+            <h3>{{ t.methodology_deadzone_heading }}</h3>
+            <p>{{ t.methodology_deadzone_body }}</p>
+        </div>
+
+        <div class="info-card">
+            <h3>{{ t.methodology_ceiling_heading }}</h3>
+            <p>{{ t.methodology_ceiling_body }}</p>
+        </div>
+
+        <div class="info-card">
+            <h3>{{ t.methodology_elevation_heading }}</h3>
+            <p>{{ t.methodology_elevation_body }}</p>
+        </div>
+
+        <div class="info-card">
+            <h3>{{ t.methodology_not_modeled_heading }}</h3>
+            <ul>
+                {% for item in t.methodology_not_modeled %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="info-card">
+            <h3>{{ t.methodology_limitations_heading }}</h3>
+            <ul>
+                {% for item in t.methodology_limitations %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="info-card info-card-full">
+            <div class="info-callout">
+                <strong>{{ t.methodology_validation_heading }}</strong><br>
+                {{ t.methodology_validation_body }}
+            </div>
+        </div>
+    </div>
+
+    <a href="{{ url_for('home', lang=lang) }}" class="back-link">{{ t.back_link }}</a>
+</div>
+{% endblock %}
