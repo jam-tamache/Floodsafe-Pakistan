@@ -30,13 +30,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap; /* NEW - was overflowing off-screen at narrow widths
-                        instead of wrapping, and overflow-x:hidden on
-                        html/body was silently clipping the hamburger
-                        toggle (the last flex child) out of view entirely
-                        rather than showing a scrollbar. Wrapping puts
-                        .topbar-right on its own line when it doesn't fit
-                        next to the brand, so nothing gets clipped. */
+    flex-wrap: wrap;
     row-gap: 8px;
     gap: 24px;
     padding: 14px 24px;
@@ -95,19 +89,21 @@ body {
 }
 
 .topbar-toggle {
-    display: none; /* shown only under the mobile breakpoint below */
+    display: none;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
-    font-size: 1.4rem;
     color: #0F5459;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 6px;
+    border-radius: 6px;
 }
 
-/* Mobile dropdown menu - hidden by default, shown as a block below the
-   bar when .topbar-menu-open is toggled on .topbar via the inline script
-   in base.html. This is a dropdown, not a full-height side drawer, since
-   the top-bar nav only ever has a handful of short links. */
+.topbar-toggle:hover {
+    background-color: #E4F3F1;
+}
+
 .topbar-mobile-menu {
     display: none;
     flex-direction: column;
@@ -120,21 +116,43 @@ body {
     border-radius: 6px;
 }
 
+/* FIX: the language switcher was moved out of .topbar-right (see media
+   query below) and into the mobile dropdown menu, so it needs its own
+   spacing here separating it from the nav links above it. */
+.topbar-mobile-menu .lang-switch {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #D8F4EF;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
 .topbar.topbar-menu-open .topbar-mobile-menu {
     display: flex;
 }
 
 @media (max-width: 900px) {
     .topbar-nav {
-        display: none; /* replaced by .topbar-mobile-menu */
+        display: none;
     }
 
     .topbar-toggle {
-        display: block;
+        display: inline-flex;
     }
 
     .topbar-inner {
         padding: 14px 16px;
+    }
+
+    /* FIX: the language switcher used to sit in .topbar-right right next
+       to the hamburger button. At mobile widths it didn't fit alongside
+       the brand on one line, so it wrapped onto its own row underneath -
+       breaking the single straight top row. Hidden here and moved into
+       the mobile dropdown menu instead (see base.html markup and the
+       .topbar-mobile-menu .lang-switch rule above) - the top row is now
+       always just brand + hamburger, nothing else, at every mobile width. */
+    .topbar-right .lang-switch {
+        display: none;
     }
 }
 
@@ -142,8 +160,6 @@ body {
     width: 100%;
     padding: 32px 24px;
 }
-
-/* ---- Existing page/component styles below, unchanged ---- */
 
 /* ---- Home page hero (index.html) ---- */
 
@@ -190,11 +206,18 @@ body {
 
 .home-card select {
     width: 100%;
-    padding: 8px 13px;
+    padding: 10px 13px;
     border-radius: 8px;
     border: 1px solid #B7D9D6;
-    font-size: 1rem;
+    font-size: 1.15rem;
     background-color: #fff;
+}
+
+/* Urdu/Sindhi script reads smaller than Latin at the same pixel size
+   (joined letterforms, diacritics) - bump city-dropdown text further for
+   ur/sd specifically, on top of the general 1.15rem bump above. */
+html[dir="rtl"] .home-card select {
+    font-size: 1.3rem;
 }
 
 .field-hint {
@@ -309,12 +332,6 @@ button:hover {
     letter-spacing: 0.3px;
 }
 
-/* Classes below now match risk_slug from app.py's RISK_SLUGS dict
-   (low/moderate/high/very-high) instead of being derived in the template
-   via risk_level_key.split(' ')[0].lower() - that string-split silently
-   broke for "Very High Risk" (-> "risk-very", no matching class). Renamed
-   .risk-medium -> .risk-moderate to match the new tier name, and added
-   .risk-very-high as a real 4th tier, not a fallback of .risk-high. */
 .risk-low {
     background-color: #D4EDDA;
     color: #155724;
@@ -544,10 +561,11 @@ button:hover {
     border-inline-start-color: #B7950B;
 }
 
+/* ---- Scenario toggle (index.html) ---- */
 .scenario-toggle {
-    width: 300px;
+    width: 100%;
     margin-top: 8px;
-    background-color: #F4FBFA;
+    background-color: #FFFFFF;
     border: 1px solid #B7D9D6;
     border-radius: 8px;
     padding: 12px 16px;
@@ -619,6 +637,19 @@ html[dir="rtl"] .lang-switch {
     direction: ltr;
 }
 
+html[dir="rtl"] .home-hero {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .home-title,
+html[dir="rtl"] .home-intro {
+    text-align: right;
+}
+
+html[dir="rtl"] .disclaimer-banner {
+    text-align: right;
+}
+
 .disclaimer-banner {
     background-color: #fff3cd;
     color: #664d03;
@@ -629,6 +660,19 @@ html[dir="rtl"] .lang-switch {
     margin-bottom: 16px;
     text-align: left;
     width: 100%;
+}
+
+/* FIX: the bare ⚠ character renders as a large color emoji by default on
+   Android Chrome (and some other mobile browsers), badly out of scale
+   with the surrounding text. The \uFE0E variation selector in the
+   markup forces text presentation; font-variant-emoji: text here is a
+   belt-and-suspenders rule for browsers that support it. Explicit
+   font-size/vertical-align keep it visually matched to the text next to
+   it regardless of the font's own glyph metrics. */
+.warn-icon {
+    font-variant-emoji: text;
+    font-size: 1em;
+    vertical-align: -0.05em;
 }
 
 .terrain-warning {
@@ -679,14 +723,7 @@ html[dir="rtl"] .lang-switch {
     }
 }
 
-/* ---- Premium back button ----
-   NEW (this session). Used everywhere {{ t.back_link }} appears
-   (check.html, about.html, how_it_works.html) via one shared class,
-   instead of each template's plain unstyled <a> - so a future style
-   change to "the back button" only ever needs to happen here, once.
-   Deliberately a ghost/outline pill (not a solid-teal button like
-   .home-form's submit button) so it doesn't visually compete with
-   primary call-to-action buttons on the same page. */
+/* ---- Premium back button ---- */
 .back-link {
     display: inline-flex;
     align-items: center;
@@ -706,13 +743,13 @@ html[dir="rtl"] .lang-switch {
 }
 
 .back-link::before {
-    content: "\2190"; /* ← */
+    content: "\2190";
     font-size: 1rem;
     transition: transform 0.15s ease;
 }
 
 html[dir="rtl"] .back-link::before {
-    content: "\2192"; /* → - arrow flips direction to match reading order */
+    content: "\2192";
 }
 
 .back-link:hover {
@@ -735,13 +772,7 @@ html[dir="rtl"] .back-link:hover::before {
     box-shadow: 0px 4px 12px rgba(15, 84, 89, 0.12);
 }
 
-/* ---- Info pages (about.html / how_it_works.html) ----
-   NEW (this session). Replaces the narrow 440px .results block those two
-   pages were borrowing from check.html's error state - too cramped for
-   prose, and gave both pages the same generic look. Reuses the site's
-   existing card visual language (#F4FBFA background, teal headings,
-   0px 6px 20px shadow) already established by .result-card/.home-card,
-   rather than inventing a new style. */
+/* ---- Info pages (about.html / how_it_works.html / data_methodology.html) ---- */
 .info-page {
     max-width: 860px;
     margin: 0 auto;
@@ -783,8 +814,8 @@ html[dir="rtl"] .back-link:hover::before {
 }
 
 .info-card p {
-    margin: 0 0 10px 0;
-    line-height: 1.6;
+    margin: 0 0 14px 0;
+    line-height: 1.65;
     font-size: 0.95rem;
     color: #2E3A3B;
 }
@@ -827,11 +858,167 @@ html[dir="rtl"] .back-link:hover::before {
     font-size: 0.85rem;
     color: #4A5B5C;
     font-style: italic;
-    margin-top: 6px;
+    margin-top: 10px;
+}
+
+/* ---- Methodology table (data_methodology.html) ----
+   FIX: previously plain, unstyled cells with only 4px top margin -
+   looked cramped and pasted-in next to paragraphs with generous spacing
+   elsewhere on this page. Now wrapped like a card (rounded, shadowed,
+   striped rows) so it reads as a designed element, not raw HTML. */
+.methodology-table-wrap {
+    overflow-x: auto;
+    margin: 18px 0;
+    border-radius: 10px;
+    box-shadow: 0px 4px 14px rgba(15, 84, 89, 0.08);
+}
+
+.methodology-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.methodology-table th,
+.methodology-table td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid #D8F4EF;
+}
+
+.methodology-table th {
+    color: #0F5459;
+    font-weight: 700;
+    background-color: #E4F3F1;
+}
+
+.methodology-table td {
+    color: #2E3A3B;
+}
+
+.methodology-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.methodology-table tbody tr:nth-child(even) td {
+    background-color: #F4FBFA;
+}
+
+html[dir="rtl"] .methodology-table th,
+html[dir="rtl"] .methodology-table td {
+    text-align: right;
 }
 
 @media (max-width: 700px) {
     .info-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ---- Risk legend (map.html full map + check.html single-result map) ----
+   REVISED: was bare colored dots with no visible label (the labels were
+   never actually blank in the code - they were {{ t.legend_low }} etc,
+   which render as empty strings when translations.py doesn't have those
+   keys yet. Add legend_low/legend_moderate/legend_high/legend_very_high/
+   legend_not_scored to translations.py or this will look identical to
+   before). Now styled as tinted pill chips reusing the same color
+   language as .risk-low/.risk-moderate/.risk-high/.risk-very-high, so it
+   reads as a designed component instead of raw dots. Colors are the
+   single source of truth for what a legend item means - VERIFY the dot
+   colors (#28A745/#FFC107/#FD7E14/#DC3545/#7f8c8d) actually match
+   RISK_COLORS in risk_check.py and MAP_ONLY_COLOR in map.html's script
+   before treating this as done. If tiers change, update only the rules
+   below - never add a second color mapping elsewhere. */
+.map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+}
+
+.map-legend-item-low { background-color: #D4EDDA; color: #155724; }
+.map-legend-item-moderate { background-color: #FFF3CD; color: #856404; }
+.map-legend-item-high { background-color: #FFE3CC; color: #7A3E0A; }
+.map-legend-item-very-high { background-color: #F8D7DA; color: #721C24; }
+.map-legend-item-unscored { background-color: #E9ECEF; color: #495057; }
+
+.map-legend-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.map-legend-dot-low { background-color: #28A745; }
+.map-legend-dot-moderate { background-color: #FFC107; }
+.map-legend-dot-high { background-color: #FD7E14; }
+.map-legend-dot-very-high { background-color: #DC3545; }
+.map-legend-dot-unscored { background-color: #7f8c8d; }
+
+/* check.html: sits directly under the single-result map inside its
+   existing .result-card, so it only needs top spacing, not its own
+   card/shadow. */
+.map-legend-compact {
+    margin-top: 14px;
+}
+
+/* map.html: sits above the full map, styled as a card matching the rest
+   of the site's card pattern (.result-card / .info-card / .home-card
+   all share this same background/radius/shadow combination).
+   FIX: previously stretched to the full .map-page width (up to 1200px)
+   with pills packed to the left, leaving a large empty gap on the
+   right - looked unfinished. Now sized to fit its content and centered,
+   so the card hugs the pills instead of floating in a mostly-empty bar. */
+.map-legend-full {
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    background-color: #F4FBFA;
+    padding: 14px 20px;
+    border-radius: 10px;
+    box-shadow: 0px 6px 20px rgba(15, 84, 89, 0.12);
+    margin: 0 auto 16px;
+}
+
+html[dir="rtl"] .map-legend {
+    direction: rtl;
+}
+
+/* ---- Map page (map.html) ----
+   NEW: single shared container so the heading, intro paragraph, legend,
+   and the map itself all sit at the same left/right edges instead of
+   each having its own (or no) width rule. */
+.map-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.map-intro {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4A5B5C;
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 20px;
+}
+
+html[dir="rtl"] .map-intro {
+    text-align: center;
 }
