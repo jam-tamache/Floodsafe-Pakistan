@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang in ['ur', 'sd'] else 'ltr' }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{{ t.app_title }}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+<header class="topbar">
+    <div class="topbar-inner">
+        <a href="{{ url_for('home', lang=lang) }}" class="topbar-brand">
+            <span class="topbar-logo">&#127754;</span>
+            <span class="topbar-title">{{ t.app_title }}</span>
+        </a>
+
+        <!-- Desktop nav: hidden below the mobile breakpoint, replaced by
+             the dropdown menu at the bottom of this file. Contact is
+             deliberately not here yet - no destination/action has been
+             decided for it, see base.html notes in chat history. About,
+             How It Works, and Data & Methodology are real routes (see
+             app.py) - not same-page anchors like they were in the old
+             sidebar. -->
+        <nav class="topbar-nav">
+            <a href="{{ url_for('home', lang=lang) }}"
+               class="topbar-link {{ 'topbar-link-active' if request.path == url_for('home') else '' }}">
+               {{ t.nav_home }}
+            </a>
+            <a href="{{ url_for('about', lang=lang) }}"
+               class="topbar-link {{ 'topbar-link-active' if request.path == url_for('about') else '' }}">
+               {{ t.nav_about }}
+            </a>
+            <a href="{{ url_for('how_it_works', lang=lang) }}"
+               class="topbar-link {{ 'topbar-link-active' if request.path == url_for('how_it_works') else '' }}">
+               {{ t.nav_how_it_works }}
+            </a>
+            <a href="{{ url_for('data_methodology', lang=lang) }}"
+               class="topbar-link {{ 'topbar-link-active' if request.path == url_for('data_methodology') else '' }}">
+               {{ t.nav_data_methodology }}
+            </a>
+            <!-- Map is a real, working route the mockup's nav list didn't
+                 show - dropping it would remove access to a finished
+                 feature, so it stays in nav even though it wasn't in the
+                 reference image. Flag if you actually want it elsewhere
+                 (e.g. a button on the Home page instead of top nav). -->
+            <a href="{{ url_for('map_view', lang=lang) }}"
+               class="topbar-link {{ 'topbar-link-active' if request.path == url_for('map_view') else '' }}">
+               &#128506; {{ t.nav_map }}
+            </a>
+        </nav>
+
+        <div class="topbar-right">
+            {% block lang_switch %}
+            <div class="lang-switch">
+                <a href="?lang=en" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
+                <a href="?lang=ur" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
+                <a href="?lang=sd" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
+            </div>
+            {% endblock %}
+
+            <!-- FIX: was a bare &#9776; (☰) Unicode character - on the
+                 device in Hammad's Sep 13 screenshot it rendered as a
+                 solid filled box instead of three lines, almost
+                 certainly a missing-glyph ("tofu") fallback, the same
+                 failure class as the oversized ⚠ warning icon fixed
+                 earlier this project. An inline SVG can't fail this way
+                 since it doesn't depend on the device's font having this
+                 character. currentColor keeps it using the button's
+                 existing text color (#0F5459) with no extra CSS. -->
+            <button class="topbar-toggle" id="navToggle" aria-label="Toggle navigation">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M3 6H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M3 12H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile dropdown menu: same links as .topbar-nav above, shown only
+         under the mobile breakpoint when .topbar-menu-open is toggled on
+         .topbar. Kept as a separate list rather than reusing .topbar-nav
+         with a media query, since the two need different layout (row vs
+         stacked column) and duplicating the four links is simpler than
+         fighting one element into two shapes. -->
+    <nav class="topbar-mobile-menu" id="mobileMenu">
+        <a href="{{ url_for('home', lang=lang) }}" class="topbar-link">{{ t.nav_home }}</a>
+        <a href="{{ url_for('about', lang=lang) }}" class="topbar-link">{{ t.nav_about }}</a>
+        <a href="{{ url_for('how_it_works', lang=lang) }}" class="topbar-link">{{ t.nav_how_it_works }}</a>
+        <a href="{{ url_for('data_methodology', lang=lang) }}" class="topbar-link">{{ t.nav_data_methodology }}</a>
+        <a href="{{ url_for('map_view', lang=lang) }}" class="topbar-link">&#128506; {{ t.nav_map }}</a>
+        <!-- FIX: this row was completely missing before - the CSS for
+             .topbar-mobile-menu .lang-switch already existed in
+             style.css from the earlier session, written on the
+             assumption this markup existed, but it was never actually
+             added here. That's why the language switcher disappeared
+             entirely on mobile instead of moving into this menu as
+             intended. self.lang_switch() re-renders whatever this page's
+             lang_switch block contains (the plain version above, or
+             check.html's version with city/rainfall preserved in the
+             URL) rather than hardcoding a second, page-unaware copy
+             here. -->
+        {{ self.lang_switch() }}
+    </nav>
+</header>
+
+<main class="page-content">
+    {% block content %}{% endblock %}
+</main>
+
+<script>
+    const topbar = document.querySelector('.topbar');
+    document.getElementById('navToggle').addEventListener('click', function () {
+        topbar.classList.toggle('topbar-menu-open');
+    });
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
