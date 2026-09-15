@@ -38,7 +38,7 @@
     <h1>{{ t.app_title }}</h1>
 
     <div class="disclaimer-banner">
-        &#9888; {{ t.disclaimer_banner }}
+        <span class="warn-icon">&#9888;&#xFE0E;</span> {{ t.disclaimer_banner }}
     </div>
 
     {% if error %}
@@ -79,7 +79,7 @@
                     <text x="70" y="84" class="gauge-scale-text">0 &ndash; 1</text>
                 </svg>
                 <div class="risk-badge risk-{{ risk_slug }}">
-                    &#9888; {{ risk_level }}
+                    <span class="warn-icon">&#9888;&#xFE0E;</span> {{ risk_level }}
                 </div>
             </div>
             <p class="plain-explanation">{{ plain_explanation }}</p>
@@ -89,6 +89,26 @@
             <h3 class="result-card-heading">3. {{ t.risk_map_heading }}</h3>
             {% if city_lat and city_lon %}
             <div id="result-map"></div>
+            <!-- NEW: 4-tier legend (no "not risk-scored" swatch here -
+                 this page only ever shows one already-scored city, so a
+                 grey "unscored" swatch would be meaningless on this
+                 page. Colors below must match RISK_COLORS in
+                 risk_check.py - see .map-legend-dot-* in style.css,
+                 which is the single source of truth for these hexes. -->
+            <div class="map-legend map-legend-compact">
+                <span class="map-legend-item map-legend-item-low">
+                    <span class="map-legend-dot map-legend-dot-low"></span>{{ t.legend_low }}
+                </span>
+                <span class="map-legend-item map-legend-item-moderate">
+                    <span class="map-legend-dot map-legend-dot-moderate"></span>{{ t.legend_moderate }}
+                </span>
+                <span class="map-legend-item map-legend-item-high">
+                    <span class="map-legend-dot map-legend-dot-high"></span>{{ t.legend_high }}
+                </span>
+                <span class="map-legend-item map-legend-item-very-high">
+                    <span class="map-legend-dot map-legend-dot-very-high"></span>{{ t.legend_very_high }}
+                </span>
+            </div>
             {% else %}
             <p class="elevation-note">{{ t.map_unavailable }}</p>
             {% endif %}
