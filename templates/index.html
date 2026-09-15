@@ -22,10 +22,17 @@
             <input type="hidden" name="lang" value="{{ lang }}">
 
             <label for="forecast-city">{{ t.form_city_label }}</label>
+            <!-- Option value stays the canonical English city name (c) -
+                 risk_check.py's normalize_city()/_CITY_TO_PROFILE/
+                 _CITY_COORDS_LOOKUP all key off that string. Only the
+                 displayed label is translated, via t.city_names keyed by
+                 the lowercase form of c. Falls back to c itself if a city
+                 is somehow missing from city_names, rather than showing
+                 a blank option. -->
             <select id="forecast-city" name="city" required>
                 <option value="" disabled selected>{{ t.form_city_placeholder }}</option>
                 {% for c in cities %}
-                <option value="{{ c }}">{{ c }}</option>
+                <option value="{{ c }}">{{ t.city_names.get(c.lower(), c) }}</option>
                 {% endfor %}
             </select>
 
@@ -48,7 +55,7 @@
                 <select id="scenario-city" name="city" required>
                     <option value="" disabled selected>{{ t.form_city_placeholder }}</option>
                     {% for c in cities %}
-                    <option value="{{ c }}">{{ c }}</option>
+                    <option value="{{ c }}">{{ t.city_names.get(c.lower(), c) }}</option>
                     {% endfor %}
                 </select>
 
