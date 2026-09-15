@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}FloodSafe Pakistan &mdash; Map{% endblock %}
+{% block title %}{{ t.map_title }}{% endblock %}
 
 {% block head_extra %}
 <link
@@ -24,9 +24,43 @@
 {% endblock %}
 
 {% block content %}
-<h1>FloodSafe Pakistan &mdash; Map</h1>
-<p>Color-coded by current risk level &mdash; click a marker for details. Grey pins are shown for map context only (outside Sindh, not risk-scored).</p>
-<div id="map"></div>
+<!-- FIX: h1/p/legend/map previously had no shared container - the
+     paragraph and #map stretched to the full content width while the
+     legend sat inside its own max-width:1200/margin:auto box, so on wide
+     screens the legend looked indented relative to everything around it.
+     Wrapped in one .map-page container so every element shares the same
+     left/right edges. -->
+<div class="map-page">
+    <h1>{{ t.map_title }}</h1>
+    <p class="map-intro">{{ t.map_intro }}</p>
+
+    <!-- Legend for this page's 5 possible marker states (4 scored risk
+         tiers + grey unscored). Colors here must match RISK_COLORS in
+         risk_check.py and MAP_ONLY_COLOR in the script below - see
+         .map-legend-dot-* in style.css, which is the single source of
+         truth for these hexes. If the tiers or the unscored color ever
+         change, update style.css only - do not add a second color
+         mapping here. -->
+    <div class="map-legend map-legend-full">
+        <span class="map-legend-item map-legend-item-low">
+            <span class="map-legend-dot map-legend-dot-low"></span>{{ t.legend_low }}
+        </span>
+        <span class="map-legend-item map-legend-item-moderate">
+            <span class="map-legend-dot map-legend-dot-moderate"></span>{{ t.legend_moderate }}
+        </span>
+        <span class="map-legend-item map-legend-item-high">
+            <span class="map-legend-dot map-legend-dot-high"></span>{{ t.legend_high }}
+        </span>
+        <span class="map-legend-item map-legend-item-very-high">
+            <span class="map-legend-dot map-legend-dot-very-high"></span>{{ t.legend_very_high }}
+        </span>
+        <span class="map-legend-item map-legend-item-unscored">
+            <span class="map-legend-dot map-legend-dot-unscored"></span>{{ t.legend_not_scored }}
+        </span>
+    </div>
+
+    <div id="map"></div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -52,11 +86,11 @@
                 fillOpacity: 0.85
             })
             .addTo(map)
-            .bindPopup(`<strong>${c.city}</strong><br>Outside Sindh — not risk-scored`)
+            .bindPopup(`<strong>${c.city}</strong><br>{{ t.legend_not_scored }}`)
             .bindTooltip(c.city, { permanent: false });
             return;
         }
-        // FIX (this session): previously recomputed color here via a
+        // FIX (earlier session): previously recomputed color here via a
         // stale 3-tier { high, medium, low } object keyed off
         // risk_level_key.split(' ')[0].toLowerCase() — broke for
         // "Moderate Risk" (-> "moderate", no match) and "Very High Risk"
