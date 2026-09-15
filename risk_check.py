@@ -717,6 +717,29 @@ def how_it_works():
     return render_template("how_it_works.html", t=t, lang=lang)
 
 
+@app.route("/data-methodology")
+def data_methodology():
+    """NEW this session. Region thresholds are built from REGIONAL_PROFILES
+    directly rather than typed into the template a second time - this is
+    the exact discipline that would have prevented the earlier dead-zone
+    doc/code mismatch (METHODOLOGY.md claiming a different saturation
+    distance than the code actually used). Dict order (mega_urban_coastal,
+    central_plains, arid_plains_desert) is preserved from Python 3.7+
+    dict ordering, matching METHODOLOGY.md's table order.
+    """
+    lang = get_lang()
+    t = get_translation(lang)
+    regions_for_template = [
+        {
+            "label": profile["label"],
+            "low_max": profile["low_max"],
+            "medium_max": profile["medium_max"],
+        }
+        for profile in REGIONAL_PROFILES.values()
+    ]
+    return render_template("data_methodology.html", t=t, lang=lang, regions=regions_for_template)
+
+
 _city_risk_cache = {}
 _cache_last_refreshed = None
 CACHE_TTL_SECONDS = 3600  # refresh hourly - forecast rainfall doesn't meaningfully shift minute to minute
