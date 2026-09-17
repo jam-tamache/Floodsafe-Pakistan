@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}FloodSafe Pakistan &mdash; About{% endblock %}
+
+{% block content %}
+<div class="info-page">
+    <h1>{{ t.about_title }}</h1>
+    <p class="info-lede">{{ t.about_lede }}</p>
+
+    <div class="info-grid">
+        <div class="info-card">
+            <span class="info-card-icon">&#127758;</span>
+            <h3>{{ t.about_validated_heading }}</h3>
+            <p>{{ t.about_validated_body }}</p>
+        </div>
+
+        <div class="info-card">
+            <span class="info-card-icon warn-icon">&#9888;&#65038;</span>
+            <h3>{{ t.about_warning_heading }}</h3>
+            <p>{{ t.about_warning_body }}</p>
+        </div>
+    </div>
+
+    <div class="info-callout">
+        {{ t.about_callout }}
+    </div>
+
+    <br>
+    <a href="{{ url_for('home', lang=lang) }}" class="back-link">{{ t.back_link }}</a>
+</div>
+{% endblock %}
