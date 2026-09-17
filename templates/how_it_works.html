@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}FloodSafe Pakistan &mdash; How It Works{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ t.how_it_works_title }}</h1>
+
+    <section class="results">
+        <p>{{ t.how_it_works_body_1 }}</p>
+        <p>{{ t.how_it_works_body_2 }}</p>
+    </section>
+
+    <a href="{{ url_for('home', lang=lang) }}" class="back-link">{{ t.back_link }}</a>
+</div>
+{% endblock %}
