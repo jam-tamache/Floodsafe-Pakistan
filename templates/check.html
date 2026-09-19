@@ -123,21 +123,31 @@
     <div class="result-grid result-grid-secondary">
         <div class="result-card">
             <h3 class="result-card-heading">4. {{ t.why_risk_heading.format(risk_level=risk_level) }}</h3>
+            <!-- FIX (this session): terrain_warning is now an empty string
+                 on dry days (no rain = no storm-specific warning), so
+                 this must be guarded or an empty paragraph renders. -->
+            {% if terrain_warning %}
             <p class="terrain-warning">{{ terrain_warning }}</p>
+            {% endif %}
             <div class="impact-bar-row">
                 <span class="impact-bar-label">{{ t.impact_rainfall_label }}</span>
                 <div class="impact-bar-track">
                     <div class="impact-bar-fill" style="width: {{ ((rainfall_points / 54) * 100)|round(0) }}%;"></div>
                 </div>
-                <span class="impact-bar-value">{{ rainfall_points }}/54</span>
+                <span class="impact-bar-value">{{ rainfall_points }}/54 {{ t.impact_points_unit }}</span>
             </div>
+            <!-- FIX (this session): elevation_used was never passed in
+                 from risk_check.py's render_template call, so this
+                 condition was always false and the Elevation bar never
+                 rendered - even for cities whose score was driven almost
+                 entirely by elevation. It is passed now. -->
             {% if elevation_used %}
             <div class="impact-bar-row">
                 <span class="impact-bar-label">{{ t.impact_elevation_label }}</span>
                 <div class="impact-bar-track">
                     <div class="impact-bar-fill" style="width: {{ ((elevation_points / 30) * 100)|round(0) }}%;"></div>
                 </div>
-                <span class="impact-bar-value">{{ elevation_points }}/30</span>
+                <span class="impact-bar-value">{{ elevation_points }}/30 {{ t.impact_points_unit }}</span>
             </div>
             {% endif %}
             <p class="elevation-note">{{ elevation_note }}</p>
@@ -145,11 +155,20 @@
 
         <div class="result-card">
             <h3 class="result-card-heading">5. {{ t.safety_tips_heading }}</h3>
-            <ul>
+            <!-- FIX (this session): on dry days safety_tips holds generic
+                 preparedness tips and safety_tips_note explains why the
+                 rating is terrain-driven. Both are guarded so this card
+                 can never render as a bare heading again. -->
+            {% if safety_tips_note %}
+            <p class="elevation-note safety-tips-note">{{ safety_tips_note }}</p>
+            {% endif %}
+            {% if safety_tips %}
+            <ul class="safety-tips-list">
             {% for tip in safety_tips %}
                 <li>{{ tip }}</li>
             {% endfor %}
             </ul>
+            {% endif %}
         </div>
 
         <!-- FIX (earlier session): this panel previously repeated city,
