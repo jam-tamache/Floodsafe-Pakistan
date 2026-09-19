@@ -92,7 +92,10 @@ TRANSLATIONS = {
         "forecast_error_unavailable": "We couldn't fetch a rainfall forecast right now. Try exploring a scenario instead.",
         "source_forecast": "Based on forecasted rainfall for the next {hours}h: {mm}mm expected.",
         "source_scenario": "Based on your hypothetical scenario of {mm}mm rainfall — not a real forecast.",
-        "score_breakdown": "Score: {score}/100 (rainfall {rain}/70, elevation {elev}/30)",
+        # FIXED this session: rainfall max was shown as /70, but the real
+        # rainfall ceiling is 54 (see RAINFALL_COMPONENT_MAX in app.py and
+        # the "4. Why is the risk..." card, which already showed /54).
+        "score_breakdown": "Score: {score}/100 (rainfall {rain}/54, elevation {elev}/30)",
         "how_calculated_toggle": "How is this calculated?",
         "explanation_with_elevation": "With {rainfall}mm of rain and {city} sitting on {elevation_position} compared to nearby areas, this adds up to {risk_level}.",
         "explanation_without_elevation": "With {rainfall}mm of rain expected for {city}, this adds up to {risk_level}.",
@@ -138,6 +141,17 @@ TRANSLATIONS = {
                 "Follow evacuation guidance from PDMA Sindh / district administration - do not rely on this app for shelter locations",
             ],
         },
+        # NEW this session: shown INSTEAD of safety_tips[risk] when rainfall
+        # is negligible (see is_dry_conditions() in app.py). Deliberately
+        # generic - every item is sensible on any day and none implies a
+        # storm is coming. Applies to every city and every risk level.
+        "safety_tips_dry_note": "No significant rain is involved in this assessment, so this rating reflects the area's terrain rather than an active flood threat. General preparedness tips:",
+        "safety_tips_dry": [
+            "Save emergency numbers: Rescue 1122 and PDMA Sindh (pdma.gos.pk)",
+            "Keep copies of important documents (CNIC, land papers) in a waterproof bag",
+            "Know your nearest higher ground and your evacuation route",
+            "Check the forecast again if rain is expected",
+        ],
         "terrain_warnings": {
             "Mega-Urban & Coastal": "Urban drainage systems can back up quickly - avoid clogged storm drains and underpasses.",
             "Central Agricultural Plains": "Low-lying farmland can pool water for days - keep livestock and stored grain away from field edges.",
@@ -148,7 +162,7 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "Central Agricultural Plains",
             "Arid Plains & Deserts": "Arid Plains & Deserts",
         },
-        "elevation_note_available": "Elevation for {city} ({elevation}m) was factored into this score relative to other {profile} locations.",
+        "elevation_note_available": "{city} sits at {elevation}m. That is compared with other {profile} locations: the lower a city sits within its group, the more of the {max_points} elevation points it gets ({points} here). The bar above shows these points, not meters.",
         "elevation_note_unavailable": "Elevation data for {city} was not available - this score is based on rainfall alone.",
         "home_subtitle": "Get an estimate of flood risk for any supported Sindh city based on a live 72-hour rainfall forecast.",
         "about_title": "About This Project",
@@ -164,8 +178,9 @@ TRANSLATIONS = {
         "risk_map_heading": "Risk Map",
         "map_unavailable": "Map unavailable for this location.",
         "why_risk_heading": "Why is the risk {risk_level}?",
-        "impact_rainfall_label": "Rainfall",
-        "impact_elevation_label": "Elevation",
+        "impact_rainfall_label": "Rainfall score",
+        "impact_elevation_label": "Elevation score",
+        "impact_points_unit": "pts",
         "key_information_heading": "Key Information",
         "assessment_type_label": "Assessment Type:",
         "assessment_type_forecast": "Forecast (72h)",
@@ -304,7 +319,8 @@ TRANSLATIONS = {
         "forecast_error_unavailable": "ہم اس وقت بارش کی پیشگوئی حاصل نہیں کر سکے۔ براہ کرم اس کے بجائے ایک منظرنامہ آزمائیں۔",
         "source_forecast": "اگلے {hours} گھنٹوں کی پیشگوئی شدہ بارش پر مبنی: متوقع {mm} ملی میٹر۔",
         "source_scenario": "آپ کے فرضی منظرنامے پر مبنی جس میں {mm} ملی میٹر بارش شامل ہے - یہ حقیقی پیشگوئی نہیں ہے۔",
-        "score_breakdown": "اسکور: {score}/100 (بارش {rain}/70، بلندی {elev}/30)",
+        # FIXED this session: rainfall max was /70, real ceiling is 54.
+        "score_breakdown": "اسکور: {score}/100 (بارش {rain}/54، بلندی {elev}/30)",
         "how_calculated_toggle": "یہ کیسے شمار کیا جاتا ہے؟",
         "explanation_with_elevation": "{rainfall} ملی میٹر بارش اور {city} کا آس پاس کے علاقوں کے مقابلے میں {elevation_position} پر ہونا، یہ مل کر {risk_level} بنتا ہے۔",
         "explanation_without_elevation": "{city} کے لیے متوقع {rainfall} ملی میٹر بارش کے ساتھ، یہ {risk_level} بنتا ہے۔",
@@ -349,6 +365,14 @@ TRANSLATIONS = {
                 "PDMA سندھ / ضلعی انتظامیہ کی انخلا ہدایات پر عمل کریں - پناہ گاہ کی جگہ کے لیے صرف اس ایپ پر انحصار نہ کریں",
             ],
         },
+        # NEW this session - UNREVIEWED by a native speaker (draft).
+        "safety_tips_dry_note": "اس تشخیص میں بارش نہ ہونے کے برابر ہے، اس لیے یہ درجہ بندی علاقے کی زمینی ساخت کو ظاہر کرتی ہے، سیلاب کے کسی فوری خطرے کو نہیں۔ عمومی تیاری کی ہدایات:",
+        "safety_tips_dry": [
+            "ہنگامی نمبر محفوظ کر لیں: ریسکیو 1122 اور PDMA سندھ (pdma.gos.pk)",
+            "اہم دستاویزات (شناختی کارڈ، زمین کے کاغذات) کی نقول واٹر پروف تھیلے میں رکھیں",
+            "اپنے قریب ترین اونچے مقام اور انخلا کے راستے سے واقف رہیں",
+            "اگر بارش متوقع ہو تو پیشگوئی دوبارہ چیک کریں",
+        ],
         "terrain_warnings": {
             "Mega-Urban & Coastal": "شہری نکاسی آب کا نظام جلد بھر سکتا ہے - بند نالوں اور انڈرپاسز سے بچیں۔",
             "Central Agricultural Plains": "نشیبی زرعی زمین میں پانی کئی دنوں تک جمع رہ سکتا ہے - مویشیوں اور ذخیرہ شدہ اناج کو کھیتوں کے کناروں سے دور رکھیں۔",
@@ -359,7 +383,7 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "وسطی زرعی میدانی علاقے",
             "Arid Plains & Deserts": "خشک میدانی اور صحرائی علاقے",
         },
-        "elevation_note_available": "{city} کی بلندی ({elevation} میٹر) کو دیگر {profile} مقامات کے مقابلے میں اس اسکور میں شامل کیا گیا۔",
+        "elevation_note_available": "{city} کی بلندی {elevation} میٹر ہے۔ اس کا موازنہ دیگر {profile} مقامات سے کیا جاتا ہے: گروپ میں جتنی نچلی جگہ ہو، اتنے ہی زیادہ بلندی پوائنٹس ملتے ہیں (زیادہ سے زیادہ {max_points}، یہاں {points})۔ اوپر کی پٹی میٹر نہیں بلکہ یہی پوائنٹس دکھاتی ہے۔",
         "elevation_note_unavailable": "{city} کے لیے بلندی کا ڈیٹا دستیاب نہیں تھا - یہ اسکور صرف بارش پر مبنی ہے۔",
         "home_subtitle": "کسی بھی معاون سندھ شہر کے لیے لائیو 72 گھنٹے کی بارش کی پیشگوئی کی بنیاد پر سیلاب کے خطرے کا اندازہ حاصل کریں۔",
         "about_title": "اس منصوبے کے بارے میں",
@@ -375,8 +399,9 @@ TRANSLATIONS = {
         "risk_map_heading": "خطرے کا نقشہ",
         "map_unavailable": "اس مقام کے لیے نقشہ دستیاب نہیں۔",
         "why_risk_heading": "خطرہ {risk_level} کیوں ہے؟",
-        "impact_rainfall_label": "بارش",
-        "impact_elevation_label": "بلندی",
+        "impact_rainfall_label": "بارش کا اسکور",
+        "impact_elevation_label": "بلندی کا اسکور",
+        "impact_points_unit": "پوائنٹس",
         "key_information_heading": "اہم معلومات",
         "assessment_type_label": "تشخیص کی قسم:",
         "assessment_type_forecast": "پیشگوئی (72 گھنٹے)",
@@ -515,7 +540,8 @@ TRANSLATIONS = {
         "forecast_error_unavailable": "اسان هن وقت برسات جي اڳڪٿي حاصل نه ڪري سگهياسين. مهرباني ڪري ان جي بدران هڪ منظرنامو آزمايو.",
         "source_forecast": "ايندڙ {hours} ڪلاڪن جي اڳڪٿي ٿيل برسات تي ٻڌل: متوقع {mm} ملي ميٽر.",
         "source_scenario": "توهان جي فرضي منظرنامي تي ٻڌل جنهن ۾ {mm} ملي ميٽر برسات شامل آهي - هي حقيقي اڳڪٿي ناهي.",
-        "score_breakdown": "اسڪور: {score}/100 (برسات {rain}/70، بلندي {elev}/30)",
+        # FIXED this session: rainfall max was /70, real ceiling is 54.
+        "score_breakdown": "اسڪور: {score}/100 (برسات {rain}/54، بلندي {elev}/30)",
         "how_calculated_toggle": "هي ڪيئن ڳڻيو ويندو آهي؟",
         "explanation_with_elevation": "{rainfall} ملي ميٽر برسات ۽ {city} جو ڀرپاسي وارن علائقن جي مقابلي ۾ {elevation_position} تي هجڻ، هي گڏجي {risk_level} ٿو ٺاهي.",
         "explanation_without_elevation": "{city} لاءِ متوقع {rainfall} ملي ميٽر برسات سان، هي {risk_level} ٿو ٺاهي.",
@@ -560,6 +586,14 @@ TRANSLATIONS = {
                 "PDMA سنڌ / ضلعي انتظاميه جي لڏپلاڻ هدايتن تي عمل ڪريو - پناهگاهه جي جاءِ لاءِ رڳو هن ايپ تي ڀروسو نه ڪريو",
             ],
         },
+        # NEW this session - UNREVIEWED by a native speaker (draft).
+        "safety_tips_dry_note": "هن جانچ ۾ برسات نه هجڻ جي برابر آهي، تنهنڪري هي درجو علائقي جي زميني بناوت کي ظاهر ڪري ٿو، سيلاب جي ڪنهن فوري خطري کي نه. عام تياري جون هدايتون:",
+        "safety_tips_dry": [
+            "هنگامي نمبر محفوظ ڪريو: ريسڪيو 1122 ۽ PDMA سنڌ (pdma.gos.pk)",
+            "اهم دستاويزن (شناختي ڪارڊ، زمين جا ڪاغذ) جون نقلون واٽر پروف ٿيلهي ۾ رکو",
+            "پنهنجي ويجهي مٿاهين جاءِ ۽ لڏپلاڻ جي رستي کان واقف رهو",
+            "جيڪڏهن برسات متوقع هجي ته اڳڪٿي ٻيهر چيڪ ڪريو",
+        ],
         "terrain_warnings": {
             "Mega-Urban & Coastal": "شهري نيڪال جو نظام جلدي ڀرجي سگهي ٿو - بند نالن ۽ انڊرپاسز کان بچو.",
             "Central Agricultural Plains": "هيٺاهين زرعي زمين ۾ پاڻي ڪيترن ڏينهن تائين بيهي سگهي ٿو - ڍورن ۽ ذخيرو ٿيل اناج کي فيلڊ جي ڪنارن کان پري رکو.",
@@ -570,7 +604,7 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "مرڪزي زرعي ميدان",
             "Arid Plains & Deserts": "سڪل ميدان ۽ ريگستان",
         },
-        "elevation_note_available": "{city} جي بلندي ({elevation} ميٽر) کي ٻين {profile} هنڌن جي مقابلي ۾ هن اسڪور ۾ شامل ڪيو ويو.",
+        "elevation_note_available": "{city} جي بلندي {elevation} ميٽر آهي. ان جو مقابلو ٻين {profile} هنڌن سان ڪيو ويندو آهي: گروپ ۾ جيترو هيٺاهون هجي، اوترا وڌيڪ بلندي پوائنٽ ملن ٿا (وڌ ۾ وڌ {max_points}، هتي {points}). مٿي واري پٽي ميٽر نه پر اهي ئي پوائنٽ ڏيکاري ٿي.",
         "elevation_note_unavailable": "{city} لاءِ بلندي جو ڊيٽا موجود نه هو - هي اسڪور فقط برسات تي ٻڌل آهي.",
         "home_subtitle": "ڪنهن به سپورٽ ٿيل سنڌ جي شهر لاءِ لائيو 72 ڪلاڪن جي برسات جي اڳڪٿي جي بنياد تي سيلاب جي خطري جو اندازو حاصل ڪريو.",
         "about_title": "هن منصوبي بابت",
@@ -586,8 +620,9 @@ TRANSLATIONS = {
         "risk_map_heading": "خطري جو نقشو",
         "map_unavailable": "هن هنڌ لاءِ نقشو دستياب ناهي.",
         "why_risk_heading": "خطرو {risk_level} ڇو آهي؟",
-        "impact_rainfall_label": "برسات",
-        "impact_elevation_label": "بلندي",
+        "impact_rainfall_label": "برسات جو اسڪور",
+        "impact_elevation_label": "بلندي جو اسڪور",
+        "impact_points_unit": "پوائنٽ",
         "key_information_heading": "اهم معلومات",
         "assessment_type_label": "جانچ جو قسم:",
         "assessment_type_forecast": "اڳڪٿي (72 ڪلاڪ)",
