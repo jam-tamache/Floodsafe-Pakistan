@@ -201,15 +201,33 @@ ELEVATION_COMPONENT_MAX = 30  # points contributed by elevation, unchanged this 
 # Very High Risk (75-100) is reachable but only near its low end.
 RAINFALL_COMPONENT_MAX = 54
 
-# NEW this session: threshold below which rainfall's contribution to the
-# score is considered "negligible" for messaging purposes only - it does
-# NOT change the score itself, only which sentence build_plain_explanation()
-# picks. 2.0 out of the 25-point Low/Moderate rainfall band was chosen as
-# "close enough to zero that a lay reader would call this dry" - e.g. the
-# Sep 11 case of 1.5mm rainfall still contributing ~0.9 points. Revisit
-# this number if it ever produces a false terrain-baseline message for a
-# rainfall total that a reader would actually consider real rain.
+# Threshold below which rainfall's contribution to the score is considered
+# "negligible" for MESSAGING purposes only - it does NOT change the score
+# itself, only which copy is shown. 2.0 out of the 25-point Low/Moderate
+# rainfall band was chosen as "close enough to zero that a lay reader would
+# call this dry" - e.g. the Sep 11 case of 1.5mm rainfall still
+# contributing ~0.9 points. Revisit this number if it ever produces a
+# false "dry" message for a rainfall total that a reader would actually
+# consider real rain.
+#
+# NEW this session: this threshold now gates THREE things, all via
+# is_dry_conditions() below so they can never disagree with each other:
+#   1. build_plain_explanation()'s "terrain baseline" sentence (existing)
+#   2. the static terrain_warning text (e.g. "Urban drainage systems can
+#      back up quickly...") - describes an active storm, so it is
+#      suppressed when there is no rain
+#   3. the safety_tips list - pre-flood actions written for a rain event,
+#      suppressed when there is no rain
+# This applies to every city, every profile and every risk level.
 RAINFALL_NEGLIGIBLE_THRESHOLD = 2.0
+
+
+def is_dry_conditions(rain_pts):
+    """Single source of truth for "rainfall is negligible". Takes the
+    rainfall POINTS (not mm) because the threshold is defined in points,
+    which makes it scale correctly with each region's own low_max.
+    """
+    return rain_pts < RAINFALL_NEGLIGIBLE_THRESHOLD
 
 
 def elevation_component(city, profile_key):
@@ -372,6 +390,7 @@ def _compute_risk_core(city, rainfall_mm):
         "elevation_points": elev_pts,
         "elevation_used": elevation_used,
         "elevation_m": elevation_m,
+        "dry_conditions": is_dry_conditions(rain_pts),  # NEW - see RAINFALL_NEGLIGIBLE_THRESHOLD note
         "score": total_score,                # 0-100 - still shown in "How is this calculated?"
         "score_0_1": score_0_1,              # display-rounded - drives the gauge
         "risk_level_key": risk_key,
@@ -407,16 +426,16 @@ def build_plain_explanation(rainfall_mm, elevation_used, elev_pts, rain_pts, ris
     calculated?" toggle in check.html) for people who want the methodology
     transparency, but this sentence is the thing an ordinary person reads.
 
-    NEW this session: a third branch, "terrain baseline", for the case a
-    city is scored Moderate+ almost entirely off low-lying terrain while
-    rainfall is negligible (e.g. Badin @ 1.5mm during a dry spell still
-    reading Moderate Risk off elevation alone). Without this, that reads
-    to a lay user as "the app is warning about a storm that isn't
-    happening." Gated on rain_pts < RAINFALL_NEGLIGIBLE_THRESHOLD AND
-    risk_key != "Low Risk" - a Low Risk city with negligible rain doesn't
-    need a special caveat, that's just the expected/reassuring case.
+    Third branch, "terrain baseline", covers the case a city is scored
+    Moderate+ almost entirely off low-lying terrain while rainfall is
+    negligible (e.g. Badin @ 1.5mm during a dry spell still reading
+    Moderate Risk off elevation alone). Without this, that reads to a lay
+    user as "the app is warning about a storm that isn't happening."
+    Gated on is_dry_conditions(rain_pts) AND risk_key != "Low Risk" - a
+    Low Risk city with negligible rain doesn't need a special caveat,
+    that's just the expected/reassuring case.
     """
-    if elevation_used and rain_pts < RAINFALL_NEGLIGIBLE_THRESHOLD and risk_key != "Low Risk":
+    if elevation_used and is_dry_conditions(rain_pts) and risk_key != "Low Risk":
         position_key = (
             "elevation_position_low"
             if elev_pts >= (ELEVATION_COMPONENT_MAX / 2)
@@ -446,6 +465,18 @@ def check_risk(rainfall_mm, city, t):
     """t = translation dict for the active language (from translations.py).
     Raises MapOnlyCityError / UnsupportedCityError - callers must catch
     both before rendering a result.
+
+    NEW this session: when rainfall is negligible (dry_conditions), the
+    static terrain_warning is returned EMPTY and the safety_tips are
+    REPLACED by generic preparedness tips (t["safety_tips_dry"], plus an
+    explanatory t["safety_tips_dry_note"]) instead of the rain-scenario
+    text - an empty tips card on a safety page is a defect. Previously e.g. Karachi at 0.0mm showed
+    "Urban drainage systems can back up quickly - avoid clogged storm
+    drains and underpasses" next to a 0.0 rainfall bar, and "move
+    documents to a high, dry place" as if a storm were imminent. Applies
+    to every profile and every risk level. The score and risk tier are
+    deliberately UNCHANGED - only the copy is gated. check.html must
+    still guard terrain_warning being empty.
     """
     core = _compute_risk_core(city, rainfall_mm)
     profile_label = core["profile_label"]
@@ -457,10 +488,15 @@ def check_risk(rainfall_mm, city, t):
     score_0_1 = core["score_0_1"]
     risk_key = core["risk_level_key"]
     risk_slug = core["risk_slug"]
+    dry_conditions = core["dry_conditions"]
 
     if elevation_used:
+        # points/max_points added this session so the note can explain that
+        # the bar next to it is POINTS, not meters (str.format ignores
+        # unused kwargs, so an older translation without them still works).
         elevation_note = t["elevation_note_available"].format(
-            city=city.title(), elevation=elevation_m, profile=t["terrain_profile_labels"][profile_label]
+            city=city.title(), elevation=elevation_m, profile=t["terrain_profile_labels"][profile_label],
+            points=elev_pts, max_points=ELEVATION_COMPONENT_MAX,
         )
     else:
         elevation_note = t["elevation_note_unavailable"].format(city=city.title())
@@ -482,10 +518,12 @@ def check_risk(rainfall_mm, city, t):
         "elevation_points": elev_pts,
         "elevation_used": elevation_used,
         "elevation_note": elevation_note,
-        "safety_tips": t["safety_tips"][risk_key],
+        "dry_conditions": dry_conditions,
+        "safety_tips_note": t["safety_tips_dry_note"] if dry_conditions else "",
+        "safety_tips": t["safety_tips_dry"] if dry_conditions else t["safety_tips"][risk_key],
         "shelter_message": t["shelter_message"],
         "terrain_profile": t["terrain_profile_labels"][profile_label],
-        "terrain_warning": t["terrain_warnings"][profile_label],
+        "terrain_warning": "" if dry_conditions else t["terrain_warnings"][profile_label],
         "risk_color": core["risk_color"],
     }
 
@@ -688,6 +726,9 @@ def _render_risk_result(result, city, rainfall, mode, t, lang, forecast_hours=No
         risk_level=result["risk_level"], risk_level_key=result["risk_level_key"],
         risk_slug=result["risk_slug"],
         terrain_profile=result["terrain_profile"], terrain_warning=result["terrain_warning"],
+        dry_conditions=result["dry_conditions"],
+        safety_tips_note=result["safety_tips_note"],
+        elevation_used=result["elevation_used"],
         risk_color=result["risk_color"],
         score=result["score"], score_0_1=result["score_0_1"],
         rainfall_points=result["rainfall_points"],
@@ -719,7 +760,7 @@ def how_it_works():
 
 @app.route("/data-methodology")
 def data_methodology():
-    """NEW this session. Region thresholds are built from REGIONAL_PROFILES
+    """Region thresholds are built from REGIONAL_PROFILES
     directly rather than typed into the template a second time - this is
     the exact discipline that would have prevented the earlier dead-zone
     doc/code mismatch (METHODOLOGY.md claiming a different saturation
