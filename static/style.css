@@ -439,7 +439,16 @@ button:hover {
     text-anchor: middle;
 }
 
-/* ---- Impact bars (rainfall/elevation contribution, "Why is risk X") ---- */
+/* ---- Impact bars (rainfall/elevation contribution, "Why is risk X") ----
+   CHANGED this session: the label and value columns used FIXED widths
+   (70px / 48px), sized for the old one-word labels ("Rainfall") and bare
+   values ("0.0/54"). The longer "Rainfall score" / "Elevation score"
+   labels and "30.0/30 pts" values wrapped onto two lines. Now min-width +
+   nowrap: both rows share the same minimum label/value width so the two
+   bars still start and end at the same x position, and a longer
+   translation (Urdu/Sindhi) grows the column instead of wrapping or
+   clipping. text-align: end (not right) so the value hugs the correct
+   edge in RTL. */
 
 .impact-bar-row {
     display: flex;
@@ -449,8 +458,9 @@ button:hover {
 }
 
 .impact-bar-label {
-    width: 70px;
+    min-width: 110px;
     flex-shrink: 0;
+    white-space: nowrap;
     font-size: 0.85rem;
     font-weight: 600;
     color: #0F5459;
@@ -458,6 +468,7 @@ button:hover {
 
 .impact-bar-track {
     flex: 1;
+    min-width: 50px;
     height: 8px;
     background-color: #E4F3F1;
     border-radius: 4px;
@@ -471,9 +482,10 @@ button:hover {
 }
 
 .impact-bar-value {
-    width: 48px;
+    min-width: 70px;
     flex-shrink: 0;
-    text-align: right;
+    white-space: nowrap;
+    text-align: end;
     font-size: 0.8rem;
     color: #4A5B5C;
 }
@@ -680,6 +692,32 @@ html[dir="rtl"] .disclaimer-banner {
     font-size: 0.9rem;
     color: #197278;
     margin-top: 4px;
+}
+
+/* ---- Safety Tips card (check.html, card 5) ----
+   NEW this session. The card previously had no list styling of its own
+   (only the old .results ul li rule, which doesn't apply inside
+   .result-card), so bullets sat tight with browser-default spacing.
+   .safety-tips-note is the dry-day explanation sentence above the list.
+   padding-inline-start (not padding-left) so bullets sit correctly in
+   the RTL (ur/sd) layouts. */
+.result-card .safety-tips-note {
+    margin-bottom: 16px;
+    line-height: 1.55;
+}
+
+.result-card .safety-tips-list {
+    margin-top: 0;
+    padding-inline-start: 22px;
+}
+
+.result-card .safety-tips-list li {
+    margin-bottom: 12px;
+    line-height: 1.55;
+}
+
+.result-card .safety-tips-list li:last-child {
+    margin-bottom: 0;
 }
 
 .results ul li {
