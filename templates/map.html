@@ -77,6 +77,13 @@
     const cities = {{ cities | tojson }};
 
     cities.forEach(function (c) {
+        // FIX (this session): popups/tooltips used c.city, the raw English
+        // name from city_coordinates.csv, so ur/sd pages showed Latin-script
+        // city names. risk_check.py's map_view() now sends city_display
+        // (translated via translations.py's city_names). Falls back to
+        // c.city if it's ever missing.
+        const cityName = c.city_display || c.city;
+
         if (!c.scored) {
             L.circleMarker([c.lat, c.lon], {
                 radius: 8,
@@ -86,8 +93,8 @@
                 fillOpacity: 0.85
             })
             .addTo(map)
-            .bindPopup(`<strong>${c.city}</strong><br>{{ t.legend_not_scored }}`)
-            .bindTooltip(c.city, { permanent: false });
+            .bindPopup(`<strong>${cityName}</strong><br>{{ t.legend_not_scored }}`)
+            .bindTooltip(cityName, { permanent: false });
             return;
         }
         // FIX (earlier session): previously recomputed color here via a
@@ -109,7 +116,7 @@
             fillOpacity: 0.95
         })
         .addTo(map)
-        .bindPopup(`<strong>${c.city}</strong><br>${c.risk_level}<br>${c.plain_explanation}`);
+        .bindPopup(`<strong>${cityName}</strong><br>${c.risk_level}<br>${c.plain_explanation}`);
     });
 </script>
 {% endblock %}
