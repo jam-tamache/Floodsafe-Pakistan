@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.app_title }} &mdash; {{ t.floods_title }}{% endblock %}
+
+{% block content %}
+<div class="info-page">
+    <div class="info-stack">
+        <h1>{{ t.floods_title }}</h1>
+        <p class="info-lede">{{ t.floods_lede }}</p>
+
+        <div class="info-card">
+            <h3>{{ t.floods_what_heading }}</h3>
+            <p>{{ t.floods_what_body }}</p>
+        </div>
+
+        <div class="info-card">
+            <h3>{{ t.floods_pakistan_heading }}</h3>
+            <p>{{ t.floods_pakistan_body }}</p>
+        </div>
+
+        <div class="info-card">
+            <h3>{{ t.floods_sindh_heading }}</h3>
+            <p>{{ t.floods_sindh_body }}</p>
+        </div>
+
+        <div class="info-card">
+            <h3>{{ t.floods_matters_heading }}</h3>
+            <p>{{ t.floods_matters_body }}</p>
+        </div>
+
+        <div class="info-callout">
+            <strong>{{ t.floods_sources_heading }}</strong>
+            <!-- Source names and titles stay in English (they are the
+                 published names of the documents), so the list is pinned
+                 to lang="en" dir="ltr" to stop mixed-direction text
+                 reordering punctuation like "(4 Oct 2022)". -->
+            <ul class="source-list" lang="en" dir="ltr">
+                <li><a class="source-link" href="https://www.worldbank.org/en/news/press-release/2022/10/28/pakistan-flood-damages-and-economic-losses-over-usd-30-billion-and-reconstruction-needs-over-usd-16-billion-new-assessme" target="_blank" rel="noopener">World Bank &mdash; Pakistan Floods 2022 PDNA</a></li>
+                <li><a class="source-link" href="https://www.undp.org/pakistan/press-releases/pdna-pakistan-floods" target="_blank" rel="noopener">UNDP &mdash; PDNA press release</a></li>
+                <li><a class="source-link" href="https://www.unocha.org/publications/report/pakistan/revised-pakistan-2022-floods-response-plan-01-sep-2022-31-may-2023-04-oct-2022" target="_blank" rel="noopener">UN OCHA &mdash; Revised Floods Response Plan (4 Oct 2022)</a></li>
+                <li><a class="source-link" href="https://www.britannica.com/event/Pakistan-floods-of-2022" target="_blank" rel="noopener">Britannica &mdash; Pakistan floods of 2022</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <a href="{{ url_for('about', lang=lang) }}" class="back-link">{{ t.back_link }}</a>
+</div>
+{% endblock %}
