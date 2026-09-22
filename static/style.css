@@ -409,6 +409,9 @@ button:hover {
 .gauge-svg {
     width: 140px;
     height: 140px;
+    /* FIX: in RTL pages (ur/sd) the "0 - 1" scale label rendered reversed
+       as "1 - 0". Numbers on the gauge are always read left-to-right. */
+    direction: ltr;
 }
 
 .gauge-track {
@@ -897,6 +900,119 @@ html[dir="rtl"] .back-link:hover::before {
     color: #4A5B5C;
     font-style: italic;
     margin-top: 10px;
+}
+
+/* ---- Stacked cards on info pages (about.html, floods_2022.html) ----
+   NEW: cards placed directly inside .info-stack (not inside .info-grid)
+   had no spacing between them, so they touched. Scoped to .info-stack
+   with direct-child selectors so how_it_works.html and
+   data_methodology.html, which don't use this class, are unaffected.
+   .info-grid already carries its own 20px bottom margin. */
+.info-stack > .info-card {
+    margin-bottom: 20px;
+}
+
+.info-stack > .info-callout {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+/* ---- Premium call-to-action link (about.html -> floods page) ----
+   NEW: replaces a bare default-blue text link. Filled teal pill in the
+   same palette as .back-link (which is the outlined counterpart), with
+   an arrow that points the reading direction (flipped for ur/sd). The
+   :visited rule stops the browser turning the label purple. */
+.info-card p.info-card-action {
+    margin-top: 18px;
+}
+
+.info-link-btn,
+.info-link-btn:visited {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 24px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #197278 0%, #0F5459 100%);
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 0.92rem;
+    letter-spacing: 0.2px;
+    text-decoration: none;
+    box-shadow: 0px 6px 16px rgba(15, 84, 89, 0.28);
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.info-link-btn::after {
+    content: "\2192";
+    font-size: 1.05rem;
+    transition: transform 0.15s ease;
+}
+
+html[dir="rtl"] .info-link-btn::after {
+    content: "\2190";
+}
+
+.info-link-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0px 10px 22px rgba(15, 84, 89, 0.36);
+}
+
+.info-link-btn:hover::after {
+    transform: translateX(3px);
+}
+
+html[dir="rtl"] .info-link-btn:hover::after {
+    transform: translateX(-3px);
+}
+
+.info-link-btn:active {
+    transform: translateY(0);
+    box-shadow: 0px 4px 12px rgba(15, 84, 89, 0.28);
+}
+
+/* ---- Source list (floods_2022.html) ----
+   NEW: replaces a run-on paragraph of default-blue links with one
+   tidy row per source. The arrow is a neutral "opens elsewhere" mark and
+   uses margin-inline-start:auto so it sits at the far end in any
+   direction. */
+.source-list {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.source-link,
+.source-link:visited {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    background-color: #FFFFFF;
+    border: 1px solid #B7D9D6;
+    border-radius: 8px;
+    color: #0F5459;
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-decoration: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease,
+                transform 0.15s ease;
+}
+
+.source-link::after {
+    content: "\2197";
+    margin-inline-start: auto;
+    color: #197278;
+    font-size: 1rem;
+}
+
+.source-link:hover {
+    border-color: #197278;
+    transform: translateY(-1px);
+    box-shadow: 0px 6px 16px rgba(15, 84, 89, 0.14);
 }
 
 /* ---- Methodology table (data_methodology.html) ----
