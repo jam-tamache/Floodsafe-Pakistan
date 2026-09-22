@@ -62,6 +62,17 @@ TRANSLATIONS = {
             "mithi": "Mithi",
             "umerkot": "Umerkot",
             "sanghar": "Sanghar",
+            # Non-Sindh MAP_ONLY_CITIES (added this session) - map popups/tooltips only.
+            "lahore": "Lahore",
+            "islamabad": "Islamabad",
+            "peshawar": "Peshawar",
+            "quetta": "Quetta",
+            "gwadar": "Gwadar",
+            "pasni": "Pasni",
+            "turbat": "Turbat",
+            "sibi": "Sibi",
+            "chaman": "Chaman",
+            "cholistan": "Cholistan",
         },
 
         "form_city_label": "City:",
@@ -172,12 +183,34 @@ TRANSLATIONS = {
         "about_warning_heading": "Not an Official Warning",
         "about_warning_body": "FloodSafe does not predict flooding with certainty and is not a substitute for official warnings from PDMA Sindh or your local authorities.",
         "about_callout": "Cities outside Sindh are shown on the map for geographic context only and are not risk-scored, for the same reason above — their terrain hasn't been validated against this model yet.",
+        # NEW - About-page "why" section + link to the /floods-2022 page.
+        # The 70 percent figure is from the World Bank/UNDP PDNA (Oct 2022);
+        # it is cited on the floods_2022 page, which about_floods_link opens.
+        "about_why_heading": "Why I built FloodSafe",
+        "about_why_body_1": "The 2022 floods hit Sindh harder than any other province, with close to 70 percent of Pakistan's total flood damages and economic losses. I experienced them firsthand: large parts of my city were flooded and our electricity was out for seven days. I kept asking one question: what if people had access to clearer flood-risk information early enough to prepare?",
+        "about_why_body_2": "FloodSafe estimates a city's flood risk from a rainfall scenario or a live 72-hour forecast, using rainfall and the city's elevation relative to nearby areas. It explains the result and provides practical safety guidance in English, Urdu, and Sindhi. It is a planning aid and does not replace official warnings from NDMA or PDMA.",
+        "about_floods_link": "Read what happened in the 2022 floods",
+        # NEW - full text of the /floods-2022 page (floods_2022.html). Figures are
+        # from the World Bank/UNDP PDNA, UN OCHA and Britannica (see the page's
+        # source list). English is the reference text; ur/sd are UNREVIEWED drafts.
+        "floods_title": "The 2022 Floods",
+        "floods_lede": "Between June and October 2022, record monsoon rains and glacier melt flooded Pakistan. Sindh was the worst-affected province.",
+        "floods_what_heading": "What happened",
+        "floods_what_body": "Unusually heavy monsoon rain, worsened by seasonal glacier runoff, caused the Indus River and its tributaries to flood. Rainfall in Sindh and Balochistan was about 4.5 times higher than normal, and roughly one third of the country was submerged.",
+        "floods_pakistan_heading": "Across Pakistan",
+        "floods_pakistan_body": "About 33 million people were affected and more than 1,700 lost their lives. Damages and economic losses exceeded USD 30 billion, and reconstruction needs exceeded USD 16 billion.",
+        "floods_sindh_heading": "In Sindh",
+        "floods_sindh_body": "Sindh accounted for close to 70 percent of total damages and losses. Of the more than 2 million houses affected nationwide, 89 percent were in Sindh: over 683,000 destroyed and over 1.1 million damaged. Nearly half of all recorded deaths were also in Sindh.",
+        "floods_matters_heading": "Why this matters for FloodSafe",
+        "floods_matters_body": "These are early assessments from October 2022 and the final figures may differ. FloodSafe is a planning aid that estimates flood risk from rainfall and elevation. It is not a forecast of flooding and does not replace official warnings from NDMA and PDMA.",
+        "floods_sources_heading": "Sources",
         "how_it_works_title": "How It Works",
         "how_it_works_body_1": "FloodSafe estimates flood risk for Sindh cities from two factors: rainfall (either a live 72-hour forecast or a scenario you type in) and each city's elevation relative to nearby cities in the same terrain region. The two are combined into a single 0–1 score, which maps to Low, Moderate, High, or Very High risk.",
         "how_it_works_body_2": "Rainfall thresholds are project-defined, not sourced from an official government classification — they were derived by the developer and are documented, with reasoning, in the project's methodology notes. Elevation data comes from a public elevation API, looked up once per city.",
         "risk_map_heading": "Risk Map",
         "map_unavailable": "Map unavailable for this location.",
-        "why_risk_heading": "Why is the risk {risk_level}?",
+        "why_risk_heading": "Why is this rated {risk_level}?",
+        "unit_mm": "mm",
         "impact_rainfall_label": "Rainfall score",
         "impact_elevation_label": "Elevation score",
         "impact_points_unit": "pts",
@@ -289,6 +322,18 @@ TRANSLATIONS = {
             "mithi": "مٹھی",
             "umerkot": "عمرکوٹ",
             "sanghar": "سانگھڑ",
+            # Non-Sindh MAP_ONLY_CITIES (added this session) - map popups/tooltips only.
+            # UNREVIEWED by a native speaker (draft), same as the rest of the backlog.
+            "lahore": "لاہور",
+            "islamabad": "اسلام آباد",
+            "peshawar": "پشاور",
+            "quetta": "کوئٹہ",
+            "gwadar": "گوادر",
+            "pasni": "پسنی",
+            "turbat": "تربت",
+            "sibi": "سبی",
+            "chaman": "چمن",
+            "cholistan": "چولستان",
         },
 
         "form_city_label": "شہر:",
@@ -393,12 +438,34 @@ TRANSLATIONS = {
         "about_warning_heading": "یہ کوئی سرکاری وارننگ نہیں ہے",
         "about_warning_body": "فلڈ سیف یقین کے ساتھ سیلاب کی پیشگوئی نہیں کرتا اور PDMA سندھ یا آپ کے مقامی حکام کی سرکاری وارننگز کا متبادل نہیں ہے۔",
         "about_callout": "سندھ سے باہر کے شہر صرف جغرافیائی حوالے کے لیے نقشے پر دکھائے گئے ہیں اور ان کا خطرہ اسکور نہیں کیا گیا - اسی وجہ سے جیسا کہ اوپر بتایا گیا، ان کی زمینی خصوصیات ابھی اس ماڈل کے خلاف تصدیق شدہ نہیں ہیں۔",
+        # NEW - UNREVIEWED by a native speaker (my draft), same as the rest
+        # of the backlog.
+        "about_why_heading": "میں نے فلڈ سیف کیوں بنایا",
+        "about_why_body_1": "2022 کے سیلاب نے سندھ کو کسی بھی دوسرے صوبے سے زیادہ متاثر کیا؛ پاکستان کے کل سیلابی نقصانات اور معاشی خسارے کا تقریباً 70 فیصد سندھ میں ہوا۔ میں نے یہ سیلاب خود جھیلا: میرے شہر کے بڑے حصے زیرِ آب آ گئے اور ہماری بجلی سات دن تک بند رہی۔ میں ایک ہی سوال پوچھتا رہا: اگر لوگوں کو سیلاب کے خطرے کی واضح معلومات تیاری کے لیے کافی پہلے مل جاتیں تو کیا ہوتا؟",
+        "about_why_body_2": "فلڈ سیف بارش کے کسی منظرنامے یا لائیو 72 گھنٹے کی پیشگوئی کی بنیاد پر، بارش اور آس پاس کے علاقوں کے مقابلے میں شہر کی بلندی کو استعمال کرتے ہوئے، شہر کے سیلابی خطرے کا اندازہ لگاتا ہے۔ یہ نتیجے کی وضاحت کرتا ہے اور انگریزی، اردو اور سندھی میں عملی حفاظتی ہدایات فراہم کرتا ہے۔ یہ منصوبہ بندی میں مدد کا ذریعہ ہے اور NDMA یا PDMA کی سرکاری وارننگز کا متبادل نہیں۔",
+        "about_floods_link": "2022 کے سیلاب میں کیا ہوا، پڑھیں",
+        # NEW - full text of the /floods-2022 page (floods_2022.html). Figures are
+        # from the World Bank/UNDP PDNA, UN OCHA and Britannica (see the page's
+        # source list). ur/sd are UNREVIEWED drafts - check the numbers as well as
+        # the wording before relying on them.
+        "floods_title": "2022 کے سیلاب",
+        "floods_lede": "جون سے اکتوبر 2022 کے دوران ریکارڈ مون سون بارشوں اور گلیشیئر پگھلنے سے پاکستان میں سیلاب آیا۔ سندھ سب سے زیادہ متاثر ہونے والا صوبہ تھا۔",
+        "floods_what_heading": "کیا ہوا",
+        "floods_what_body": "غیر معمولی طور پر شدید مون سون بارشوں اور موسمی گلیشیئر پگھلاؤ کے باعث دریائے سندھ اور اس کے معاون دریاؤں میں سیلاب آ گیا۔ سندھ اور بلوچستان میں بارش معمول سے تقریباً 4.5 گنا زیادہ ہوئی، اور ملک کا تقریباً ایک تہائی حصہ زیرِ آب آ گیا۔",
+        "floods_pakistan_heading": "پورے پاکستان میں",
+        "floods_pakistan_body": "تقریباً 3 کروڑ 30 لاکھ (33 ملین) افراد متاثر ہوئے اور 1,700 سے زائد افراد جاں بحق ہوئے۔ نقصانات اور معاشی خسارہ 30 ارب امریکی ڈالر سے زیادہ رہا، اور بحالی و تعمیرِ نو کی ضروریات 16 ارب ڈالر سے زیادہ تھیں۔",
+        "floods_sindh_heading": "سندھ میں",
+        "floods_sindh_body": "پاکستان کے کل نقصانات اور معاشی خسارے کا تقریباً 70 فیصد سندھ میں ہوا۔ ملک بھر میں متاثر ہونے والے 20 لاکھ سے زائد گھروں میں سے 89 فیصد سندھ میں تھے: 6 لاکھ 83 ہزار سے زائد گھر تباہ ہوئے اور 11 لاکھ سے زائد کو نقصان پہنچا۔ ریکارڈ شدہ اموات کا تقریباً نصف بھی سندھ میں ہوا۔",
+        "floods_matters_heading": "فلڈ سیف کے لیے یہ کیوں اہم ہے",
+        "floods_matters_body": "یہ اکتوبر 2022 کے ابتدائی تخمینے ہیں اور حتمی اعداد و شمار مختلف ہو سکتے ہیں۔ فلڈ سیف منصوبہ بندی میں مدد کا ایک ذریعہ ہے جو بارش اور بلندی کی بنیاد پر سیلاب کے خطرے کا اندازہ لگاتا ہے۔ یہ سیلاب کی پیشگوئی نہیں ہے اور NDMA اور PDMA کی سرکاری وارننگز کا متبادل نہیں۔",
+        "floods_sources_heading": "ذرائع",
         "how_it_works_title": "یہ کیسے کام کرتا ہے",
         "how_it_works_body_1": "فلڈ سیف سندھ کے شہروں کے لیے دو عوامل سے سیلاب کے خطرے کا اندازہ لگاتا ہے: بارش (یا تو 72 گھنٹے کی لائیو پیشگوئی یا آپ کا درج کردہ منظرنامہ) اور ہر شہر کی بلندی اسی زمینی خطے کے قریبی شہروں کے مقابلے میں۔ یہ دونوں مل کر ایک 0 سے 1 تک کا اسکور بناتے ہیں، جو کم، درمیانہ، شدید، یا انتہائی شدید خطرے میں تبدیل ہوتا ہے۔",
         "how_it_works_body_2": "بارش کی حدیں منصوبے کے اپنے طے کردہ ہیں، کسی سرکاری درجہ بندی سے حاصل شدہ نہیں - یہ ڈویلپر نے مرتب کی ہیں اور ان کی وجوہات منصوبے کے طریقہ کار کے نوٹس میں دستاویزی ہیں۔ بلندی کا ڈیٹا ایک عوامی بلندی API سے حاصل کیا جاتا ہے، جو ہر شہر کے لیے ایک بار حاصل کیا جاتا ہے۔",
         "risk_map_heading": "خطرے کا نقشہ",
         "map_unavailable": "اس مقام کے لیے نقشہ دستیاب نہیں۔",
-        "why_risk_heading": "خطرہ {risk_level} کیوں ہے؟",
+        "why_risk_heading": "یہ {risk_level} کیوں ہے؟",
+        "unit_mm": "ملی میٹر",
         "impact_rainfall_label": "بارش کا اسکور",
         "impact_elevation_label": "بلندی کا اسکور",
         "impact_points_unit": "پوائنٹس",
@@ -510,6 +577,18 @@ TRANSLATIONS = {
             "mithi": "مٺي",
             "umerkot": "عمرڪوٽ",
             "sanghar": "سانگھڙ",
+            # Non-Sindh MAP_ONLY_CITIES (added this session) - map popups/tooltips only.
+            # UNREVIEWED by a native speaker (draft), same as the rest of the backlog.
+            "lahore": "لاهور",
+            "islamabad": "اسلام آباد",
+            "peshawar": "پشاور",
+            "quetta": "ڪوئٽا",
+            "gwadar": "گوادر",
+            "pasni": "پسني",
+            "turbat": "تربت",
+            "sibi": "سبي",
+            "chaman": "چمن",
+            "cholistan": "چولستان",
         },
 
         "form_city_label": "شهر:",
@@ -614,12 +693,36 @@ TRANSLATIONS = {
         "about_warning_heading": "هي ڪا سرڪاري وارننگ ناهي",
         "about_warning_body": "فلڊ سيف يقين سان سيلاب جي اڳڪٿي نٿو ڪري ۽ PDMA سنڌ يا توهان جي مقامي اختيارين جي سرڪاري وارننگن جو متبادل ناهي.",
         "about_callout": "سنڌ کان ٻاهر جا شهر رڳو جاگرافيائي حوالي لاءِ نقشي تي ڏيکاريا ويا آهن ۽ انهن جو خطرو اسڪور نه ڪيو ويو آهي - ساڳئي سبب مطابق جيئن مٿي ٻڌايو ويو، سندن زميني خاصيتون اڃا هن ماڊل خلاف تصديق ٿيل ناهن.",
+        # NEW - UNREVIEWED by a native speaker (my draft; my Sindhi is weaker
+        # than my Urdu). Uses "سيلاب" for flood to match the rest of this
+        # file, although "ٻوڏ" is the more idiomatic Sindhi word - a native
+        # reviewer should decide.
+        "about_why_heading": "مون فلڊ سيف ڇو ٺاهيو",
+        "about_why_body_1": "2022 جي سيلاب سنڌ کي ٻين سڀني صوبن کان وڌيڪ متاثر ڪيو؛ پاڪستان جي ڪل سيلابي نقصانن ۽ معاشي خساري جو تقريباً 70 سيڪڙو سنڌ ۾ ٿيو. مون اهو سيلاب پاڻ ڏٺو: منهنجي شهر جا وڏا حصا پاڻيءَ هيٺ اچي ويا ۽ اسان جي بجلي ست ڏينهن بند رهي. مان هڪ ئي سوال پڇندو رهيس: جيڪڏهن ماڻهن کي سيلاب جي خطري بابت صاف معلومات تياريءَ لاءِ ڪافي اڳ ملي وڃي ها ته ڇا ٿئي ها؟",
+        "about_why_body_2": "فلڊ سيف برسات جي ڪنهن منظرنامي يا لائيو 72 ڪلاڪن جي اڳڪٿي جي بنياد تي، برسات ۽ ڀرپاسي جي علائقن جي مقابلي ۾ شهر جي بلندي استعمال ڪندي، شهر جي سيلاب جي خطري جو اندازو لڳائي ٿو. هي نتيجي جي وضاحت ڪري ٿو ۽ انگريزي، اردو ۽ سنڌي ۾ عملي حفاظتي هدايتون ڏئي ٿو. هي منصوبابندي ۾ مدد جو ذريعو آهي ۽ NDMA يا PDMA جي سرڪاري وارننگن جو متبادل ناهي.",
+        "about_floods_link": "2022 جي سيلاب ۾ ڇا ٿيو، پڙهو",
+        # NEW - full text of the /floods-2022 page (floods_2022.html). Figures are
+        # from the World Bank/UNDP PDNA, UN OCHA and Britannica (see the page's
+        # source list). ur/sd are UNREVIEWED drafts - check the numbers as well as
+        # the wording before relying on them.
+        "floods_title": "2022 جو سيلاب",
+        "floods_lede": "جون کان آڪٽوبر 2022 دوران رڪارڊ مون سون برساتن ۽ گليشيئر جي ڳرڻ سبب پاڪستان ۾ سيلاب آيو. سنڌ سڀ کان وڌيڪ متاثر ٿيندڙ صوبو هو.",
+        "floods_what_heading": "ڇا ٿيو",
+        "floods_what_body": "غير معمولي طور تي تمام وڏين مون سون برساتن ۽ موسمي گليشيئر ڳرڻ سبب درياءُ سنڌو ۽ ان جي شاخن ۾ سيلاب اچي ويو. سنڌ ۽ بلوچستان ۾ برسات معمول کان تقريباً 4.5 ڀيرا وڌيڪ ٿي، ۽ ملڪ جو تقريباً ٽيون حصو پاڻيءَ هيٺ اچي ويو.",
+        "floods_pakistan_heading": "سڄي پاڪستان ۾",
+        "floods_pakistan_body": "تقريباً 3 ڪروڙ 30 لک (33 ملين) ماڻهو متاثر ٿيا ۽ 1,700 کان وڌيڪ ماڻهو مري ويا. نقصان ۽ معاشي خسارو 30 ارب آمريڪي ڊالرن کان وڌيڪ رهيو، ۽ بحالي ۽ ٻيهر تعمير جون ضرورتون 16 ارب ڊالرن کان وڌيڪ هيون.",
+        "floods_sindh_heading": "سنڌ ۾",
+        "floods_sindh_body": "پاڪستان جي ڪل نقصان ۽ معاشي خساري جو تقريباً 70 سيڪڙو سنڌ ۾ ٿيو. سڄي ملڪ ۾ متاثر ٿيل 20 لک کان وڌيڪ گهرن مان 89 سيڪڙو سنڌ ۾ هئا: 6 لک 83 هزار کان وڌيڪ گهر تباهه ٿيا ۽ 11 لک کان وڌيڪ کي نقصان پهتو. رڪارڊ ٿيل موتن جو تقريباً اڌ به سنڌ ۾ ٿيو.",
+        "floods_matters_heading": "فلڊ سيف لاءِ هي ڇو اهم آهي",
+        "floods_matters_body": "هي آڪٽوبر 2022 جا شروعاتي اندازا آهن ۽ حتمي انگ مختلف ٿي سگهن ٿا. فلڊ سيف منصوبابندي ۾ مدد جو هڪ ذريعو آهي جيڪو برسات ۽ بلندي جي بنياد تي سيلاب جي خطري جو اندازو لڳائي ٿو. هي سيلاب جي اڳڪٿي ناهي ۽ NDMA ۽ PDMA جي سرڪاري وارننگن جو متبادل ناهي.",
+        "floods_sources_heading": "ماخذ",
         "how_it_works_title": "هي ڪيئن ڪم ڪري ٿو",
         "how_it_works_body_1": "فلڊ سيف سنڌ جي شهرن لاءِ ٻن عنصرن مان سيلاب جي خطري جو اندازو لڳائي ٿو: برسات (يا ته 72 ڪلاڪن جي لائيو اڳڪٿي يا توهان جو داخل ڪيل منظرنامو) ۽ هر شهر جي بلندي ساڳئي زميني علائقي جي ويجهن شهرن جي مقابلي ۾. ٻئي گڏجي هڪ 0 کان 1 تائين اسڪور ٺاهين ٿا، جيڪو گھٽ، وچولو، وڏو، يا تمام وڏو خطري ۾ تبديل ٿئي ٿو.",
         "how_it_works_body_2": "برسات جون حدون منصوبي جون پنهنجون مقرر ڪيل آهن، ڪنهن به سرڪاري درجه بندي مان حاصل ٿيل نه آهن - اهي ڊولپر پاران مرتب ڪيون ويون آهن ۽ سندن دليل منصوبي جي طريقيڪار جي نوٽس ۾ دستاويز ٿيل آهن. بلندي جو ڊيٽا هڪ عوامي بلندي API مان حاصل ڪيو ويندو آهي، جيڪو هر شهر لاءِ هڪ ڀيرو حاصل ڪيو ويندو آهي.",
         "risk_map_heading": "خطري جو نقشو",
         "map_unavailable": "هن هنڌ لاءِ نقشو دستياب ناهي.",
-        "why_risk_heading": "خطرو {risk_level} ڇو آهي؟",
+        "why_risk_heading": "هي {risk_level} ڇو آهي؟",
+        "unit_mm": "ملي ميٽر",
         "impact_rainfall_label": "برسات جو اسڪور",
         "impact_elevation_label": "بلندي جو اسڪور",
         "impact_points_unit": "پوائنٽ",
