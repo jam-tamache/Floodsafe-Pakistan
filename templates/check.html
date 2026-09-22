@@ -58,9 +58,9 @@
          explicit instruction. -->
     <div class="result-grid">
         <div class="result-card">
-            <h3 class="result-card-heading">1. {{ t.city_label }} / {{ t.rainfall_label }}</h3>
-            <p><strong>{{ t.city_label }}</strong> {{ city.title() }}</p>
-            <p><strong>{{ t.rainfall_label }}</strong> {{ rainfall }}mm</p>
+            <h3 class="result-card-heading">1. {{ t.city_label.rstrip(':') }} / {{ t.rainfall_label.rstrip(':') }}</h3>
+            <p><strong>{{ t.city_label }}</strong> {{ city_display }}</p>
+            <p><strong>{{ t.rainfall_label }}</strong> {{ rainfall }} {{ t.unit_mm }}</p>
             <p class="source-note source-{{ mode }}">{{ source_note }}</p>
             <p>{{ t.terrain_profile_label }} {{ terrain_profile }}</p>
         </div>
