@@ -410,6 +410,17 @@ SUPPORTED_CITY_DISPLAY_NAMES = sorted({
 })
 
 
+def localized_city(city, t):
+    """Display name for `city` in the ACTIVE language, from translations.py's
+    city_names dict (keys are normalized lowercase names). Falls back to the
+    title-cased name for a city with no translation entry, so a missing key
+    degrades to the old English behavior instead of crashing. Previously the
+    result page always showed city.title() - "Karachi" in Latin script even
+    inside Urdu/Sindhi sentences.
+    """
+    return t.get("city_names", {}).get(normalize_city(city), city.title())
+
+
 def get_lang():
     """Read ?lang= from the query string, fall back to English if missing/invalid."""
     lang = request.args.get("lang", DEFAULT_LANGUAGE)
@@ -442,7 +453,7 @@ def build_plain_explanation(rainfall_mm, elevation_used, elev_pts, rain_pts, ris
             else "elevation_position_high"
         )
         return t["explanation_terrain_baseline"].format(
-            rainfall=rainfall_mm, city=city.title(),
+            rainfall=rainfall_mm, city=localized_city(city, t),
             elevation_position=t[position_key], risk_level=risk_level_display,
         )
     elif elevation_used:
@@ -452,12 +463,12 @@ def build_plain_explanation(rainfall_mm, elevation_used, elev_pts, rain_pts, ris
             else "elevation_position_high"
         )
         return t["explanation_with_elevation"].format(
-            rainfall=rainfall_mm, city=city.title(),
+            rainfall=rainfall_mm, city=localized_city(city, t),
             elevation_position=t[position_key], risk_level=risk_level_display,
         )
     else:
         return t["explanation_without_elevation"].format(
-            rainfall=rainfall_mm, city=city.title(), risk_level=risk_level_display,
+            rainfall=rainfall_mm, city=localized_city(city, t), risk_level=risk_level_display,
         )
 
 
@@ -495,11 +506,11 @@ def check_risk(rainfall_mm, city, t):
         # the bar next to it is POINTS, not meters (str.format ignores
         # unused kwargs, so an older translation without them still works).
         elevation_note = t["elevation_note_available"].format(
-            city=city.title(), elevation=elevation_m, profile=t["terrain_profile_labels"][profile_label],
+            city=localized_city(city, t), elevation=elevation_m, profile=t["terrain_profile_labels"][profile_label],
             points=elev_pts, max_points=ELEVATION_COMPONENT_MAX,
         )
     else:
-        elevation_note = t["elevation_note_unavailable"].format(city=city.title())
+        elevation_note = t["elevation_note_unavailable"].format(city=localized_city(city, t))
 
     risk_level_display = t["risk_levels"][risk_key]
     plain_explanation = build_plain_explanation(
@@ -720,7 +731,8 @@ def _render_risk_result(result, city, rainfall, mode, t, lang, forecast_hours=No
 
     return render_template(
         "check.html", t=t, lang=lang,
-        city=city, rainfall=rainfall, mode=mode, source_note=source_note,
+        city=city, city_display=localized_city(city, t),
+        rainfall=rainfall, mode=mode, source_note=source_note,
         plain_explanation=result["plain_explanation"],
         safety_tips=result["safety_tips"], shelter_message=result["shelter_message"],
         risk_level=result["risk_level"], risk_level_key=result["risk_level_key"],
@@ -749,6 +761,19 @@ def about():
     lang = get_lang()
     t = get_translation(lang)
     return render_template("about.html", t=t, lang=lang)
+
+
+@app.route("/floods-2022")
+def floods_2022():
+    """Sourced factual page on the 2022 floods, linked from the About page.
+    Deliberately NOT in the nav (base.html) - it is background reading, not
+    a tool feature. The template is English-only for now; the ur/sd About
+    link text says so. The endpoint name must stay "floods_2022" because
+    about.html calls url_for('floods_2022', ...).
+    """
+    lang = get_lang()
+    t = get_translation(lang)
+    return render_template("floods_2022.html", t=t, lang=lang)
 
 
 @app.route("/how-it-works")
@@ -833,6 +858,7 @@ def map_view():
     cities_for_template = []
     for city, entry in city_data.items():
         item = dict(entry)
+        item["city_display"] = localized_city(city, t)
         if entry.get("scored"):
             item["risk_level"] = t["risk_levels"][entry["risk_level_key"]]
             item["plain_explanation"] = build_plain_explanation(
