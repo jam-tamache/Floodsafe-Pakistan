@@ -10,8 +10,12 @@
     </div>
 
     <div class="home-card">
+        <!-- FIX (this session): the bare &#9888; renders as an oversized
+             color emoji on Android Chrome. &#xFE0E; forces text
+             presentation and .warn-icon sizes it to the surrounding text -
+             the same fix check.html already had. -->
         <div class="disclaimer-banner">
-            &#9888; {{ t.disclaimer_banner }}
+            <span class="warn-icon">&#9888;&#xFE0E;</span> {{ t.disclaimer_banner }}
         </div>
 
         <!-- Primary flow: 72h forecast (city only). Swapped to primary
