@@ -46,6 +46,12 @@ import risk_check
 # checked. The underlying mm thresholds and expected classifications
 # below were re-verified by hand against the corrected rainfall_component()
 # and are unchanged - only the label string was wrong.
+#
+# These tests patch elevation to None specifically so they stay valid
+# regardless of the elevation-rainfall scaling fix below (see
+# TestElevationRainfallScaling) - with elevation_used=False, elevation's
+# contribution is 0 whether or not it's scaled by rainfall, so this class
+# needs no changes for that fix.
 # ---------------------------------------------------------------------------
 
 class TestRainfallClassification(unittest.TestCase):
@@ -166,6 +172,10 @@ class TestRainfallClassification(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # 2. Elevation component, tested directly (not dependent on real CSV data
 #    or which cities currently have rows).
+#
+# elevation_component() is UNCHANGED by the elevation-rainfall scaling fix
+# below - it still returns the raw, un-scaled terrain-position score. These
+# tests call it directly with no rainfall argument and remain valid as-is.
 # ---------------------------------------------------------------------------
 
 class TestElevationComponent(unittest.TestCase):
@@ -206,6 +216,122 @@ class TestElevationComponent(unittest.TestCase):
         self.assertFalse(used)
         self.assertEqual(points, 0)
         self.assertIsNone(elev)
+
+
+# ---------------------------------------------------------------------------
+# 2b. NEW this session — elevation-rainfall scaling fix.
+#
+# REAL BUG, found by inspecting the actual city_elevation.csv on file, not
+# a hypothetical: elevation_component() scores a city purely on its
+# RELATIVE position within its region, with no regard to whether any rain
+# is forecast at all. That meant any city sitting in roughly the bottom
+# ~17% of its region's elevation range (raw elevation points > 25 out of
+# 30) was guaranteed at least Moderate Risk at 0mm rainfall, purely from
+# terrain. Checked against the real CSV: this affected 7 of ~29 scored
+# cities across all three regions — karachi (9m) and umerkot (17m), each
+# the lowest in their region; mirpurkhas (17m) and tando muhammad khan
+# (18m) in central_plains; kotri and jamshoro (23m each, tied); and tando
+# allahyar (26m, 27.3/30 points — just over the 25-point Moderate line).
+# A quarter of all scored cities reading "Moderate Risk" on a bone-dry day
+# is a model defect, not a rare boundary case — this was not a one-off
+# Karachi issue.
+#
+# Fix: elevation's contribution to total_score is now scaled by how close
+# rainfall_mm is to the region's own low_max threshold
+# (elevation_rain_fraction = min(rainfall_mm / low_max, 1.0)), reusing the
+# same FFD-anchored threshold already documented in METHODOLOGY.md rather
+# than inventing a new number. At 0mm, elevation contributes nothing
+# regardless of terrain — score floors at Low. As rainfall approaches
+# low_max, elevation's full raw weight phases back in linearly, so
+# genuinely wet scenarios are essentially unaffected in classification
+# (see the Karachi worked-example test below: still Moderate Risk, just a
+# lower raw score than before the fix — see METHODOLOGY.md).
+#
+# elevation_component() itself is untouched — the scaling happens one
+# level up, in _compute_risk_core() / check_risk(). These tests exercise
+# check_risk() directly (the whole pipeline) rather than calling the
+# scaling arithmetic in isolation, since the fix's entire point is that it
+# changes what actually reaches a user, not just an internal number.
+# ---------------------------------------------------------------------------
+
+class TestElevationRainfallScaling(unittest.TestCase):
+
+    def setUp(self):
+        self._orig_ranges = dict(risk_check._REGION_ELEVATION_RANGES)
+        from translations import get_translation
+        self.t = get_translation("en")
+
+    def tearDown(self):
+        risk_check._REGION_ELEVATION_RANGES.clear()
+        risk_check._REGION_ELEVATION_RANGES.update(self._orig_ranges)
+
+    def test_lowest_elevation_city_at_zero_rain_stays_low_risk(self):
+        # nawabshah is central_plains (low_max=50); force it to this
+        # region's lowest elevation so it gets full 30 raw elevation
+        # points — the exact shape of the original bug.
+        risk_check._REGION_ELEVATION_RANGES["central_plains"] = (5, 105)
+        with patch("elevation_data.get_elevation", return_value=5):
+            result = risk_check.check_risk(0.0, "nawabshah", self.t)
+        self.assertEqual(
+            result["risk_level_key"], "Low Risk",
+            f"lowest-elevation city at 0mm rainfall should be Low Risk, "
+            f"got {result['risk_level_key']} (score {result['score']}) "
+            f"— this is exactly the bug the elevation-rainfall scaling fixes"
+        )
+        self.assertEqual(result["elevation_points"], 0.0)
+        # Raw terrain position is preserved separately — this city IS
+        # genuinely low-lying, that fact doesn't disappear just because
+        # today happens to be dry.
+        self.assertEqual(result["elevation_terrain_points"], 30.0)
+
+    def test_lowest_elevation_city_at_full_low_max_gets_full_elevation_weight(self):
+        # At rainfall == low_max (50mm for central_plains), rain_fraction
+        # is 1.0, so elevation contributes its full raw score — confirms
+        # the fix doesn't weaken genuinely wet scenarios.
+        risk_check._REGION_ELEVATION_RANGES["central_plains"] = (5, 105)
+        with patch("elevation_data.get_elevation", return_value=5):
+            result = risk_check.check_risk(50.0, "nawabshah", self.t)
+        self.assertEqual(result["elevation_points"], 30.0)
+        self.assertEqual(result["score"], 55.0)  # 25.0 (rain, full low_max band) + 30.0 (elevation, full weight)
+
+    def test_elevation_contribution_scales_linearly_with_rainfall(self):
+        # At half of low_max (25mm), elevation should contribute half its
+        # raw points (15.0 of 30.0), not its full value.
+        risk_check._REGION_ELEVATION_RANGES["central_plains"] = (5, 105)
+        with patch("elevation_data.get_elevation", return_value=5):
+            result = risk_check.check_risk(25.0, "nawabshah", self.t)
+        self.assertEqual(result["elevation_points"], 15.0)
+        self.assertEqual(result["elevation_terrain_points"], 30.0)  # raw score unaffected by rainfall
+
+    def test_highest_elevation_city_unaffected_either_way(self):
+        # A city at its region's highest elevation gets 0 raw elevation
+        # points regardless of rainfall — 0 scaled by anything is still 0.
+        # Confirms the fix doesn't accidentally touch high-ground cities.
+        risk_check._REGION_ELEVATION_RANGES["central_plains"] = (5, 105)
+        with patch("elevation_data.get_elevation", return_value=105):
+            result_dry = risk_check.check_risk(0.0, "dadu", self.t)
+            result_wet = risk_check.check_risk(50.0, "dadu", self.t)
+        self.assertEqual(result_dry["elevation_points"], 0.0)
+        self.assertEqual(result_wet["elevation_points"], 0.0)
+
+    def test_karachi_worked_example_matches_updated_methodology(self):
+        # Matches METHODOLOGY.md's updated worked example: karachi at
+        # 25mm (mega_urban_coastal, low_max=40), assumed lowest in its
+        # region (real elevation range from city_elevation.csv: 9m-26m).
+        self._orig_mega = risk_check._REGION_ELEVATION_RANGES.get("mega_urban_coastal")
+        risk_check._REGION_ELEVATION_RANGES["mega_urban_coastal"] = (9, 26)
+        try:
+            with patch("elevation_data.get_elevation", return_value=9):
+                result = risk_check.check_risk(25.0, "karachi", self.t)
+        finally:
+            if self._orig_mega is not None:
+                risk_check._REGION_ELEVATION_RANGES["mega_urban_coastal"] = self._orig_mega
+
+        self.assertEqual(result["rainfall_points"], 15.6)
+        self.assertEqual(result["elevation_terrain_points"], 30.0)
+        self.assertEqual(result["elevation_points"], 18.8)   # 30.0 * (25/40) = 18.75 -> 18.8
+        self.assertEqual(result["score"], 34.4)              # 15.6 + 18.8
+        self.assertEqual(result["risk_level_key"], "Moderate Risk")
 
 
 # ---------------------------------------------------------------------------
