@@ -35,7 +35,7 @@ explicit to the user, not just to the code.)
 
 ```
 total_score (0-100) = rainfall_component (0-54, saturating)
-                     + elevation_component (0-30)
+                     + elevation_component (0-30, scaled by rainfall - see below)
 
 score_0_1 = total_score / 100
 
@@ -122,14 +122,85 @@ stronger source than this and is a reasonable post-V1 improvement.
 | Central Agricultural Plains (baseline) | 50mm | 120mm |
 | Arid Plains & Deserts | 70mm | 140mm |
 
+### Elevation component (0-30 points, scaled by rainfall)
+
+Elevation data comes from Open-Elevation, with OpenTopoData as a
+fallback, fetched per-city by `get_elevation.py` and stored in
+`city_elevation.csv`. A city's **raw terrain-position score** is computed
+relative to other cities in its own regional profile — not on one
+national scale — because low elevation means something different in
+coastal terrain than it does inland. The lowest-elevation city in a
+region gets the full 30 raw points; the highest gets 0.
+
+- **Limitation:** this rewards relative position within a small set of
+  cities (4-20 per region), not an absolute flood-risk elevation
+  threshold from a hydrological study. It is a reasonable first-pass
+  signal, not a validated flood model.
+- If elevation data is unavailable for a city, elevation's contribution
+  is 0 and the result explicitly tells the user the score is
+  rainfall-only for that city - never silently substituted.
+
+#### Elevation-rainfall scaling (fixes a real bug)
+
+**This is a fix, not part of the original design.** Elevation's raw
+terrain-position score, on its own, does not account for whether any
+rain is actually happening. That meant a city sitting in roughly the
+bottom ~17% of its region's elevation range (raw elevation points > 25
+out of 30) was scored **at least Moderate Risk even at 0mm rainfall**,
+purely from terrain — a bone-dry day would still show "Moderate Risk"
+for that city.
+
+This was checked against the real `city_elevation.csv` on file, not
+treated as a hypothetical: **7 of ~29 scored cities** were affected
+across all three regions — Karachi (9m) and Umerkot (17m), each the
+lowest-elevation city in their region; Mirpurkhas (17m) and Tando
+Muhammad Khan (18m) in the Central Plains; Kotri and Jamshoro (23m each,
+tied); and Tando Allahyar (26m, scoring 27.3/30 — just over the
+25-point Moderate line). A quarter of all scored cities reading
+"Moderate Risk" during dry weather was a model defect, not an isolated
+edge case.
+
+**The fix:** elevation's contribution to `total_score` is now scaled by
+how close the current rainfall is to the region's own `low_max`
+threshold:
+
+```
+elevation_rain_fraction = min(rainfall_mm / low_max, 1.0)
+elevation_points = elevation_terrain_points * elevation_rain_fraction
+```
+
+`low_max` is reused rather than inventing a new threshold — it is
+already the FFD-anchored boundary (see above) for "some real rain has
+started falling" in that region. At 0mm, `elevation_rain_fraction` is 0,
+so elevation contributes nothing regardless of terrain, and the score
+floors at Low. As rainfall approaches `low_max`, elevation's full raw
+weight phases back in linearly. Past `low_max`, elevation contributes at
+full weight, same as before this fix — genuinely wet scenarios are
+essentially unaffected (see the updated worked example below).
+
+The city's raw terrain-position score is still tracked separately
+(`elevation_terrain_points` in the code) and used anywhere the app
+describes a city's geography (e.g. "this is a low-lying city") — that
+description shouldn't change just because today happens to be dry.
+Only the score's *use* of that geography is now rainfall-dependent.
+
 ### Worked example: Karachi, 25mm forecast over 72 hours
 
 - `low_max` for Mega-Urban & Coastal = 40mm. 25mm ≤ 40mm, so:
   `rainfall_points = 25 × (25 / 40) = 15.6`
-- Assuming Karachi is the lowest-elevation city in its region, it gets
-  the full 30 elevation points: `elevation_points = 30.0`
-- `total_score = 15.6 + 30.0 = 45.6` → `score_0_1 = 0.456` →
+- Assuming Karachi is the lowest-elevation city in its region, its raw
+  terrain-position score is the full 30 points.
+- `elevation_rain_fraction = min(25 / 40, 1.0) = 0.625`
+- `elevation_points = 30.0 × 0.625 = 18.75 → 18.8` (rounded)
+- `total_score = 15.6 + 18.8 = 34.4` → `score_0_1 = 0.344` →
   **Moderate Risk** (0.25 - 0.50 range)
+
+(Before the elevation-rainfall scaling fix, this same 25mm scenario
+scored `15.6 + 30.0 = 45.6` — still Moderate Risk, but overstating
+elevation's role on a day with only light rainfall. The classification
+doesn't change here; the score composition is now more honest about what
+elevation should actually be contributing when it isn't raining much
+yet.)
 
 ### The "dead zone" past `medium_max`
 
@@ -148,24 +219,6 @@ dead-zone test locks in the current 100%-of-`medium_max` saturation
 distance; if that distance is ever narrowed (e.g. to make the tail more
 responsive to extreme rainfall), this section and that test both need to
 be updated together — the two must never drift apart again.
-
-### Elevation component (0-30 points)
-
-Elevation data comes from Open-Elevation, with OpenTopoData as a
-fallback, fetched per-city by `get_elevation.py` and stored in
-`city_elevation.csv`. A city's elevation is scored **relative to other
-cities in its own regional profile** - not on one national scale -
-because low elevation means something different in coastal terrain
-than it does inland. The lowest-elevation city in a region scores the
-full 30 points; the highest scores 0.
-
-- **Limitation:** this rewards relative position within a small set of
-  cities (4-20 per region), not an absolute flood-risk elevation
-  threshold from a hydrological study. It is a reasonable first-pass
-  signal, not a validated flood model.
-- If elevation data is unavailable for a city, elevation_component
-  returns 0 and the result explicitly tells the user the score is
-  rainfall-only for that city - never silently substituted.
 
 ## What's explicitly NOT modeled in V1
 
@@ -194,15 +247,19 @@ full 30 points; the highest scores 0.
 
 ## Validation status
 
-"Validated" in this document means the thresholds are anchored to an
-official Pakistani rainfall classification (FFD) via a stated, simplified
-scaling method, and the scoring code has automated tests covering
-Low/Moderate/High/Very High classification, elevation edge cases, and
-forecast aggregation (`test_risk_scoring.py`, 15/15 passing). It does
-**not** mean this model has been tested against historical flood outcomes
-in Sindh — that is explicitly a post-V1 item (comparing model output
-against 2-3 documented real flood events, including cases where the
-model would be wrong).
+"Designed and calibrated for Sindh" in this document means the
+thresholds are anchored to an official Pakistani rainfall classification
+(FFD) via a stated, simplified scaling method, and the scoring code has
+automated tests covering Low/Moderate/High/Very High classification,
+elevation edge cases (including the elevation-rainfall scaling fix
+above), and forecast aggregation (`test_risk_scoring.py`, 20/20 passing).
+It does **not** mean this model has been tested against historical flood
+outcomes in Sindh — that is explicitly a post-V1 item (comparing model
+output against documented real flood events, including cases where the
+model would be wrong). An initial historical back-test against
+documented flood events is planned; results will be published here once
+complete, with sample size and methodology stated plainly rather than
+described as full validation.
 
 ## Open items
 
@@ -215,3 +272,7 @@ model would be wrong).
   zone" section above. If changed, it must be changed in code and this
   doc together, with `test_risk_scoring.py` updated to match.
 - Historical validation against real flood events (post-V1, per roadmap).
+- The elevation_note shown to users (translations.py, en/ur/sd) now
+  reflects the rain-scaled elevation contribution rather than the city's
+  fixed terrain position, but the wording hasn't yet been reviewed to
+  make that shift clear to a reader - flagged, not yet done.
