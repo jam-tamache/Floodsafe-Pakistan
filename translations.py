@@ -173,7 +173,13 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "Central Agricultural Plains",
             "Arid Plains & Deserts": "Arid Plains & Deserts",
         },
-        "elevation_note_available": "{city} sits at {elevation}m. That is compared with other {profile} locations: the lower a city sits within its group, the more of the {max_points} elevation points it gets ({points} here). The bar above shows these points, not meters.",
+                # UPDATED this session - reflects the elevation-rainfall scaling
+        # fix (see risk_check.py / METHODOLOGY.md): elevation points now
+        # only count in full once real rainfall is actually expected, so
+        # {points} can change day to day for the same city as the rainfall
+        # forecast changes, not just by which city was picked. Previously
+        # this note implied a fixed number tied only to terrain position.
+        "elevation_note_available": "{city} sits at {elevation}m. That is compared with other {profile} locations: the lower a city sits within its group, the more elevation points it can contribute (up to {max_points}). This only counts toward the score once real rainfall is expected — with little or no rain, elevation's contribution is scaled down, since low-lying terrain alone isn't a flood risk on a dry day. Right now it contributes {points} points. The bar above shows these points, not meters.",
         "elevation_note_unavailable": "Elevation data for {city} was not available - this score is based on rainfall alone.",
         "home_subtitle": "Get an estimate of flood risk for any supported Sindh city based on a live 72-hour rainfall forecast.",
         "about_title": "About This Project",
@@ -238,7 +244,12 @@ TRANSLATIONS = {
         "methodology_table_medium_header": "High risk starts around",
         "methodology_table_tier_note": "These two numbers mark where Moderate and High risk typically begin from rainfall alone. Very High Risk isn't a separate rainfall threshold — it only happens when the combined rainfall-plus-elevation score crosses 75 out of 100 (see below). All four levels — Low, Moderate, High, and Very High — are used the same way everywhere in the app: the home page results, the map, and this page.",
         "methodology_example_heading": "A worked example",
-        "methodology_example_body": "Say Karachi is forecast 25mm of rain over 72 hours. Its terrain type has a 40mm lower threshold, so 25mm scores about 15.6 of the rainfall component's first 25 points. If Karachi also happens to be the lowest-lying city in its terrain group that day, it gets the full 30 elevation points. Together, that's roughly 45.6 out of 100 — enough to land in the Moderate Risk range.",
+                # UPDATED this session - matches the elevation-rainfall scaling fix
+        # (see risk_check.py / METHODOLOGY.md). Total changed from 45.6 to
+        # 34.4; classification (Moderate Risk) is unchanged. Previously this
+        # example gave elevation full weight regardless of how little rain
+        # was forecast, which is exactly the bug that was fixed.
+        "methodology_example_body": "Say Karachi is forecast 25mm of rain over 72 hours. Its terrain type has a 40mm lower threshold, so 25mm scores about 15.6 of the rainfall component's first 25 points. If Karachi also happens to be the lowest-lying city in its terrain group, its elevation score would count for the full 30 points once rainfall reaches that same 40mm threshold — but at just 25mm, elevation's contribution is scaled down to about 18.8 of those 30 points, since low-lying terrain alone isn't treated as risky on a day with only light rain. Together, that's roughly 34.4 out of 100 — enough to land in the Moderate Risk range.",
         "methodology_deadzone_heading": "Why very heavy rain doesn't always spike the score",
         "methodology_deadzone_body": "Once rainfall passes a region's higher threshold, the rainfall component doesn't jump straight to its ceiling — it climbs gradually, reaching its maximum only once rainfall roughly doubles that threshold. This is a deliberate choice to avoid over-reacting to one extreme number, not a bug — but it's also not independently validated, and the project may revisit it later.",
         "methodology_ceiling_heading": "Why a perfect score is rare",
@@ -428,7 +439,10 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "وسطی زرعی میدانی علاقے",
             "Arid Plains & Deserts": "خشک میدانی اور صحرائی علاقے",
         },
-        "elevation_note_available": "{city} کی بلندی {elevation} میٹر ہے۔ اس کا موازنہ دیگر {profile} مقامات سے کیا جاتا ہے: گروپ میں جتنی نچلی جگہ ہو، اتنے ہی زیادہ بلندی پوائنٹس ملتے ہیں (زیادہ سے زیادہ {max_points}، یہاں {points})۔ اوپر کی پٹی میٹر نہیں بلکہ یہی پوائنٹس دکھاتی ہے۔",
+                # UPDATED this session - UNREVIEWED by a native speaker (draft),
+        # same as the rest of the backlog. Mirrors the EN fix: elevation
+        # points now only count in full once real rainfall is expected.
+        "elevation_note_available": "{city} کی بلندی {elevation} میٹر ہے۔ اس کا موازنہ دیگر {profile} مقامات سے کیا جاتا ہے: گروپ میں جتنی نچلی جگہ ہو، اتنے ہی زیادہ بلندی پوائنٹس (زیادہ سے زیادہ {max_points}) شامل ہو سکتے ہیں۔ لیکن یہ پوائنٹس اسکور میں تبھی پورے شامل ہوتے ہیں جب واقعی بارش متوقع ہو - کم یا نہ ہونے کے برابر بارش کی صورت میں بلندی کا حصہ کم کر دیا جاتا ہے، کیونکہ صرف نشیبی زمین خشک دن میں سیلابی خطرہ نہیں بنتی۔ اس وقت یہ {points} پوائنٹس شامل کر رہی ہے۔ اوپر کی پٹی میٹر نہیں بلکہ یہی پوائنٹس دکھاتی ہے۔",
         "elevation_note_unavailable": "{city} کے لیے بلندی کا ڈیٹا دستیاب نہیں تھا - یہ اسکور صرف بارش پر مبنی ہے۔",
         "home_subtitle": "کسی بھی معاون سندھ شہر کے لیے لائیو 72 گھنٹے کی بارش کی پیشگوئی کی بنیاد پر سیلاب کے خطرے کا اندازہ حاصل کریں۔",
         "about_title": "اس منصوبے کے بارے میں",
@@ -493,7 +507,10 @@ TRANSLATIONS = {
         "methodology_table_medium_header": "شدید خطرہ یہاں سے شروع ہوتا ہے",
         "methodology_table_tier_note": "یہ دونوں نمبر ظاہر کرتے ہیں کہ صرف بارش کی بنیاد پر درمیانہ اور شدید خطرہ عام طور پر کہاں سے شروع ہوتا ہے۔ انتہائی شدید خطرہ کوئی الگ بارش کی حد نہیں ہے — یہ تب ہوتا ہے جب بارش اور بلندی کا مجموعی اسکور 100 میں سے 75 سے تجاوز کر جائے (نیچے دیکھیں)۔ چاروں سطحیں — کم، درمیانہ، شدید، اور انتہائی شدید — پوری ایپ میں ایک ہی طرح استعمال ہوتی ہیں: ہوم پیج کے نتائج، نقشہ، اور یہ صفحہ۔",
         "methodology_example_heading": "ایک مثال",
-        "methodology_example_body": "فرض کریں کراچی کے لیے اگلے 72 گھنٹوں میں 25 ملی میٹر بارش کی پیشگوئی ہے۔ اس کی زمینی قسم کی نچلی حد 40 ملی میٹر ہے، تو 25 ملی میٹر بارش کے پہلے 25 پوائنٹس میں سے تقریباً 15.6 پوائنٹس بنتے ہیں۔ اگر کراچی اس دن اپنے زمینی گروپ میں سب سے نچلے مقام پر بھی ہو، تو اسے بلندی کے پورے 30 پوائنٹس ملتے ہیں۔ ملا کر یہ 100 میں سے تقریباً 45.6 بنتا ہے — جو درمیانہ خطرے کی حد میں آنے کے لیے کافی ہے۔",
+                # UPDATED this session - UNREVIEWED by a native speaker (draft),
+        # same as the rest of the backlog. Matches the EN fix: total
+        # changed from 45.6 to 34.4, classification unchanged.
+        "methodology_example_body": "فرض کریں کراچی کے لیے اگلے 72 گھنٹوں میں 25 ملی میٹر بارش کی پیشگوئی ہے۔ اس کی زمینی قسم کی نچلی حد 40 ملی میٹر ہے، تو 25 ملی میٹر بارش کے پہلے 25 پوائنٹس میں سے تقریباً 15.6 پوائنٹس بنتے ہیں۔ اگر کراچی اپنے زمینی گروپ میں سب سے نچلے مقام پر بھی ہو، تو اس کی بلندی کا اسکور اسی 40 ملی میٹر کی حد تک بارش پہنچنے پر ہی پورے 30 پوائنٹس شمار ہو گا - لیکن صرف 25 ملی میٹر پر، بلندی کا حصہ گھٹ کر تقریباً 18.8 پوائنٹس رہ جاتا ہے، کیونکہ ہلکی بارش والے دن میں صرف نشیبی زمین کو خطرناک نہیں سمجھا جاتا۔ ملا کر یہ 100 میں سے تقریباً 34.4 بنتا ہے - جو درمیانہ خطرے کی حد میں آنے کے لیے کافی ہے۔",
         "methodology_deadzone_heading": "شدید بارش ہمیشہ اسکور کو کیوں نہیں بڑھاتی",
         "methodology_deadzone_body": "جب بارش کسی علاقے کی بالائی حد سے تجاوز کر جائے، تو بارش کا حصہ فوری طور پر اپنی زیادہ سے زیادہ حد تک نہیں پہنچتا - یہ آہستہ آہستہ بڑھتا ہے، اور اپنی زیادہ سے زیادہ حد تک تب پہنچتا ہے جب بارش اس حد سے تقریباً دگنی ہو جائے۔ یہ ایک جان بوجھ کر کیا گیا فیصلہ ہے تاکہ ایک انتہائی نمبر پر حد سے زیادہ ردعمل نہ ہو، کوئی خرابی نہیں - لیکن یہ بھی آزادانہ طور پر تصدیق شدہ نہیں ہے، اور منصوبہ مستقبل میں اس پر نظرثانی کر سکتا ہے۔",
         "methodology_ceiling_heading": "ایک مکمل اسکور کیوں نایاب ہے",
@@ -683,7 +700,11 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "مرڪزي زرعي ميدان",
             "Arid Plains & Deserts": "سڪل ميدان ۽ ريگستان",
         },
-        "elevation_note_available": "{city} جي بلندي {elevation} ميٽر آهي. ان جو مقابلو ٻين {profile} هنڌن سان ڪيو ويندو آهي: گروپ ۾ جيترو هيٺاهون هجي، اوترا وڌيڪ بلندي پوائنٽ ملن ٿا (وڌ ۾ وڌ {max_points}، هتي {points}). مٿي واري پٽي ميٽر نه پر اهي ئي پوائنٽ ڏيکاري ٿي.",
+                # UPDATED this session - UNREVIEWED by a native speaker (draft; my
+        # Sindhi is weaker than my Urdu), same as the rest of the backlog.
+        # Mirrors the EN fix: elevation points now only count in full once
+        # real rainfall is expected.
+        "elevation_note_available": "{city} جي بلندي {elevation} ميٽر آهي. ان جو مقابلو ٻين {profile} هنڌن سان ڪيو ويندو آهي: گروپ ۾ جيترو هيٺاهون هجي، اوترا وڌيڪ بلندي پوائنٽ (وڌ ۾ وڌ {max_points}) شامل ٿي سگهن ٿا. پر هي پوائنٽ اسڪور ۾ تڏهن پورا شامل ٿين ٿا جڏهن واقعي برسات جي اميد هجي - گھٽ يا نه هجڻ جي برابر برسات جي صورت ۾ بلندي جو حصو گھٽايو ويندو آهي، ڇاڪاڻ ته فقط هيٺاهين زمين سڪل ڏينهن ۾ سيلابي خطرو نٿي بڻجي. هن وقت هي {points} پوائنٽ شامل ڪري رهي آهي. مٿي واري پٽي ميٽر نه پر اهي ئي پوائنٽ ڏيکاري ٿي.",
         "elevation_note_unavailable": "{city} لاءِ بلندي جو ڊيٽا موجود نه هو - هي اسڪور فقط برسات تي ٻڌل آهي.",
         "home_subtitle": "ڪنهن به سپورٽ ٿيل سنڌ جي شهر لاءِ لائيو 72 ڪلاڪن جي برسات جي اڳڪٿي جي بنياد تي سيلاب جي خطري جو اندازو حاصل ڪريو.",
         "about_title": "هن منصوبي بابت",
@@ -750,7 +771,11 @@ TRANSLATIONS = {
         "methodology_table_medium_header": "وڏو خطرو هتان کان شروع ٿئي ٿو",
         "methodology_table_tier_note": "هي ٻئي انگ ڏيکارين ٿا ته رڳو برسات جي بنياد تي وچولو ۽ وڏو خطرو عام طور تي ڪٿان شروع ٿئي ٿو. تمام وڏو خطرو ڪا الڳ برسات جي حد ناهي — هي تڏهن ٿئي ٿو جڏهن برسات ۽ بلندي جو گڏيل اسڪور 100 مان 75 کان لنگهي وڃي (هيٺ ڏسو). چارئي سطحون — گھٽ، وچولو، وڏو، ۽ تمام وڏو — سڄي ايپ ۾ ساڳئي طرح استعمال ٿين ٿيون: هوم پيج جا نتيجا، نقشو، ۽ هي صفحو.",
         "methodology_example_heading": "هڪ مثال",
-        "methodology_example_body": "فرض ڪريو ڪراچي لاءِ ايندڙ 72 ڪلاڪن ۾ 25 ملي ميٽر برسات جي اڳڪٿي آهي. ان جي زميني قسم جي هيٺين حد 40 ملي ميٽر آهي، تنهنڪري 25 ملي ميٽر برسات جي پهرين 25 پوائنٽن مان تقريباً 15.6 پوائنٽ ٺهن ٿا. جيڪڏهن ڪراچي ان ڏينهن پنهنجي زميني گروپ ۾ سڀ کان هيٺاهين هنڌ تي به هجي، ته ان کي بلندي جا سڀ 30 پوائنٽ ملن ٿا. گڏي هي 100 مان تقريباً 45.6 ٿئي ٿو — جيڪو وچولي خطري جي حد ۾ اچڻ لاءِ ڪافي آهي.",
+                # UPDATED this session - UNREVIEWED by a native speaker (draft; my
+        # Sindhi is weaker than my Urdu), same as the rest of the backlog.
+        # Matches the EN fix: total changed from 45.6 to 34.4,
+        # classification unchanged.
+        "methodology_example_body": "فرض ڪريو ڪراچي لاءِ ايندڙ 72 ڪلاڪن ۾ 25 ملي ميٽر برسات جي اڳڪٿي آهي. ان جي زميني قسم جي هيٺين حد 40 ملي ميٽر آهي، تنهنڪري 25 ملي ميٽر برسات جي پهرين 25 پوائنٽن مان تقريباً 15.6 پوائنٽ ٺهن ٿا. جيڪڏهن ڪراچي پنهنجي زميني گروپ ۾ سڀ کان هيٺاهين هنڌ تي به هجي، ته ان جي بلندي جو اسڪور ان ساڳئي 40 ملي ميٽر حد تائين برسات پهچڻ تي ئي پورا 30 پوائنٽ ٿيندو - پر فقط 25 ملي ميٽر تي، بلندي جو حصو گھٽجي تقريباً 18.8 پوائنٽ رهجي وڃي ٿو، ڇاڪاڻ ته هلڪي برسات وارن ڏينهن ۾ رڳو هيٺاهين زمين کي خطرناڪ نه سمجهيو ويندو آهي. گڏي هي 100 مان تقريباً 34.4 ٿئي ٿو - جيڪو وچولي خطري جي حد ۾ اچڻ لاءِ ڪافي آهي.",
         "methodology_deadzone_heading": "تمام وڏي برسات هميشه اسڪور کي ڇو نٿي وڌائي",
         "methodology_deadzone_body": "جڏهن برسات ڪنهن علائقي جي مٿينءَ حد کان لنگهي وڃي، ته برسات جو حصو سِڌو سنئون پنهنجي وڌ ۾ وڌ حد تائين نٿو پهچي - هي آهستي آهستي وڌي ٿو، ۽ پنهنجي وڌ ۾ وڌ حد تائين تڏهن پهچي ٿو جڏهن برسات ان حد کان تقريباً ٻيڻي ٿي وڃي. هي هڪ ڄاڻي واڻي ڪيل فيصلو آهي ته جيئن هڪ انتهائي انگ تي حد کان وڌيڪ ردعمل نه ٿئي، ڪا خرابي ناهي - پر هي پڻ آزاد طور تي تصديق ٿيل ناهي، ۽ منصوبو مستقبل ۾ ان تي نظرثاني ڪري سگهي ٿو.",
         "methodology_ceiling_heading": "هڪ مڪمل اسڪور ڇو ناياب آهي",
