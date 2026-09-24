@@ -233,12 +233,23 @@ def is_dry_conditions(rain_pts):
 def elevation_component(city, profile_key):
     """Returns (points_0_to_30, elevation_was_used: bool, elevation_m_or_None).
 
-    Lower elevation within its own region scores higher (more flood risk),
-    since low-lying land pools water. A city at its region's minimum
-    elevation gets the full 30 points; at the region's maximum, 0 points.
-    A region with only one elevation value (min == max) can't be scored
-    relatively, so it falls back to a fixed midpoint (15) rather than a
-    division by zero or a fabricated distinction.
+    This is the city's RAW terrain-position score: lower elevation within
+    its own region scores higher (more flood risk), since low-lying land
+    pools water. A city at its region's minimum elevation gets the full 30
+    points; at the region's maximum, 0 points. A region with only one
+    elevation value (min == max) can't be scored relatively, so it falls
+    back to a fixed midpoint (15) rather than a division by zero or a
+    fabricated distinction.
+
+    IMPORTANT: this function deliberately knows nothing about rainfall.
+    It answers "where does this city sit in its region", nothing else.
+    Whether/how much that terrain score actually gets added to a risk
+    total is decided one level up, in _compute_risk_core() - see the
+    elevation-rainfall scaling note there for why raw terrain position
+    alone is not allowed to drive the score at 0mm rainfall. Keeping this
+    function pure also means TestElevationComponent in
+    test_risk_scoring.py can keep testing it directly with no rainfall
+    argument at all.
     """
     normalized = normalize_city(city)
     elevation_m = elevation_data.get_elevation(normalized)
@@ -368,6 +379,51 @@ def _compute_risk_core(city, rainfall_mm):
     afterward for the value actually shown to the user (the gauge, the
     "Score: X/100" text). Classification precision and display precision
     are two different concerns - conflating them is what broke this.
+
+    FIXED this session (real bug #3, same underlying class - a value
+    being trusted at face value when it silently meant something
+    different than intended, this time in elevation_component() rather
+    than rounding): elevation_component() scores a city purely on its
+    RELATIVE position within its own region, with no regard to whether
+    any rain is actually happening. That meant any city sitting in
+    roughly the bottom ~17% of its region's elevation range (raw
+    elevation points > 25 out of 30) was guaranteed at least Moderate
+    Risk at 0mm rainfall, on terrain alone. This was not a one-off
+    Karachi edge case - checked against the real city_elevation.csv on
+    file, it affected 7 of ~29 scored cities across all three regions:
+    karachi (9m) and umerkot (17m), each the lowest in their region;
+    mirpurkhas (17m) and tando muhammad khan (18m) in central_plains;
+    kotri and jamshoro (23m each, tied); and tando allahyar (26m,
+    27.3/30 -> just over the 25-point Moderate line). A quarter of all
+    scored cities reading "Moderate Risk" on a bone-dry day is a model
+    defect, not a rare boundary case.
+
+    Fix: elevation's contribution to total_score is now scaled by how
+    close rainfall_mm is to this region's own low_max threshold -
+    elevation_rain_fraction = min(rainfall_mm / low_max, 1.0). At 0mm,
+    elevation contributes nothing regardless of terrain (score floors at
+    Low). As rainfall approaches low_max, elevation's full raw weight
+    phases back in linearly, so genuinely wet scenarios are unaffected -
+    e.g. the Karachi worked example in METHODOLOGY.md (25mm, lowest
+    elevation in its region) still lands Moderate Risk, just at 34.4/100
+    instead of the old 45.6/100. low_max is reused here rather than
+    inventing a new threshold - it is already the FFD-anchored boundary
+    documented in METHODOLOGY.md for "some real rain has actually
+    started falling" in this region.
+
+    elevation_component() itself is UNCHANGED by this fix - it still
+    returns the raw, un-scaled 0-30 terrain-position score (see that
+    function's docstring). This function now returns BOTH the raw score
+    (as "elevation_terrain_points", for describing a city's geography -
+    e.g. "this is one of the lowest-lying cities in its region",
+    independent of today's weather) and the rain-scaled score (as
+    "elevation_points", the value actually added to total_score, so that
+    rainfall_points + elevation_points always sums to total_score for
+    anyone checking the "How is this calculated?" breakdown by hand).
+    Callers that were describing a city's terrain position (e.g.
+    build_plain_explanation's "low-lying" vs "elevated" wording) must use
+    elevation_terrain_points, not elevation_points, for that - geography
+    doesn't change just because it isn't raining today.
     """
     normalized = normalize_city(city)
     profile = get_profile(city)
@@ -375,7 +431,12 @@ def _compute_risk_core(city, rainfall_mm):
     profile_key = _CITY_TO_PROFILE[normalized]
 
     rain_pts = rainfall_component(rainfall_mm, profile)
-    elev_pts, elevation_used, elevation_m = elevation_component(city, profile_key)
+    elev_terrain_pts, elevation_used, elevation_m = elevation_component(city, profile_key)
+
+    low_max = profile["low_max"]
+    elevation_rain_fraction = min(rainfall_mm / low_max, 1.0) if low_max > 0 else 1.0
+    elev_pts = round(elev_terrain_pts * elevation_rain_fraction, 1)
+
     total_score = round(rain_pts + elev_pts, 1)   # 0-100, methodology unchanged
 
     raw_score_0_1 = total_score / 100             # UNROUNDED - used for classification
@@ -387,7 +448,9 @@ def _compute_risk_core(city, rainfall_mm):
         "profile_label": profile_label,
         "rainfall_mm": rainfall_mm,
         "rainfall_points": rain_pts,
-        "elevation_points": elev_pts,
+        "elevation_points": elev_pts,                     # rain-scaled - what was actually added to total_score
+        "elevation_terrain_points": elev_terrain_pts,      # raw, un-scaled - describes the city's terrain position
+        "elevation_rain_fraction": elevation_rain_fraction,
         "elevation_used": elevation_used,
         "elevation_m": elevation_m,
         "dry_conditions": is_dry_conditions(rain_pts),  # NEW - see RAINFALL_NEGLIGIBLE_THRESHOLD note
@@ -429,7 +492,7 @@ def get_lang():
     return lang
 
 
-def build_plain_explanation(rainfall_mm, elevation_used, elev_pts, rain_pts, risk_key, city, risk_level_display, t):
+def build_plain_explanation(rainfall_mm, elevation_used, elev_terrain_pts, rain_pts, risk_key, city, risk_level_display, t):
     """One always-visible sentence explaining WHY the score came out the way
     it did, in plain language - the raw "Score: 67.0/100 (rainfall 37.0/70,
     elevation 30.0/30)" breakdown means nothing to someone deciding whether
@@ -437,19 +500,38 @@ def build_plain_explanation(rainfall_mm, elevation_used, elev_pts, rain_pts, ris
     calculated?" toggle in check.html) for people who want the methodology
     transparency, but this sentence is the thing an ordinary person reads.
 
+    elev_terrain_pts is the city's RAW, un-scaled terrain-position score
+    (see elevation_component()) - deliberately NOT the rain-scaled
+    "elevation_points" value from _compute_risk_core(). This function is
+    describing geography ("this city sits low relative to others nearby"),
+    which doesn't change depending on whether it's raining today - only
+    the SCORE's use of that geography changes with rainfall. Passing the
+    rain-scaled value here would make this sentence describe the city's
+    terrain incorrectly on a dry day (e.g. calling Karachi "elevated"
+    simply because today happens to be dry).
+
     Third branch, "terrain baseline", covers the case a city is scored
     Moderate+ almost entirely off low-lying terrain while rainfall is
-    negligible (e.g. Badin @ 1.5mm during a dry spell still reading
-    Moderate Risk off elevation alone). Without this, that reads to a lay
-    user as "the app is warning about a storm that isn't happening."
-    Gated on is_dry_conditions(rain_pts) AND risk_key != "Low Risk" - a
-    Low Risk city with negligible rain doesn't need a special caveat,
-    that's just the expected/reassuring case.
+    negligible. Before the elevation-rainfall scaling fix (see
+    _compute_risk_core()'s docstring), this was a common real case - e.g.
+    Badin @ 1.5mm during a dry spell still reading Moderate Risk off
+    elevation alone. After that fix, elevation's contribution is scaled
+    toward zero as rainfall approaches zero, so a low-lying city at
+    genuinely negligible rainfall should no longer reach Moderate+ in the
+    first place - this branch is now expected to be rare-to-unreachable
+    in practice rather than a routine case. Left in place defensively
+    rather than deleted, since "rare" is not the same guarantee as
+    "impossible" (e.g. a single-value region's midpoint fallback in
+    elevation_component could still combine with a borderline rainfall
+    value in an edge case not yet enumerated). Gated on
+    is_dry_conditions(rain_pts) AND risk_key != "Low Risk" - a Low Risk
+    city with negligible rain doesn't need a special caveat, that's just
+    the expected/reassuring case.
     """
     if elevation_used and is_dry_conditions(rain_pts) and risk_key != "Low Risk":
         position_key = (
             "elevation_position_low"
-            if elev_pts >= (ELEVATION_COMPONENT_MAX / 2)
+            if elev_terrain_pts >= (ELEVATION_COMPONENT_MAX / 2)
             else "elevation_position_high"
         )
         return t["explanation_terrain_baseline"].format(
@@ -459,7 +541,7 @@ def build_plain_explanation(rainfall_mm, elevation_used, elev_pts, rain_pts, ris
     elif elevation_used:
         position_key = (
             "elevation_position_low"
-            if elev_pts >= (ELEVATION_COMPONENT_MAX / 2)
+            if elev_terrain_pts >= (ELEVATION_COMPONENT_MAX / 2)
             else "elevation_position_high"
         )
         return t["explanation_with_elevation"].format(
@@ -488,11 +570,22 @@ def check_risk(rainfall_mm, city, t):
     to every profile and every risk level. The score and risk tier are
     deliberately UNCHANGED - only the copy is gated. check.html must
     still guard terrain_warning being empty.
+
+    Also NEW this session: elevation_note is built from
+    core["elevation_points"] - the RAIN-SCALED elevation score, i.e. what
+    was actually added to total_score - not the raw terrain-position
+    score. See _compute_risk_core()'s docstring for the fix this
+    reflects. The note's wording still needs a human pass in
+    translations.py (en/ur/sd) to make clear that this number can now
+    shift with rainfall, not just with which city was picked - flagged,
+    not done here, since this file has no access to translations.py's
+    actual string content.
     """
     core = _compute_risk_core(city, rainfall_mm)
     profile_label = core["profile_label"]
     rain_pts = core["rainfall_points"]
-    elev_pts = core["elevation_points"]
+    elev_pts = core["elevation_points"]                     # rain-scaled - matches total_score breakdown
+    elev_terrain_pts = core["elevation_terrain_points"]      # raw - describes geography, not today's score
     elevation_used = core["elevation_used"]
     elevation_m = core["elevation_m"]
     total_score = core["score"]
@@ -514,7 +607,7 @@ def check_risk(rainfall_mm, city, t):
 
     risk_level_display = t["risk_levels"][risk_key]
     plain_explanation = build_plain_explanation(
-        rainfall_mm, elevation_used, elev_pts, rain_pts, risk_key, city, risk_level_display, t
+        rainfall_mm, elevation_used, elev_terrain_pts, rain_pts, risk_key, city, risk_level_display, t
     )
 
     return {
@@ -527,6 +620,7 @@ def check_risk(rainfall_mm, city, t):
         "score_0_1": score_0_1,
         "rainfall_points": rain_pts,
         "elevation_points": elev_pts,
+        "elevation_terrain_points": elev_terrain_pts,
         "elevation_used": elevation_used,
         "elevation_note": elevation_note,
         "dry_conditions": dry_conditions,
@@ -861,8 +955,14 @@ def map_view():
         item["city_display"] = localized_city(city, t)
         if entry.get("scored"):
             item["risk_level"] = t["risk_levels"][entry["risk_level_key"]]
+            # NOTE: entry["elevation_terrain_points"] (raw, unscaled) is
+            # passed here, not entry["elevation_points"] (rain-scaled) -
+            # build_plain_explanation's position_key wording describes the
+            # city's geography, which must not flip just because a given
+            # city's cached forecast happens to be dry right now. See
+            # build_plain_explanation()'s docstring.
             item["plain_explanation"] = build_plain_explanation(
-                entry["rainfall_mm"], entry["elevation_used"], entry["elevation_points"],
+                entry["rainfall_mm"], entry["elevation_used"], entry["elevation_terrain_points"],
                 entry["rainfall_points"], entry["risk_level_key"], city, item["risk_level"], t
             )
         cities_for_template.append(item)
