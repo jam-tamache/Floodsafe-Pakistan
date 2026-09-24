@@ -110,7 +110,14 @@ TRANSLATIONS = {
         "how_calculated_toggle": "How is this calculated?",
         "explanation_with_elevation": "With {rainfall}mm of rain and {city} sitting on {elevation_position} compared to nearby areas, this adds up to {risk_level}.",
         "explanation_without_elevation": "With {rainfall}mm of rain expected for {city}, this adds up to {risk_level}.",
-        "explanation_terrain_baseline": "{city}'s {risk_level} here is driven mainly by its {elevation_position} relative to nearby areas — actual forecasted rainfall is minimal, at just {rainfall}mm.",
+        # UPDATED - the old wording said the risk level was "driven mainly by"
+        # terrain when rainfall is minimal. That described the pre-fix
+        # elevation bug (terrain alone could force Moderate Risk on a dry
+        # day) and is no longer true: elevation is now scaled by rainfall.
+        # Placeholders {city}, {rainfall}, {risk_level} only - the old
+        # {elevation_position} placeholder was dropped (extra kwargs passed
+        # to .format() are ignored, so callers do not need to change).
+        "explanation_terrain_baseline": "With only {rainfall}mm of rain expected for {city}, this adds up to {risk_level}. Elevation counts for very little when there is almost no rain.",
         "elevation_position_low": "lower ground",
         "elevation_position_high": "higher ground",
         "risk_levels": {
@@ -156,7 +163,10 @@ TRANSLATIONS = {
         # is negligible (see is_dry_conditions() in app.py). Deliberately
         # generic - every item is sensible on any day and none implies a
         # storm is coming. Applies to every city and every risk level.
-        "safety_tips_dry_note": "No significant rain is involved in this assessment, so this rating reflects the area's terrain rather than an active flood threat. General preparedness tips:",
+        # UPDATED: the old wording said the rating "reflects the area's
+        # terrain", which stopped being true once elevation was scaled by
+        # rainfall (terrain now contributes 0 points at 0mm).
+        "safety_tips_dry_note": "No significant rain is expected in this assessment, so there is no active flood threat. General preparedness tips:",
         "safety_tips_dry": [
             "Save emergency numbers: Rescue 1122 and PDMA Sindh (pdma.gos.pk)",
             "Keep copies of important documents (CNIC, land papers) in a waterproof bag",
@@ -173,7 +183,7 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "Central Agricultural Plains",
             "Arid Plains & Deserts": "Arid Plains & Deserts",
         },
-                # UPDATED this session - reflects the elevation-rainfall scaling
+        # UPDATED this session - reflects the elevation-rainfall scaling
         # fix (see risk_check.py / METHODOLOGY.md): elevation points now
         # only count in full once real rainfall is actually expected, so
         # {points} can change day to day for the same city as the rainfall
@@ -211,8 +221,14 @@ TRANSLATIONS = {
         "floods_matters_body": "These are early assessments from October 2022 and the final figures may differ. FloodSafe is a planning aid that estimates flood risk from rainfall and elevation. It is not a forecast of flooding and does not replace official warnings from NDMA and PDMA.",
         "floods_sources_heading": "Sources",
         "how_it_works_title": "How It Works",
-        "how_it_works_body_1": "FloodSafe estimates flood risk for Sindh cities from two factors: rainfall (either a live 72-hour forecast or a scenario you type in) and each city's elevation relative to nearby cities in the same terrain region. The two are combined into a single 0–1 score, which maps to Low, Moderate, High, or Very High risk.",
-        "how_it_works_body_2": "Rainfall thresholds are project-defined, not sourced from an official government classification — they were derived by the developer and are documented, with reasoning, in the project's methodology notes. Elevation data comes from a public elevation API, looked up once per city.",
+        # UPDATED - "0–1 score" corrected to "out of 100" to match the rest of
+        # the app (score_breakdown, methodology page).
+        "how_it_works_body_1": "FloodSafe estimates flood risk for Sindh cities from two factors: rainfall (either a live 72-hour forecast or a scenario you type in) and each city's elevation relative to nearby cities in the same terrain region. The two are combined into a single score out of 100, which maps to Low, Moderate, High, or Very High risk.",
+        # UPDATED - the old text said thresholds were "not sourced from an
+        # official government classification", which contradicted the
+        # methodology page (thresholds are anchored to the Flood Forecasting
+        # Division's 24-hour scale). Now consistent with methodology_rainfall_body_1.
+        "how_it_works_body_2": "Rainfall thresholds are anchored to Pakistan's official Flood Forecasting Division 24-hour rainfall scale, scaled up to a 72-hour window using a standard rule of thumb. The exact spacing between terrain regions is the developer's own judgment and is documented, with reasoning, in the project's methodology notes. Elevation data comes from a public elevation API, looked up once per city.",
         "risk_map_heading": "Risk Map",
         "map_unavailable": "Map unavailable for this location.",
         "why_risk_heading": "Why is this rated {risk_level}?",
@@ -244,7 +260,7 @@ TRANSLATIONS = {
         "methodology_table_medium_header": "High risk starts around",
         "methodology_table_tier_note": "These two numbers mark where Moderate and High risk typically begin from rainfall alone. Very High Risk isn't a separate rainfall threshold — it only happens when the combined rainfall-plus-elevation score crosses 75 out of 100 (see below). All four levels — Low, Moderate, High, and Very High — are used the same way everywhere in the app: the home page results, the map, and this page.",
         "methodology_example_heading": "A worked example",
-                # UPDATED this session - matches the elevation-rainfall scaling fix
+        # UPDATED this session - matches the elevation-rainfall scaling fix
         # (see risk_check.py / METHODOLOGY.md). Total changed from 45.6 to
         # 34.4; classification (Moderate Risk) is unchanged. Previously this
         # example gave elevation full weight regardless of how little rain
@@ -255,7 +271,10 @@ TRANSLATIONS = {
         "methodology_ceiling_heading": "Why a perfect score is rare",
         "methodology_ceiling_body": "Because the rainfall component tops out at 54 points, not 70, the highest score this model can actually produce is about 84 out of 100 — not 100. Very High Risk (75-100) is still reachable, but only near the low end of that range. This is a real trade-off in how the score is built, not a bug.",
         "methodology_elevation_heading": "How elevation is scored",
-        "methodology_elevation_body": "A city's elevation is compared only to other cities with the same terrain type, not the whole country — 7 meters means something different on the coast than it does inland. The lowest city in a group gets the most elevation points; the highest gets none. If elevation data isn't available for a city, the app says so directly and scores that city on rainfall alone, instead of guessing.",
+        # UPDATED - the old text described only the terrain ranking ("lowest
+        # city gets the most points") and said nothing about rainfall scaling,
+        # so it contradicted the result page's elevation note.
+        "methodology_elevation_body": "A city's elevation is compared only to other cities with the same terrain type, not the whole country — 7 meters means something different on the coast than it does inland. The lowest city in a group gets the highest terrain score; the highest gets none. That terrain score only counts toward the total in proportion to how much rain is expected: with little or no rain it is scaled down, and it counts in full once rainfall reaches the region's lower threshold (see the table above). If elevation data isn't available for a city, the app says so directly and scores that city on rainfall alone, instead of guessing.",
         "methodology_not_modeled_heading": "What this model does not include",
         "methodology_not_modeled": [
             "Land use and land cover",
@@ -380,7 +399,10 @@ TRANSLATIONS = {
         "how_calculated_toggle": "یہ کیسے شمار کیا جاتا ہے؟",
         "explanation_with_elevation": "{rainfall} ملی میٹر بارش اور {city} کا آس پاس کے علاقوں کے مقابلے میں {elevation_position} پر ہونا، یہ مل کر {risk_level} بنتا ہے۔",
         "explanation_without_elevation": "{city} کے لیے متوقع {rainfall} ملی میٹر بارش کے ساتھ، یہ {risk_level} بنتا ہے۔",
-        "explanation_terrain_baseline": "{city} میں {risk_level} بنیادی طور پر اس کی {elevation_position} کی وجہ سے ہے — متوقع بارش صرف {rainfall} ملی میٹر ہے، یعنی نہ ہونے کے برابر۔",
+        # UPDATED - UNREVIEWED by a native speaker (draft). Mirrors the EN
+        # fix: the old wording said the risk level was driven mainly by
+        # terrain, which described the pre-fix elevation bug.
+        "explanation_terrain_baseline": "{city} کے لیے صرف {rainfall} ملی میٹر بارش متوقع ہونے کے ساتھ، یہ {risk_level} بنتا ہے۔ تقریباً بارش نہ ہونے کی صورت میں بلندی کا حصہ بہت کم رہ جاتا ہے۔",
         "elevation_position_low": "نچلی زمین",
         "elevation_position_high": "اونچی زمین",
         "risk_levels": {
@@ -422,7 +444,8 @@ TRANSLATIONS = {
             ],
         },
         # NEW this session - UNREVIEWED by a native speaker (draft).
-        "safety_tips_dry_note": "اس تشخیص میں بارش نہ ہونے کے برابر ہے، اس لیے یہ درجہ بندی علاقے کی زمینی ساخت کو ظاہر کرتی ہے، سیلاب کے کسی فوری خطرے کو نہیں۔ عمومی تیاری کی ہدایات:",
+        # UPDATED: no longer says the rating "reflects the terrain" (see EN note).
+        "safety_tips_dry_note": "اس تشخیص میں بارش نہ ہونے کے برابر ہے، اس لیے سیلاب کا کوئی فوری خطرہ نہیں۔ عمومی تیاری کی ہدایات:",
         "safety_tips_dry": [
             "ہنگامی نمبر محفوظ کر لیں: ریسکیو 1122 اور PDMA سندھ (pdma.gos.pk)",
             "اہم دستاویزات (شناختی کارڈ، زمین کے کاغذات) کی نقول واٹر پروف تھیلے میں رکھیں",
@@ -439,7 +462,7 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "وسطی زرعی میدانی علاقے",
             "Arid Plains & Deserts": "خشک میدانی اور صحرائی علاقے",
         },
-                # UPDATED this session - UNREVIEWED by a native speaker (draft),
+        # UPDATED this session - UNREVIEWED by a native speaker (draft),
         # same as the rest of the backlog. Mirrors the EN fix: elevation
         # points now only count in full once real rainfall is expected.
         "elevation_note_available": "{city} کی بلندی {elevation} میٹر ہے۔ اس کا موازنہ دیگر {profile} مقامات سے کیا جاتا ہے: گروپ میں جتنی نچلی جگہ ہو، اتنے ہی زیادہ بلندی پوائنٹس (زیادہ سے زیادہ {max_points}) شامل ہو سکتے ہیں۔ لیکن یہ پوائنٹس اسکور میں تبھی پورے شامل ہوتے ہیں جب واقعی بارش متوقع ہو - کم یا نہ ہونے کے برابر بارش کی صورت میں بلندی کا حصہ کم کر دیا جاتا ہے، کیونکہ صرف نشیبی زمین خشک دن میں سیلابی خطرہ نہیں بنتی۔ اس وقت یہ {points} پوائنٹس شامل کر رہی ہے۔ اوپر کی پٹی میٹر نہیں بلکہ یہی پوائنٹس دکھاتی ہے۔",
@@ -474,8 +497,13 @@ TRANSLATIONS = {
         "floods_matters_body": "یہ اکتوبر 2022 کے ابتدائی تخمینے ہیں اور حتمی اعداد و شمار مختلف ہو سکتے ہیں۔ فلڈ سیف منصوبہ بندی میں مدد کا ایک ذریعہ ہے جو بارش اور بلندی کی بنیاد پر سیلاب کے خطرے کا اندازہ لگاتا ہے۔ یہ سیلاب کی پیشگوئی نہیں ہے اور NDMA اور PDMA کی سرکاری وارننگز کا متبادل نہیں۔",
         "floods_sources_heading": "ذرائع",
         "how_it_works_title": "یہ کیسے کام کرتا ہے",
-        "how_it_works_body_1": "فلڈ سیف سندھ کے شہروں کے لیے دو عوامل سے سیلاب کے خطرے کا اندازہ لگاتا ہے: بارش (یا تو 72 گھنٹے کی لائیو پیشگوئی یا آپ کا درج کردہ منظرنامہ) اور ہر شہر کی بلندی اسی زمینی خطے کے قریبی شہروں کے مقابلے میں۔ یہ دونوں مل کر ایک 0 سے 1 تک کا اسکور بناتے ہیں، جو کم، درمیانہ، شدید، یا انتہائی شدید خطرے میں تبدیل ہوتا ہے۔",
-        "how_it_works_body_2": "بارش کی حدیں منصوبے کے اپنے طے کردہ ہیں، کسی سرکاری درجہ بندی سے حاصل شدہ نہیں - یہ ڈویلپر نے مرتب کی ہیں اور ان کی وجوہات منصوبے کے طریقہ کار کے نوٹس میں دستاویزی ہیں۔ بلندی کا ڈیٹا ایک عوامی بلندی API سے حاصل کیا جاتا ہے، جو ہر شہر کے لیے ایک بار حاصل کیا جاتا ہے۔",
+        # UPDATED - UNREVIEWED by a native speaker (draft). "0-1 score"
+        # corrected to "out of 100" (see EN note).
+        "how_it_works_body_1": "فلڈ سیف سندھ کے شہروں کے لیے دو عوامل سے سیلاب کے خطرے کا اندازہ لگاتا ہے: بارش (یا تو 72 گھنٹے کی لائیو پیشگوئی یا آپ کا درج کردہ منظرنامہ) اور ہر شہر کی بلندی اسی زمینی خطے کے قریبی شہروں کے مقابلے میں۔ یہ دونوں مل کر 100 میں سے ایک اسکور بناتے ہیں، جو کم، درمیانہ، شدید، یا انتہائی شدید خطرے میں تبدیل ہوتا ہے۔",
+        # UPDATED - UNREVIEWED by a native speaker (draft). Now consistent
+        # with methodology_rainfall_body_1 (thresholds are anchored to the
+        # Flood Forecasting Division scale).
+        "how_it_works_body_2": "بارش کی حدیں پاکستان کے فلڈ فورکاسٹنگ ڈویژن کی سرکاری 24 گھنٹے کی بارش کی درجہ بندی سے منسلک ہیں، جنہیں ایک معیاری اصول کے ذریعے 72 گھنٹے کی مدت کے لیے بڑھایا گیا ہے۔ زمینی علاقوں کے درمیان درست فرق ڈویلپر کا اپنا فیصلہ ہے اور اس کی وجوہات منصوبے کے طریقہ کار کے نوٹس میں دستاویزی ہیں۔ بلندی کا ڈیٹا ایک عوامی بلندی API سے حاصل کیا جاتا ہے، جو ہر شہر کے لیے ایک بار حاصل کیا جاتا ہے۔",
         "risk_map_heading": "خطرے کا نقشہ",
         "map_unavailable": "اس مقام کے لیے نقشہ دستیاب نہیں۔",
         "why_risk_heading": "یہ {risk_level} کیوں ہے؟",
@@ -507,7 +535,7 @@ TRANSLATIONS = {
         "methodology_table_medium_header": "شدید خطرہ یہاں سے شروع ہوتا ہے",
         "methodology_table_tier_note": "یہ دونوں نمبر ظاہر کرتے ہیں کہ صرف بارش کی بنیاد پر درمیانہ اور شدید خطرہ عام طور پر کہاں سے شروع ہوتا ہے۔ انتہائی شدید خطرہ کوئی الگ بارش کی حد نہیں ہے — یہ تب ہوتا ہے جب بارش اور بلندی کا مجموعی اسکور 100 میں سے 75 سے تجاوز کر جائے (نیچے دیکھیں)۔ چاروں سطحیں — کم، درمیانہ، شدید، اور انتہائی شدید — پوری ایپ میں ایک ہی طرح استعمال ہوتی ہیں: ہوم پیج کے نتائج، نقشہ، اور یہ صفحہ۔",
         "methodology_example_heading": "ایک مثال",
-                # UPDATED this session - UNREVIEWED by a native speaker (draft),
+        # UPDATED this session - UNREVIEWED by a native speaker (draft),
         # same as the rest of the backlog. Matches the EN fix: total
         # changed from 45.6 to 34.4, classification unchanged.
         "methodology_example_body": "فرض کریں کراچی کے لیے اگلے 72 گھنٹوں میں 25 ملی میٹر بارش کی پیشگوئی ہے۔ اس کی زمینی قسم کی نچلی حد 40 ملی میٹر ہے، تو 25 ملی میٹر بارش کے پہلے 25 پوائنٹس میں سے تقریباً 15.6 پوائنٹس بنتے ہیں۔ اگر کراچی اپنے زمینی گروپ میں سب سے نچلے مقام پر بھی ہو، تو اس کی بلندی کا اسکور اسی 40 ملی میٹر کی حد تک بارش پہنچنے پر ہی پورے 30 پوائنٹس شمار ہو گا - لیکن صرف 25 ملی میٹر پر، بلندی کا حصہ گھٹ کر تقریباً 18.8 پوائنٹس رہ جاتا ہے، کیونکہ ہلکی بارش والے دن میں صرف نشیبی زمین کو خطرناک نہیں سمجھا جاتا۔ ملا کر یہ 100 میں سے تقریباً 34.4 بنتا ہے - جو درمیانہ خطرے کی حد میں آنے کے لیے کافی ہے۔",
@@ -516,7 +544,9 @@ TRANSLATIONS = {
         "methodology_ceiling_heading": "ایک مکمل اسکور کیوں نایاب ہے",
         "methodology_ceiling_body": "چونکہ بارش کا حصہ 70 نہیں بلکہ 54 پوائنٹس پر ختم ہوتا ہے، اس ماڈل کا سب سے زیادہ ممکنہ اسکور تقریباً 100 میں سے 84 ہے، 100 نہیں۔ انتہائی شدید خطرہ (75-100) اب بھی حاصل کیا جا سکتا ہے، لیکن صرف اس حد کے نچلے سرے کے قریب۔ یہ اسکور بننے کے طریقے میں ایک حقیقی سمجھوتہ ہے، کوئی خرابی نہیں۔",
         "methodology_elevation_heading": "بلندی کیسے شمار کی جاتی ہے",
-        "methodology_elevation_body": "کسی شہر کی بلندی کا موازنہ صرف اسی طرح کی زمینی خصوصیات رکھنے والے دیگر شہروں سے کیا جاتا ہے، پورے ملک سے نہیں - ساحل پر 7 میٹر کا مطلب اندرون ملک سے مختلف ہوتا ہے۔ گروپ میں سب سے نچلے شہر کو سب سے زیادہ بلندی پوائنٹس ملتے ہیں؛ سب سے اونچے کو کوئی نہیں ملتا۔ اگر کسی شہر کے لیے بلندی کا ڈیٹا دستیاب نہ ہو، تو ایپ یہ واضح طور پر بتاتی ہے اور اس شہر کا اسکور صرف بارش پر بناتی ہے، اندازہ لگانے کے بجائے۔",
+        # UPDATED - UNREVIEWED by a native speaker (draft). Now mentions the
+        # rainfall scaling (see EN note).
+        "methodology_elevation_body": "کسی شہر کی بلندی کا موازنہ صرف اسی طرح کی زمینی خصوصیات رکھنے والے دیگر شہروں سے کیا جاتا ہے، پورے ملک سے نہیں - ساحل پر 7 میٹر کا مطلب اندرون ملک سے مختلف ہوتا ہے۔ گروپ میں سب سے نچلے شہر کو سب سے زیادہ زمینی پوائنٹس ملتے ہیں؛ سب سے اونچے کو کوئی نہیں ملتا۔ یہ پوائنٹس مجموعی اسکور میں اتنے ہی شامل ہوتے ہیں جتنی بارش متوقع ہو: کم یا نہ ہونے کے برابر بارش میں انہیں کم کر دیا جاتا ہے، اور جب بارش علاقے کی نچلی حد (اوپر جدول دیکھیں) تک پہنچ جائے تو یہ پورے شامل ہوتے ہیں۔ اگر کسی شہر کے لیے بلندی کا ڈیٹا دستیاب نہ ہو، تو ایپ یہ واضح طور پر بتاتی ہے اور اس شہر کا اسکور صرف بارش پر بناتی ہے، اندازہ لگانے کے بجائے۔",
         "methodology_not_modeled_heading": "یہ ماڈل کیا شامل نہیں کرتا",
         "methodology_not_modeled": [
             "زمین کا استعمال اور زمینی احاطہ",
@@ -641,7 +671,10 @@ TRANSLATIONS = {
         "how_calculated_toggle": "هي ڪيئن ڳڻيو ويندو آهي؟",
         "explanation_with_elevation": "{rainfall} ملي ميٽر برسات ۽ {city} جو ڀرپاسي وارن علائقن جي مقابلي ۾ {elevation_position} تي هجڻ، هي گڏجي {risk_level} ٿو ٺاهي.",
         "explanation_without_elevation": "{city} لاءِ متوقع {rainfall} ملي ميٽر برسات سان، هي {risk_level} ٿو ٺاهي.",
-        "explanation_terrain_baseline": "{city} ۾ {risk_level} خاص طور تي ان جي {elevation_position} سبب آهي — متوقع برسات فقط {rainfall} ملي ميٽر آهي، يعني نه هجڻ جي برابر.",
+        # UPDATED - UNREVIEWED by a native speaker (draft; my Sindhi is weaker
+        # than my Urdu). Mirrors the EN fix: the old wording said the risk
+        # level was driven mainly by terrain, which described the pre-fix bug.
+        "explanation_terrain_baseline": "{city} لاءِ فقط {rainfall} ملي ميٽر برسات متوقع هجڻ سان، هي {risk_level} ٿو ٺاهي. لڳ ڀڳ برسات نه هجڻ جي صورت ۾ بلندي جو حصو تمام گھٽ رهجي وڃي ٿو.",
         "elevation_position_low": "هيٺاهين زمين",
         "elevation_position_high": "مٿاهين زمين",
         "risk_levels": {
@@ -683,7 +716,8 @@ TRANSLATIONS = {
             ],
         },
         # NEW this session - UNREVIEWED by a native speaker (draft).
-        "safety_tips_dry_note": "هن جانچ ۾ برسات نه هجڻ جي برابر آهي، تنهنڪري هي درجو علائقي جي زميني بناوت کي ظاهر ڪري ٿو، سيلاب جي ڪنهن فوري خطري کي نه. عام تياري جون هدايتون:",
+        # UPDATED: no longer says the rating "reflects the terrain" (see EN note).
+        "safety_tips_dry_note": "هن جانچ ۾ برسات نه هجڻ جي برابر آهي، تنهنڪري سيلاب جو ڪو فوري خطرو ناهي. عام تياري جون هدايتون:",
         "safety_tips_dry": [
             "هنگامي نمبر محفوظ ڪريو: ريسڪيو 1122 ۽ PDMA سنڌ (pdma.gos.pk)",
             "اهم دستاويزن (شناختي ڪارڊ، زمين جا ڪاغذ) جون نقلون واٽر پروف ٿيلهي ۾ رکو",
@@ -700,7 +734,7 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "مرڪزي زرعي ميدان",
             "Arid Plains & Deserts": "سڪل ميدان ۽ ريگستان",
         },
-                # UPDATED this session - UNREVIEWED by a native speaker (draft; my
+        # UPDATED this session - UNREVIEWED by a native speaker (draft; my
         # Sindhi is weaker than my Urdu), same as the rest of the backlog.
         # Mirrors the EN fix: elevation points now only count in full once
         # real rainfall is expected.
@@ -738,8 +772,12 @@ TRANSLATIONS = {
         "floods_matters_body": "هي آڪٽوبر 2022 جا شروعاتي اندازا آهن ۽ حتمي انگ مختلف ٿي سگهن ٿا. فلڊ سيف منصوبابندي ۾ مدد جو هڪ ذريعو آهي جيڪو برسات ۽ بلندي جي بنياد تي سيلاب جي خطري جو اندازو لڳائي ٿو. هي سيلاب جي اڳڪٿي ناهي ۽ NDMA ۽ PDMA جي سرڪاري وارننگن جو متبادل ناهي.",
         "floods_sources_heading": "ماخذ",
         "how_it_works_title": "هي ڪيئن ڪم ڪري ٿو",
-        "how_it_works_body_1": "فلڊ سيف سنڌ جي شهرن لاءِ ٻن عنصرن مان سيلاب جي خطري جو اندازو لڳائي ٿو: برسات (يا ته 72 ڪلاڪن جي لائيو اڳڪٿي يا توهان جو داخل ڪيل منظرنامو) ۽ هر شهر جي بلندي ساڳئي زميني علائقي جي ويجهن شهرن جي مقابلي ۾. ٻئي گڏجي هڪ 0 کان 1 تائين اسڪور ٺاهين ٿا، جيڪو گھٽ، وچولو، وڏو، يا تمام وڏو خطري ۾ تبديل ٿئي ٿو.",
-        "how_it_works_body_2": "برسات جون حدون منصوبي جون پنهنجون مقرر ڪيل آهن، ڪنهن به سرڪاري درجه بندي مان حاصل ٿيل نه آهن - اهي ڊولپر پاران مرتب ڪيون ويون آهن ۽ سندن دليل منصوبي جي طريقيڪار جي نوٽس ۾ دستاويز ٿيل آهن. بلندي جو ڊيٽا هڪ عوامي بلندي API مان حاصل ڪيو ويندو آهي، جيڪو هر شهر لاءِ هڪ ڀيرو حاصل ڪيو ويندو آهي.",
+        # UPDATED - UNREVIEWED by a native speaker (draft; my Sindhi is weaker
+        # than my Urdu). "0-1 score" corrected to "out of 100" (see EN note).
+        "how_it_works_body_1": "فلڊ سيف سنڌ جي شهرن لاءِ ٻن عنصرن مان سيلاب جي خطري جو اندازو لڳائي ٿو: برسات (يا ته 72 ڪلاڪن جي لائيو اڳڪٿي يا توهان جو داخل ڪيل منظرنامو) ۽ هر شهر جي بلندي ساڳئي زميني علائقي جي ويجهن شهرن جي مقابلي ۾. ٻئي گڏجي 100 مان هڪ اسڪور ٺاهين ٿا، جيڪو گھٽ، وچولو، وڏو، يا تمام وڏو خطري ۾ تبديل ٿئي ٿو.",
+        # UPDATED - UNREVIEWED by a native speaker (draft; my Sindhi is weaker
+        # than my Urdu). Now consistent with methodology_rainfall_body_1.
+        "how_it_works_body_2": "برسات جون حدون پاڪستان جي فلڊ فورڪاسٽنگ ڊويزن جي سرڪاري 24 ڪلاڪن جي برسات جي درجه بندي سان ڳنڍيل آهن، جن کي هڪ معياري اصول ذريعي 72 ڪلاڪن جي مدت لاءِ وڌايو ويو آهي. زميني علائقن جي وچ ۾ صحيح فرق ڊولپر جو پنهنجو فيصلو آهي ۽ ان جا دليل منصوبي جي طريقيڪار جي نوٽس ۾ دستاويز ٿيل آهن. بلندي جو ڊيٽا هڪ عوامي بلندي API مان حاصل ڪيو ويندو آهي، جيڪو هر شهر لاءِ هڪ ڀيرو حاصل ڪيو ويندو آهي.",
         "risk_map_heading": "خطري جو نقشو",
         "map_unavailable": "هن هنڌ لاءِ نقشو دستياب ناهي.",
         "why_risk_heading": "هي {risk_level} ڇو آهي؟",
@@ -771,7 +809,7 @@ TRANSLATIONS = {
         "methodology_table_medium_header": "وڏو خطرو هتان کان شروع ٿئي ٿو",
         "methodology_table_tier_note": "هي ٻئي انگ ڏيکارين ٿا ته رڳو برسات جي بنياد تي وچولو ۽ وڏو خطرو عام طور تي ڪٿان شروع ٿئي ٿو. تمام وڏو خطرو ڪا الڳ برسات جي حد ناهي — هي تڏهن ٿئي ٿو جڏهن برسات ۽ بلندي جو گڏيل اسڪور 100 مان 75 کان لنگهي وڃي (هيٺ ڏسو). چارئي سطحون — گھٽ، وچولو، وڏو، ۽ تمام وڏو — سڄي ايپ ۾ ساڳئي طرح استعمال ٿين ٿيون: هوم پيج جا نتيجا، نقشو، ۽ هي صفحو.",
         "methodology_example_heading": "هڪ مثال",
-                # UPDATED this session - UNREVIEWED by a native speaker (draft; my
+        # UPDATED this session - UNREVIEWED by a native speaker (draft; my
         # Sindhi is weaker than my Urdu), same as the rest of the backlog.
         # Matches the EN fix: total changed from 45.6 to 34.4,
         # classification unchanged.
@@ -781,7 +819,9 @@ TRANSLATIONS = {
         "methodology_ceiling_heading": "هڪ مڪمل اسڪور ڇو ناياب آهي",
         "methodology_ceiling_body": "ڇاڪاڻ ته برسات جو حصو 70 نه پر 54 پوائنٽن تي ختم ٿئي ٿو، هن ماڊل جو وڌ ۾ وڌ ممڪن اسڪور تقريباً 100 مان 84 آهي، 100 ناهي. تمام وڏو خطرو (75-100) اڃا حاصل ٿي سگهي ٿو، پر رڳو ان حد جي هيٺين ڇيڙي جي ويجهو. هي اسڪور ٺهڻ جي طريقي ۾ هڪ حقيقي سمجهوتو آهي، ڪا خرابي ناهي.",
         "methodology_elevation_heading": "بلندي ڪيئن ڳڻي ويندي آهي",
-        "methodology_elevation_body": "ڪنهن شهر جي بلندي جو مقابلو رڳو ساڳئي زميني خاصيتن وارن ٻين شهرن سان ڪيو ويندو آهي، سڄي ملڪ سان نه - ساحل تي 7 ميٽر جو مطلب اندرون ملڪ کان مختلف هوندو آهي. گروپ ۾ سڀ کان هيٺاهين شهر کي بلندي جا سڀ کان وڌيڪ پوائنٽ ملن ٿا؛ سڀ کان مٿاهين کي ڪو نه ملي. جيڪڏهن ڪنهن شهر لاءِ بلندي جو ڊيٽا موجود نه هجي، ته ايپ اهو واضح طور تي ٻڌائي ٿي ۽ ان شهر جو اسڪور رڳو برسات تي ٺاهي ٿي، اندازو لڳائڻ جي بدران.",
+        # UPDATED - UNREVIEWED by a native speaker (draft; my Sindhi is weaker
+        # than my Urdu). Now mentions the rainfall scaling (see EN note).
+        "methodology_elevation_body": "ڪنهن شهر جي بلندي جو مقابلو رڳو ساڳئي زميني خاصيتن وارن ٻين شهرن سان ڪيو ويندو آهي، سڄي ملڪ سان نه - ساحل تي 7 ميٽر جو مطلب اندرون ملڪ کان مختلف هوندو آهي. گروپ ۾ سڀ کان هيٺاهين شهر کي سڀ کان وڌيڪ زميني پوائنٽ ملن ٿا؛ سڀ کان مٿاهين کي ڪو نه ملي. اهي پوائنٽ ڪل اسڪور ۾ ايتري ئي حد تائين شامل ٿين ٿا جيتري برسات متوقع هجي: گھٽ يا نه هجڻ جي برابر برسات ۾ انهن کي گھٽايو ويندو آهي، ۽ جڏهن برسات علائقي جي هيٺين حد (مٿي جدول ڏسو) تائين پهچي ته اهي پورا شامل ٿين ٿا. جيڪڏهن ڪنهن شهر لاءِ بلندي جو ڊيٽا موجود نه هجي، ته ايپ اهو واضح طور تي ٻڌائي ٿي ۽ ان شهر جو اسڪور رڳو برسات تي ٺاهي ٿي، اندازو لڳائڻ جي بدران.",
         "methodology_not_modeled_heading": "هي ماڊل ڇا شامل نٿو ڪري",
         "methodology_not_modeled": [
             "زمين جو استعمال ۽ زميني ڍڪ",
