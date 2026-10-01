@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% import "bt_strings.html" as s %}
+{% set bt = s.BT[lang] %}
+
+{% block title %}{{ bt.title }} - {{ t.app_title }}{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='backtest.css') }}">
+{% endblock %}
+
+{% macro ledger_rows(items, lang, bt, t) %}
+    {% set labels = {'HIT': bt.l_hit, 'MISS': bt.l_miss, 'FALSE ALARM': bt.l_fa, 'CORRECT (quiet)': bt.l_ok, 'SKIPPED': bt.l_skip} %}
+    {% for row in items %}
+    {% set oc = row.outcome|lower|replace(' ', '-')|replace('(', '')|replace(')', '') %}
+    {% set parts = row.name.split(', ', 1) %}
+    <a class="bt-grid bt-row" href="{{ url_for('back_test_case', case_id=row.id, lang=lang) }}">
+        <span class="bt-row-name">
+            <span class="bt-row-city">{{ t.city_names.get(parts[0]|lower, parts[0]) }}</span>
+            <span class="bt-row-meta bt-ltr">{{ parts[1] if parts|length > 1 else '' }}</span>
+            <span class="bt-row-meta">{% if row.rainfall_mm is not none %}{{ bt.mm.format(n=row.rainfall_mm) }}{% if row.has_caveat %} *{% endif %}{% else %}{{ bt.norain }}{% endif %}</span>
+        </span>
+        {% if row.core %}
+        <span class="bt-bar" role="img" aria-label="{{ row.core.score }} / 100">
+            <span class="bt-fill bt-o-{{ oc }}" style="width: {{ row.core.score }}%;"></span>
+            <span class="bt-tick"></span>
+        </span>
+        <span class="bt-row-res">
+            <span class="bt-score">{{ row.core.score }}</span>
+            <span class="bt-badge bt-o-{{ oc }}">{{ labels[row.outcome] }}</span>
+        </span>
+        {% else %}
+        <span class="bt-bar-none">{{ bt.notscored }}</span>
+        <span class="bt-row-res"><span class="bt-badge bt-o-skipped">{{ bt.l_skip }}</span></span>
+        {% endif %}
+    </a>
+    {% endfor %}
+{% endmacro %}
+
+{% block content %}
+<div class="bt">
+
+    <section class="bt-hero">
+        <h1>{{ bt.h1 }}</h1>
+        <p class="bt-hero-lede">{{ bt.lede }}</p>
+        <div class="bt-criteria">
+            <div class="bt-criterion bt-pass">
+                <span class="bt-criterion-title">{{ bt.c1t }}</span>
+                <p class="bt-criterion-text">{{ bt.c1x }}</p>
+            </div>
+            <div class="bt-criterion bt-fail">
+                <span class="bt-criterion-title">{{ bt.c2t }}</span>
+                <p class="bt-criterion-text">{{ bt.c2x }}</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="bt-chapter">
+        <h2>{{ bt.ch1 }}</h2>
+        <p class="bt-chapter-lede">{{ bt.ch1l }}</p>
+
+        {% if rows %}
+        <div class="bt-ledger">
+            <div class="bt-grid bt-axis" aria-hidden="true">
+                <span></span>
+                <span class="bt-axis-track">
+                    <span class="bt-axis-min">0</span>
+                    <span class="bt-axis-line">{{ bt.axis }}</span>
+                    <span class="bt-axis-max">100</span>
+                </span>
+                <span></span>
+            </div>
+
+            <h3 class="bt-group-title">{{ bt.g1 }}</h3>
+            <p class="bt-group-sub">{{ bt.g1s }}</p>
+            {{ ledger_rows(rows|selectattr('actual_flood')|list, lang, bt, t) }}
+
+            <h3 class="bt-group-title">{{ bt.g2 }}</h3>
+            <p class="bt-group-sub">{{ bt.g2s }}</p>
+            {{ ledger_rows(rows|rejectattr('actual_flood')|list, lang, bt, t) }}
+        </div>
+
+        <p class="bt-totals">{{ bt.totals.format(n=scored_count, a=model_totals['HIT'], b=model_totals['MISS'], c=model_totals['FALSE ALARM'], d=model_totals['CORRECT (quiet)']) }}</p>
+        <p class="bt-note">{{ bt.star }}</p>
+        {% endif %}
+    </section>
+
+    <section class="bt-chapter">
+        <h2>{{ bt.fair }}</h2>
+        <p>{{ bt.fair1 }}
+            <a class="bt-ltr" href="https://github.com/jam-tamache/Floodsafe-Pakistan/commit/36e305e2fe6a52f71b03f85091d8a7e5ca28c021">{{ bt.fair1l }}</a>.
+            {{ bt.fair1b }}</p>
+        <p>{{ bt.fair2.format(s=scored_count, t=total_count) }}</p>
+    </section>
+
+    <section class="bt-chapter">
+        <h2>{{ bt.cmp }}</h2>
+        <p>{{ bt.cmpl.format(mm=baseline_mm|int, n=scored_count) }}</p>
+        <div class="bt-table-wrap">
+        <table class="bt-compare">
+            <thead>
+                <tr><th>{{ bt.th_res }}</th><th class="bt-num">{{ bt.th_fs }}</th><th class="bt-num">{{ bt.th_rule }}</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>{{ bt.l_hit }}</td><td class="bt-num">{{ model_totals['HIT'] }}</td><td class="bt-num">{{ baseline_totals['HIT'] }}</td></tr>
+                <tr><td>{{ bt.l_miss }}</td><td class="bt-num">{{ model_totals['MISS'] }}</td><td class="bt-num">{{ baseline_totals['MISS'] }}</td></tr>
+                <tr><td>{{ bt.l_fa }}</td><td class="bt-num">{{ model_totals['FALSE ALARM'] }}</td><td class="bt-num">{{ baseline_totals['FALSE ALARM'] }}</td></tr>
+                <tr><td>{{ bt.l_ok }}</td><td class="bt-num">{{ model_totals['CORRECT (quiet)'] }}</td><td class="bt-num">{{ baseline_totals['CORRECT (quiet)'] }}</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p>{{ bt.cmpo }}</p>
+    </section>
+
+    <section class="bt-chapter">
+        <h2>{{ bt.lim }}</h2>
+        <details class="bt-details">
+            <summary>{{ bt.d1 }}</summary>
+            <ul>{% for x in bt.dev %}<li>{{ x }}</li>{% endfor %}</ul>
+        </details>
+        <details class="bt-details">
+            <summary>{{ bt.d2 }}</summary>
+            <ul>{% for x in bt.lims %}<li>{{ x }}</li>{% endfor %}</ul>
+        </details>
+    </section>
+
+    <section class="bt-conclusion">
+        <h2>{{ bt.concl }}</h2>
+        <p>{{ bt.concl_t }} <a class="bt-ltr" href="https://github.com/jam-tamache/Floodsafe-Pakistan">GitHub</a></p>
+    </section>
+
+    <p class="bt-note">{{ bt.foot }}</p>
+    <p class="bt-links">
+        <a href="{{ url_for('data_methodology', lang=lang) }}" class="bt-back">{{ bt.b_meth }}</a>
+        <a href="{{ url_for('home', lang=lang) }}" class="bt-back">{{ bt.b_home }}</a>
+    </p>
+
+</div>
+{% endblock %}
