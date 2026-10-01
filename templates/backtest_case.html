@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% import "bt_strings.html" as s %}
+{% set bt = s.BT[lang] %}
+
+{% block title %}{{ row.name }} - {{ bt.title }} - {{ t.app_title }}{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='backtest.css') }}">
+{% endblock %}
+
+{% block content %}
+{% set labels = {'HIT': bt.l_hit, 'MISS': bt.l_miss, 'FALSE ALARM': bt.l_fa, 'CORRECT (quiet)': bt.l_ok, 'SKIPPED': bt.l_skip} %}
+{% set oc = row.outcome|lower|replace(' ', '-')|replace('(', '')|replace(')', '') %}
+{% set cname = t.city_names.get(case.city|lower, case.city|title) %}
+<div class="bt">
+
+    <section class="bt-case-hero">
+        <h1>{{ cname }}</h1>
+        <p class="bt-case-dates bt-ltr">{{ case.date_window }}</p>
+        <div class="bt-case-verdict">
+            <span class="bt-badge bt-o-{{ oc }}">{{ labels[row.outcome] }}</span>
+            <span>
+                {% if row.outcome == 'HIT' %}{{ bt.v_hit }}
+                {% elif row.outcome == 'MISS' %}{{ bt.v_miss }}
+                {% elif row.outcome == 'FALSE ALARM' %}{{ bt.v_fa }}
+                {% elif row.outcome == 'CORRECT (quiet)' %}{{ bt.v_ok }}
+                {% else %}{{ bt.v_skip }}{% endif %}
+            </span>
+        </div>
+    </section>
+
+    <div class="bt-acts">
+        <section class="bt-act">
+            <h2>{{ bt.a1 }}</h2>
+            {% if row.rainfall_mm is not none %}
+            <p class="bt-act-big">{{ row.rainfall_mm }} <small>{{ t.unit_mm }}</small></p>
+            {% if row.has_caveat %}<p class="bt-note">{{ bt.readnote }}</p>{% endif %}
+            {% else %}
+            <p class="bt-act-big"><small>{{ bt.nofig }}</small></p>
+            {% endif %}
+            <dl>
+                <dt>{{ bt.city }}</dt><dd>{{ cname }}</dd>
+                <dt>{{ bt.land }}</dt><dd>{{ t.terrain_profile_labels.get(terrain_label, terrain_label) }}</dd>
+            </dl>
+        </section>
+
+        <section class="bt-act">
+            <h2>{{ bt.a2 }}</h2>
+            {% if row.core %}
+            <p class="bt-act-big">{{ row.core.score }} <small>/ 100</small></p>
+            <p class="bt-risk-chip">
+                <span class="bt-risk-dot" style="background: {{ row.core.risk_color }};"></span>
+                {{ t.risk_levels[row.core.risk_level_key] }}
+            </p>
+            <p class="bt-note">{{ bt.alertnote }}</p>
+            {% else %}
+            <p class="bt-act-big"><small>{{ bt.noscore }}</small></p>
+            {% endif %}
+        </section>
+
+        <section class="bt-act">
+            <h2>{{ bt.a3 }}</h2>
+            <p class="bt-act-big">{{ bt.flood if row.actual_flood else bt.noflood }}</p>
+            <p class="bt-ltr-text">{{ case.impact }}</p>
+        </section>
+    </div>
+
+    {% if row.core %}
+    <section class="bt-panel">
+        <h2>{{ bt.build }}</h2>
+        <p>{{ bt.buildl }}</p>
+
+        <div class="bt-stack" role="img" aria-label="{{ row.core.score }} / 100">
+            <span class="bt-stack-label">{{ bt.axis }}</span>
+            {% if row.core.rainfall_points > 0 %}
+            <span class="bt-seg bt-seg-rain {{ 'bt-seg-only' if row.core.elevation_points <= 0 else '' }}" style="width: {{ row.core.rainfall_points }}%;"></span>
+            {% endif %}
+            {% if row.core.elevation_used and row.core.elevation_points > 0 %}
+            <span class="bt-seg bt-seg-elev {{ 'bt-seg-only' if row.core.rainfall_points <= 0 else '' }}" style="width: {{ row.core.elevation_points }}%;"></span>
+            {% endif %}
+            <span class="bt-tick"></span>
+        </div>
+
+        <div class="bt-legend">
+            <span><i style="background: var(--bt-sea);"></i>{{ bt.seg_r.format(r=row.core.rainfall_points) }}</span>
+            {% if row.core.elevation_used %}
+            <span><i style="background: var(--bt-teal);"></i>{{ bt.seg_e.format(e=row.core.elevation_points) }}</span>
+            {% endif %}
+        </div>
+
+        <p><strong>{{ bt.line.format(s=row.core.score, r=row.core.rainfall_points, e=row.core.elevation_points) }}</strong></p>
+
+        {% if row.core.elevation_used %}
+        <p class="bt-note">
+            {{ bt.eq.format(c=cname, m=row.core.elevation_m, p=row.core.elevation_terrain_points) }}
+            {% if row.core.elevation_rain_fraction >= 1 %}{{ bt.eqfull }}{% else %}{{ bt.eqpart.format(e=row.core.elevation_points) }}{% endif %}
+        </p>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    <section class="bt-panel">
+        <h2>{{ bt.src }}</h2>
+        {% if case.rainfall_caveat %}
+        <p class="bt-caveat bt-ltr-text"><strong>{{ bt.note }}</strong> {{ case.rainfall_caveat }}</p>
+        {% endif %}
+        <p class="bt-source bt-ltr-text">{{ case.source|linkify }}</p>
+    </section>
+
+    <p class="bt-links">
+        <a href="{{ url_for('back_test', lang=lang) }}" class="bt-back">{{ bt.all }}</a>
+        <a href="{{ url_for('data_methodology', lang=lang) }}" class="bt-back">{{ bt.b_meth }}</a>
+    </p>
+
+</div>
+{% endblock %}
