@@ -10,8 +10,11 @@
     <div class="info-grid">
         <div class="info-card">
             <span class="info-card-icon">&#127758;</span>
-            <h3>{{ t.about_validated_heading }}</h3>
-            <p>{{ t.about_validated_body }}</p>
+            <h3>{{ t.about_designed_heading }}</h3>
+            <p>{{ t.about_designed_body }}</p>
+            <p class="info-card-action">
+                <a href="{{ url_for('back_test', lang=lang) }}" class="info-link-btn">{{ t.bt.title }}</a>
+            </p>
         </div>
 
         <div class="info-card">
