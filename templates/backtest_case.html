@@ -1,6 +1,5 @@
 {% extends "base.html" %}
-{% import "bt_strings.html" as s %}
-{% set bt = s.BT[lang] %}
+{% set bt = t.bt %}
 
 {% block title %}{{ row.name }} - {{ bt.title }} - {{ t.app_title }}{% endblock %}
 
