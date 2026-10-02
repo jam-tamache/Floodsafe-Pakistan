@@ -21,15 +21,11 @@
              decided for it, see base.html notes in chat history. About,
              How It Works, and Data & Methodology are real routes (see
              app.py) - not same-page anchors like they were in the old
-             sidebar. -->
+             sidebar. Order: About is last, by website convention. -->
         <nav class="topbar-nav">
             <a href="{{ url_for('home', lang=lang) }}"
                class="topbar-link {{ 'topbar-link-active' if request.path == url_for('home') else '' }}">
                {{ t.nav_home }}
-            </a>
-            <a href="{{ url_for('about', lang=lang) }}"
-               class="topbar-link {{ 'topbar-link-active' if request.path == url_for('about') else '' }}">
-               {{ t.nav_about }}
             </a>
             <a href="{{ url_for('how_it_works', lang=lang) }}"
                class="topbar-link {{ 'topbar-link-active' if request.path == url_for('how_it_works') else '' }}">
@@ -39,6 +35,14 @@
                class="topbar-link {{ 'topbar-link-active' if request.path == url_for('data_methodology') else '' }}">
                {{ t.nav_data_methodology }}
             </a>
+            <!-- NEW: Back-test. translations.py has no nav_back_test key
+                 yet, so this falls back to the English label via
+                 t.get(...) instead of crashing. Active on /back-test and
+                 on every /back-test/<case_id> page. -->
+            <a href="{{ url_for('back_test', lang=lang) }}"
+               class="topbar-link {{ 'topbar-link-active' if request.path.startswith('/back-test') else '' }}">
+               {{ t.get('nav_back_test', 'Back-test') }}
+            </a>
             <!-- Map is a real, working route the mockup's nav list didn't
                  show - dropping it would remove access to a finished
                  feature, so it stays in nav even though it wasn't in the
@@ -47,6 +51,10 @@
             <a href="{{ url_for('map_view', lang=lang) }}"
                class="topbar-link {{ 'topbar-link-active' if request.path == url_for('map_view') else '' }}">
                &#128506; {{ t.nav_map }}
+            </a>
+            <a href="{{ url_for('about', lang=lang) }}"
+               class="topbar-link {{ 'topbar-link-active' if request.path == url_for('about') else '' }}">
+               {{ t.nav_about }}
             </a>
         </nav>
 
@@ -82,14 +90,15 @@
          under the mobile breakpoint when .topbar-menu-open is toggled on
          .topbar. Kept as a separate list rather than reusing .topbar-nav
          with a media query, since the two need different layout (row vs
-         stacked column) and duplicating the four links is simpler than
+         stacked column) and duplicating the links is simpler than
          fighting one element into two shapes. -->
     <nav class="topbar-mobile-menu" id="mobileMenu">
         <a href="{{ url_for('home', lang=lang) }}" class="topbar-link">{{ t.nav_home }}</a>
-        <a href="{{ url_for('about', lang=lang) }}" class="topbar-link">{{ t.nav_about }}</a>
         <a href="{{ url_for('how_it_works', lang=lang) }}" class="topbar-link">{{ t.nav_how_it_works }}</a>
         <a href="{{ url_for('data_methodology', lang=lang) }}" class="topbar-link">{{ t.nav_data_methodology }}</a>
+        <a href="{{ url_for('back_test', lang=lang) }}" class="topbar-link">{{ t.get('nav_back_test', 'Back-test') }}</a>
         <a href="{{ url_for('map_view', lang=lang) }}" class="topbar-link">&#128506; {{ t.nav_map }}</a>
+        <a href="{{ url_for('about', lang=lang) }}" class="topbar-link">{{ t.nav_about }}</a>
         <!-- FIX: this row was completely missing before - the CSS for
              .topbar-mobile-menu .lang-switch already existed in
              style.css from the earlier session, written on the
