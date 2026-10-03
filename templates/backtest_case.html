@@ -11,11 +11,14 @@
 {% set labels = {'HIT': bt.l_hit, 'MISS': bt.l_miss, 'FALSE ALARM': bt.l_fa, 'CORRECT (quiet)': bt.l_ok, 'SKIPPED': bt.l_skip} %}
 {% set oc = row.outcome|lower|replace(' ', '-')|replace('(', '')|replace(')', '') %}
 {% set cname = t.city_names.get(case.city|lower, case.city|title) %}
+{# English text stays left-to-right. Urdu/Sindhi text must follow the page direction, #}
+{# otherwise numbers and the "Note:" label come out in the wrong order. #}
+{% set txt = 'bt-ltr-text' if lang == 'en' else '' %}
 <div class="bt">
 
     <section class="bt-case-hero">
         <h1>{{ cname }}</h1>
-        <p class="bt-case-dates bt-ltr">{{ case.date_window }}</p>
+        <p class="bt-case-dates bt-ltr">{{ case.date_window|replace(' to ', ' – ') }}</p>
         <div class="bt-case-verdict">
             <span class="bt-badge bt-o-{{ oc }}">{{ labels[row.outcome] }}</span>
             <span>
@@ -60,7 +63,7 @@
         <section class="bt-act">
             <h2>{{ bt.a3 }}</h2>
             <p class="bt-act-big">{{ bt.flood if row.actual_flood else bt.noflood }}</p>
-            <p class="bt-ltr-text">{{ case.impact }}</p>
+            <p class="{{ txt }}">{{ case_i.impact }}</p>
         </section>
     </div>
 
@@ -100,10 +103,10 @@
 
     <section class="bt-panel">
         <h2>{{ bt.src }}</h2>
-        {% if case.rainfall_caveat %}
-        <p class="bt-caveat bt-ltr-text"><strong>{{ bt.note }}</strong> {{ case.rainfall_caveat }}</p>
+        {% if case_i.rainfall_caveat %}
+        <p class="bt-caveat {{ txt }}"><strong>{{ bt.note }}</strong> {{ case_i.rainfall_caveat }}</p>
         {% endif %}
-        <p class="bt-source bt-ltr-text">{{ case.source|linkify }}</p>
+        <p class="bt-source {{ txt }}">{{ case_i.source|linkify }}</p>
     </section>
 
     <p class="bt-links">
