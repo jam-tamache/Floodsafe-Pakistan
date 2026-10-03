@@ -5,6 +5,92 @@
     <title>{% block title %}{{ t.app_title }}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- NEW: footer styles. Kept here (not in style.css) so this one file
+         is the whole change. The body/main rules keep the footer at the
+         bottom of the window on short pages. -->
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-content {
+            flex: 1 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .site-footer {
+            flex-shrink: 0;
+            background: #ffffff;
+            border-top: 1px solid #d6e6e3;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        /* Also has the class .topbar-inner in the HTML, so its width and
+           side padding are exactly the navbar's. Only height is set here. */
+        .site-footer-inner {
+            height: auto;
+            min-height: 0;
+            padding-top: 14px;
+            padding-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4b6b6e;
+            font-size: 0.88rem;
+        }
+        .footer-brand strong {
+            color: #0F5459;
+            font-weight: 700;
+        }
+        .footer-logo {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+        .footer-copy {
+            direction: ltr;
+            unicode-bidi: isolate;
+        }
+        .footer-github {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #0F5459 0%, #187378 100%);
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(15, 84, 89, 0.25);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        .footer-github:hover,
+        .footer-github:focus-visible {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(15, 84, 89, 0.35);
+        }
+        .footer-github svg {
+            flex-shrink: 0;
+        }
+        @media (max-width: 560px) {
+            .site-footer-inner {
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+        }
+    </style>
+
     {% block head_extra %}{% endblock %}
 </head>
 <body>
@@ -117,6 +203,28 @@
 <main class="page-content">
     {% block content %}{% endblock %}
 </main>
+
+<!-- NEW: footer. Left: logo + name + year. Right: GitHub profile link.
+     The name uses t.app_title, so it follows the page language like the
+     navbar does. -->
+<footer class="site-footer">
+    <div class="topbar-inner site-footer-inner">
+        <div class="footer-brand">
+            <span class="footer-logo">&#127754;</span>
+            <strong>{{ t.app_title }}</strong>
+            <span class="footer-copy">&copy; 2026</span>
+        </div>
+        <a class="footer-github"
+           href="https://github.com/jam-tamache"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="GitHub">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            <span>GitHub</span>
+        </a>
+    </div>
+</footer>
 
 <script>
     const topbar = document.querySelector('.topbar');
