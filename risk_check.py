@@ -1,8 +1,10 @@
 import os
+import re
 import time
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, abort, jsonify, render_template, request
 import requests
 import csv
+from markupsafe import Markup, escape
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -41,6 +43,28 @@ _CITY_COORDS_LOOKUP = {c["city"]: (c["lat"], c["lon"]) for c in CITY_COORDINATES
 from dotenv import load_dotenv
 from translations import get_translation, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 import elevation_data
+
+# Back-test case data (pure data, no logic) for the /back-test replay pages.
+# If the file is missing on the server the site still runs; /back-test just
+# shows no cases instead of crashing.
+try:
+    from backtest_cases import ALL_CASES as BACKTEST_CASES
+except ImportError:
+    BACKTEST_CASES = []
+
+
+# Returns case[field] in the active language (ur/sd text lives in
+# backtest_cases.py under each case's "i18n" dict). Falls back to the
+# English field if a translation is missing, or if an older
+# backtest_cases.py without case_text() is still on the server.
+def _case_text(case, field, lang):
+    return case.get(field)
+
+
+try:
+    from backtest_cases import case_text as _case_text  # noqa: F811
+except ImportError:
+    pass
 
 load_dotenv()  # reads variables from a .env file in the same folder as this script
 
@@ -898,6 +922,147 @@ def data_methodology():
         for profile in REGIONAL_PROFILES.values()
     ]
     return render_template("data_methodology.html", t=t, lang=lang, regions=regions_for_template)
+
+
+# Turns plain-text source strings like "Dawn (https://x.com/a); PMD (https://y.org/b)"
+# into safe clickable links. Jinja's built-in urlize was tried first and
+# swallowed the closing ")" and ";" into the link (broken URL), so this
+# stops each URL at whitespace or ")" and strips trailing punctuation.
+# Each link is wrapped in <bdi> so a left-to-right URL cannot reorder the
+# surrounding Urdu/Sindhi (right-to-left) text.
+_URL_RE = re.compile(r"https?://[^\s)<>\"]+")
+
+
+@app.template_filter("linkify")
+def linkify(text):
+    text = text or ""
+    parts, last = [], 0
+    for m in _URL_RE.finditer(text):
+        parts.append(escape(text[last:m.start()]))
+        url = m.group(0).rstrip(".,;:")
+        parts.append(Markup('<bdi><a href="{0}" target="_blank" rel="noopener">{0}</a></bdi>').format(url))
+        parts.append(escape(m.group(0)[len(url):]))
+        last = m.end()
+    parts.append(escape(text[last:]))
+    return Markup("").join(parts)
+
+
+# ---- Historical back-test replay ----
+#
+# /back-test lists every case in backtest_cases.py with the model's score
+# and outcome; /back-test/<case_id> replays one case. Everything shown is
+# computed here from backtest_cases.py + the SAME _compute_risk_core() the
+# live tool uses, so the page cannot drift from the back-test. All 9 cases
+# are shown, including false alarms and the skipped Jacobabad case - never
+# filter this list down to the hits.
+#
+# Must match run_backtest.py: an "alert" is Moderate Risk or higher.
+BACKTEST_ALERT_TIERS = {"Moderate Risk", "High Risk", "Very High Risk"}
+
+# Protocol section 7 baseline: alert if 72h rainfall >= this many mm, with
+# no terrain logic. Checked against BACKTEST_PROTOCOL.md section 7
+# ("50 mm or more", code uses >=) - it is not read from that file, so
+# re-check if the protocol ever changes.
+BACKTEST_BASELINE_MM = 50.0
+
+_BACKTEST_OUTCOME_KEYS = ["HIT", "MISS", "FALSE ALARM", "CORRECT (quiet)"]
+
+# CSS class for the outcome badge (reuses the existing risk-badge colors).
+_BACKTEST_BADGE_CLASS = {
+    "HIT": "risk-low",
+    "CORRECT (quiet)": "risk-low",
+    "FALSE ALARM": "risk-high",
+    "MISS": "risk-very-high",
+}
+
+
+def _classify_backtest(actual_flood, alerted):
+    if actual_flood and alerted:
+        return "HIT"
+    if actual_flood:
+        return "MISS"
+    if alerted:
+        return "FALSE ALARM"
+    return "CORRECT (quiet)"
+
+
+def evaluate_backtest_case(case):
+    """Scores one back-test case. Returns a dict; core is None and outcome
+    is "SKIPPED" when the case has no rainfall figure (Jacobabad), same as
+    run_backtest.py.
+    """
+    actual_flood = case["actual_outcome"] == "flood"
+    rainfall = case["rainfall_mm"]
+    row = {
+        "id": case["id"],
+        "name": f"{case['city'].title()}, {case['date_window']}",
+        "actual_flood": actual_flood,
+        "rainfall_mm": rainfall,
+        "has_caveat": bool(case.get("rainfall_caveat")),
+        "scored": rainfall is not None,
+        "core": None,
+        "outcome": "SKIPPED",
+        "baseline_outcome": "SKIPPED",
+    }
+    if rainfall is None:
+        return row
+    core = _compute_risk_core(case["city"], rainfall)
+    row["core"] = core
+    row["outcome"] = _classify_backtest(actual_flood, core["risk_level_key"] in BACKTEST_ALERT_TIERS)
+    row["baseline_outcome"] = _classify_backtest(actual_flood, rainfall >= BACKTEST_BASELINE_MM)
+    return row
+
+
+@app.route("/back-test")
+def back_test():
+    """Back-test results page: verdict, live-computed results table (each
+    case links to its replay), baseline comparison, deviations and
+    limitations. Translated (en/ur/sd, strings under t["bt"] in
+    translations.py) and linked from the nav ("nav_back_test"). The
+    verdict, deviation and limitation text in templates/backtest.html is
+    written from BACKTEST_RESULTS.md - if the cases or protocol change,
+    update it.
+    """
+    lang = get_lang()
+    t = get_translation(lang)
+    rows = [evaluate_backtest_case(c) for c in BACKTEST_CASES]
+    scored = [r for r in rows if r["scored"]]
+    model_totals = {k: sum(1 for r in scored if r["outcome"] == k) for k in _BACKTEST_OUTCOME_KEYS}
+    baseline_totals = {k: sum(1 for r in scored if r["baseline_outcome"] == k) for k in _BACKTEST_OUTCOME_KEYS}
+    return render_template(
+        "backtest.html", t=t, lang=lang, rows=rows,
+        scored_count=len(scored), total_count=len(rows),
+        model_totals=model_totals, baseline_totals=baseline_totals,
+        baseline_mm=BACKTEST_BASELINE_MM,
+    )
+
+
+@app.route("/back-test/<case_id>")
+def back_test_case(case_id):
+    """Replay of one historical case: what the model scored with the
+    recorded rainfall, next to what actually happened. Unknown ids 404.
+
+    case_i holds the caveat / impact / source text in the ACTIVE language
+    (ur/sd come from each case's "i18n" dict in backtest_cases.py, with
+    English as the fallback). The template must use case_i for these
+    three fields, not case.<field>.
+    """
+    lang = get_lang()
+    t = get_translation(lang)
+    case = next((c for c in BACKTEST_CASES if c["id"] == case_id), None)
+    if case is None:
+        abort(404)
+    row = evaluate_backtest_case(case)
+    profile = REGIONAL_PROFILES.get(case.get("profile_key"), {})
+    case_i = {
+        field: _case_text(case, field, lang)
+        for field in ("rainfall_caveat", "impact", "source")
+    }
+    return render_template(
+        "backtest_case.html", t=t, lang=lang, case=case, case_i=case_i, row=row,
+        terrain_label=profile.get("label", ""),
+        badge_class=_BACKTEST_BADGE_CLASS.get(row["outcome"]),
+    )
 
 
 _city_risk_cache = {}
