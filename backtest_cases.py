@@ -3,21 +3,24 @@ Back-test case data for FloodSafe Pakistan (model tag: model-v1).
 
 Each case is a real, dated, sourced event. `city` matches the exact lowercase
 key used in risk_check.py's REGIONAL_PROFILES / normalize_city(), so a case
-can be run straight through check_risk()/​_compute_risk_core() with no name
+can be run straight through check_risk() / _compute_risk_core() with no name
 translation needed.
 
 ERA5/Open-Meteo was the original plan (per BACKTEST_PROTOCOL.md) but is not
-reachable from this environment (sandbox network blocks it; the web-fetch
-tool refuses constructed API URLs). Rainfall figures below are the official
-station readings already sourced from NDMA/PDMA/PMD documents instead —
-less uniform than a single reanalysis product, but every number traces to
-a named government document, which is arguably the stronger source for a
-scholarship submission. See `source` on each case.
+reachable from this environment. Rainfall figures below are the official
+station readings already sourced from NDMA/PDMA/PMD documents instead.
+Every number traces to a named government document. See `source` on each case.
 
-`rainfall_mm` is what should be fed into check_risk()/_compute_risk_core()
-as the 72h input. Where the real 72h total isn't confirmed, `rainfall_mm`
-is left as the best available official floor and `rainfall_caveat` explains
-the gap — do not silently treat it as a true 72h total.
+`rainfall_mm` is what should be fed into check_risk() as the 72h input.
+Where the real 72h total isn't confirmed, `rainfall_mm` is left as the best
+available official floor and `rainfall_caveat` explains the gap.
+
+TRANSLATIONS: the English fields (`rainfall_caveat`, `impact`, `source`) are
+the reference text and are unchanged. Each case also has an `i18n` dict with
+"ur" and "sd" versions of those three fields. A missing key means "use the
+English text". Publication names, document numbers and URLs stay in English
+so every source remains traceable. ur/sd are UNREVIEWED drafts: a native
+speaker must read them (Sindhi is weakest).
 """
 
 FLOOD_CASES = [
@@ -44,6 +47,40 @@ FLOOD_CASES = [
             "Dawn, 28 Aug 2020 (https://www.dawn.com/news/1576798); "
             "cross-checked against Wikipedia 2020 Karachi floods summary"
         ),
+        "i18n": {
+            "ur": {
+                "rainfall_caveat": (
+                    "231.0 ملی میٹر کراچی-فیصل پر PMD کا سرکاری ایک دن کا ریکارڈ ہے "
+                    "(24 تا 27 اگست کا سلسلہ)، تصدیق شدہ 72 گھنٹے کا کل نہیں۔ "
+                    "72 گھنٹے کا اصل کل غیر تصدیق شدہ اور غالباً زیادہ ہے — "
+                    "کراچی-فیصل پر اگست کا پورا کل 588.0 ملی میٹر تھا۔ "
+                    "231.0 ملی میٹر کو کم از کم حد سمجھیں، ناپا ہوا 72 گھنٹے کا عدد نہیں۔"
+                ),
+                "impact": "41 اموات (حتمی تعداد)",
+                "source": (
+                    "PMD Pakistan Monthly Climate Summary، اگست 2020 "
+                    "(https://cdpc.pmd.gov.pk/Pakistan_Monthly_Climate_Summary_August_2020.pdf)؛ "
+                    "Dawn، 28 اگست 2020 (https://www.dawn.com/news/1576798)؛ "
+                    "ویکیپیڈیا کے 2020 کراچی سیلاب کے خلاصے سے بھی ملایا گیا"
+                ),
+            },
+            "sd": {
+                "rainfall_caveat": (
+                    "231.0 ملي ميٽر ڪراچي-فيصل تي PMD جو سرڪاري هڪ ڏينهن جو رڪارڊ آهي "
+                    "(24 کان 27 آگسٽ جو سلسلو)، تصديق ٿيل 72 ڪلاڪن جو ڪل ناهي. "
+                    "72 ڪلاڪن جو اصل ڪل غير تصديق ٿيل ۽ غالباً وڌيڪ آهي — "
+                    "ڪراچي-فيصل تي آگسٽ جو پورو ڪل 588.0 ملي ميٽر هو. "
+                    "231.0 ملي ميٽر کي گهٽ ۾ گهٽ حد سمجهو، ماپيل 72 ڪلاڪن جو انگ نه."
+                ),
+                "impact": "41 موت (حتمي تعداد)",
+                "source": (
+                    "PMD Pakistan Monthly Climate Summary، آگسٽ 2020 "
+                    "(https://cdpc.pmd.gov.pk/Pakistan_Monthly_Climate_Summary_August_2020.pdf)؛ "
+                    "Dawn، 28 آگسٽ 2020 (https://www.dawn.com/news/1576798)؛ "
+                    "وڪيپيڊيا جي 2020 ڪراچي سيلاب جي خلاصي سان به ڀيٽيو ويو"
+                ),
+            },
+        },
     },
     {
         "id": "nawabshah_sba_aug2022",
@@ -67,6 +104,38 @@ FLOOD_CASES = [
             "Tribune, 24 Aug 2022, quoting Sindh Information Minister Sharjeel Memon "
             "(https://tribune.com.pk/story/2372885/pmd-forecasts-heavy-rains-in-parts-of-three-provinces)"
         ),
+        "i18n": {
+            "ur": {
+                "rainfall_caveat": (
+                    "137.0 ملی میٹر 24-25 اگست کے 24 گھنٹوں کے لیے SBA اسٹیشن کی "
+                    "ریڈنگ ہے (NDMA SITREP-073)۔ نقصان کے اعداد 23-24 اگست تک کا "
+                    "اسنیپ شاٹ ہیں — ایک دن پہلے کے، اسی جاری سیلابی سلسلے "
+                    "(17 اگست سے شروع) کے، بالکل وہی 24 گھنٹے نہیں۔"
+                ),
+                "impact": "54,962 گھر جزوی طور پر تباہ، 23,000 مکمل تباہ، 696 مویشی ہلاک (23-24 اگست تک)",
+                "source": (
+                    "NDMA Monsoon 2022 Daily SITREP نمبر 073، مورخہ 25 اگست 2022 "
+                    "(https://www.ndma.gov.pk/storage/sitreps/August2022/0K4OF8fblju6B0XAjBr1.pdf)؛ "
+                    "Tribune، 24 اگست 2022، سندھ کے وزیر اطلاعات شرجیل میمن کے حوالے سے "
+                    "(https://tribune.com.pk/story/2372885/pmd-forecasts-heavy-rains-in-parts-of-three-provinces)"
+                ),
+            },
+            "sd": {
+                "rainfall_caveat": (
+                    "137.0 ملي ميٽر 24-25 آگسٽ جي 24 ڪلاڪن لاءِ SBA اسٽيشن جي "
+                    "ريڊنگ آهي (NDMA SITREP-073). نقصان جا انگ 23-24 آگسٽ تائين جو "
+                    "اسنيپ شاٽ آهن — هڪ ڏينهن اڳ جا، ساڳئي جاري سيلابي سلسلي "
+                    "(17 آگسٽ کان شروع) جا، بلڪل اهي 24 ڪلاڪ نه."
+                ),
+                "impact": "54,962 گهر جزوي طور تباهه، 23,000 مڪمل تباهه، 696 ڍور ضايع (23-24 آگسٽ تائين)",
+                "source": (
+                    "NDMA Monsoon 2022 Daily SITREP نمبر 073، تاريخ 25 آگسٽ 2022 "
+                    "(https://www.ndma.gov.pk/storage/sitreps/August2022/0K4OF8fblju6B0XAjBr1.pdf)؛ "
+                    "Tribune، 24 آگسٽ 2022، سنڌ جي اطلاعات واري وزير شرجيل ميمڻ جي حوالي سان "
+                    "(https://tribune.com.pk/story/2372885/pmd-forecasts-heavy-rains-in-parts-of-three-provinces)"
+                ),
+            },
+        },
     },
     {
         "id": "jacobabad_aug2022",
@@ -93,6 +162,30 @@ FLOOD_CASES = [
             "production losses...', Nature Sci. Reports, 2023 "
             "(https://www.nature.com/articles/s41598-023-30347-y)"
         ),
+        "i18n": {
+            # No "source" key: it is a bibliographic citation (author, journal,
+            # title, URL), so the English original is shown in every language.
+            "ur": {
+                "rainfall_caveat": (
+                    "اس کیس کے لیے بارش ناپنے والے آلے کا کوئی عدد نہیں ملا — یہ "
+                    "سیٹلائٹ (Sentinel-1 SAR) سے تصدیق شدہ زیرِ آب علاقہ ہے، بارش کی "
+                    "ریڈنگ نہیں۔ اسے بارش پر مبنی اسکورنگ میں جوں کا توں نہیں چلایا "
+                    "جا سکتا؛ یہ تبھی کارآمد ہے جب بیک ٹیسٹ بلندی/زمین کے منطق کو "
+                    "الگ سے جانچے، یا بعد میں بارش کا عدد مل جائے۔"
+                ),
+                "impact": "Sentinel-1 SAR تصاویر سے سیلاب کا پھیلاؤ تصدیق شدہ، تقریباً 28 اگست 2022",
+            },
+            "sd": {
+                "rainfall_caveat": (
+                    "هن ڪيس لاءِ برسات ماپڻ واري اوزار جو ڪو انگ نه مليو — هي "
+                    "سيٽلائيٽ (Sentinel-1 SAR) مان تصديق ٿيل پاڻيءَ هيٺ آيل علائقو آهي، "
+                    "برسات جي ريڊنگ نه. ان کي برسات تي ٻڌل اسڪورنگ ۾ جيئن آهي تيئن "
+                    "نٿو هلائي سگهجي؛ هي تڏهن ڪم جو آهي جڏهن بيڪ ٽيسٽ بلندي/زمين جي "
+                    "منطق کي الڳ جاچي، يا پوءِ برسات جو انگ ملي وڃي."
+                ),
+                "impact": "Sentinel-1 SAR تصويرن مان سيلاب جو ڦهلاءُ تصديق ٿيل، لڳ ڀڳ 28 آگسٽ 2022",
+            },
+        },
     },
     {
         "id": "hyderabad_aug2026",
@@ -110,6 +203,24 @@ FLOOD_CASES = [
             "wreaks havoc in several districts' (https://www.dawn.com/news/2020214) "
             "— verified against full article text, not a snippet"
         ),
+        "i18n": {
+            "ur": {
+                "impact": "کئی اضلاع میں پھیلے واقعے کا حصہ؛ پورے صوبے میں 8 اموات (مشترکہ پس منظر کے لیے نوابشاہ/عمرکوٹ کے اندراجات دیکھیں)",
+                "source": (
+                    "Dawn، 3 اگست 2026، 'Sindh CM Murad orders emergency steps as downpour "
+                    "wreaks havoc in several districts' (https://www.dawn.com/news/2020214) "
+                    "— مکمل مضمون کے متن سے تصدیق کی گئی، صرف اقتباس سے نہیں"
+                ),
+            },
+            "sd": {
+                "impact": "ڪيترن ضلعن ۾ پکڙيل واقعي جو حصو؛ سڄي صوبي ۾ 8 موت (گڏيل پس منظر لاءِ نوابشاهه/عمرڪوٽ جا اندراج ڏسو)",
+                "source": (
+                    "Dawn، 3 آگسٽ 2026، 'Sindh CM Murad orders emergency steps as downpour "
+                    "wreaks havoc in several districts' (https://www.dawn.com/news/2020214) "
+                    "— پورو مضمون پڙهي تصديق ڪئي وئي، رڳو اقتباس مان نه"
+                ),
+            },
+        },
     },
     {
         "id": "mirpurkhas_aug2026",
@@ -123,6 +234,16 @@ FLOOD_CASES = [
         "actual_outcome": "flood",
         "impact": "Part of the same multi-district event as hyderabad_aug2026/umerkot_aug2026",
         "source": "Dawn, 3 Aug 2026 (https://www.dawn.com/news/2020214)",
+        "i18n": {
+            "ur": {
+                "impact": "اسی کئی اضلاع والے واقعے کا حصہ جس میں hyderabad_aug2026 اور umerkot_aug2026 شامل ہیں",
+                "source": "Dawn، 3 اگست 2026 (https://www.dawn.com/news/2020214)",
+            },
+            "sd": {
+                "impact": "ساڳئي ڪيترن ضلعن وارو واقعو جنهن ۾ hyderabad_aug2026 ۽ umerkot_aug2026 شامل آهن",
+                "source": "Dawn، 3 آگسٽ 2026 (https://www.dawn.com/news/2020214)",
+            },
+        },
     },
     {
         "id": "umerkot_aug2026",
@@ -136,6 +257,16 @@ FLOOD_CASES = [
         "actual_outcome": "flood",
         "impact": "Highest rainfall in Sindh this event; 1 death by drowning; part of the same multi-district event",
         "source": "Dawn, 3 Aug 2026 (https://www.dawn.com/news/2020214)",
+        "i18n": {
+            "ur": {
+                "impact": "اس واقعے میں سندھ کی سب سے زیادہ بارش؛ ڈوبنے سے 1 موت؛ اسی کئی اضلاع والے واقعے کا حصہ",
+                "source": "Dawn، 3 اگست 2026 (https://www.dawn.com/news/2020214)",
+            },
+            "sd": {
+                "impact": "هن واقعي ۾ سنڌ جي سڀ کان وڌيڪ برسات؛ ٻڏڻ سبب 1 موت؛ ساڳئي ڪيترن ضلعن وارو واقعو",
+                "source": "Dawn، 3 آگسٽ 2026 (https://www.dawn.com/news/2020214)",
+            },
+        },
     },
 ]
 
@@ -155,6 +286,22 @@ NON_FLOOD_CASES = [
             "NDMA Monsoon 2020 Daily SITREP No. 045, dated 9 Aug 2020, "
             "PMD rainfall Annex B (https://www.ndma.gov.pk/storage/sitreps/September2020/9y0Bmj0Ri5QMx5zX05bM.pdf)"
         ),
+        "i18n": {
+            "ur": {
+                "impact": "اس مدت میں سیلابی نقصان کی کوئی اطلاع نہیں (سندھ کے حصے میں پورے صوبے کے لیے 'کم اموات اور نقصانات' درج ہیں، جو اس مخصوص ریڈنگ سے منسلک نہیں)",
+                "source": (
+                    "NDMA Monsoon 2020 Daily SITREP نمبر 045، مورخہ 9 اگست 2020، "
+                    "PMD بارش کا ضمیمہ B (https://www.ndma.gov.pk/storage/sitreps/September2020/9y0Bmj0Ri5QMx5zX05bM.pdf)"
+                ),
+            },
+            "sd": {
+                "impact": "هن عرصي ۾ سيلابي نقصان جي ڪا اطلاع ناهي (سنڌ واري حصي ۾ سڄي صوبي لاءِ 'ٿورا موت ۽ نقصان' درج آهن، جيڪي هن مخصوص ريڊنگ سان ڳنڍيل ناهن)",
+                "source": (
+                    "NDMA Monsoon 2020 Daily SITREP نمبر 045، تاريخ 9 آگسٽ 2020، "
+                    "PMD برسات جو ضميمو B (https://www.ndma.gov.pk/storage/sitreps/September2020/9y0Bmj0Ri5QMx5zX05bM.pdf)"
+                ),
+            },
+        },
     },
     {
         "id": "mithi_aug2020_nonflood",
@@ -171,6 +318,22 @@ NON_FLOOD_CASES = [
             "NDMA Monsoon 2020 Daily SITREP No. 045, dated 9 Aug 2020, "
             "PMD rainfall Annex B (https://www.ndma.gov.pk/storage/sitreps/September2020/9y0Bmj0Ri5QMx5zX05bM.pdf)"
         ),
+        "i18n": {
+            "ur": {
+                "impact": "اس مدت میں سیلابی نقصان کی کوئی اطلاع نہیں",
+                "source": (
+                    "NDMA Monsoon 2020 Daily SITREP نمبر 045، مورخہ 9 اگست 2020، "
+                    "PMD بارش کا ضمیمہ B (https://www.ndma.gov.pk/storage/sitreps/September2020/9y0Bmj0Ri5QMx5zX05bM.pdf)"
+                ),
+            },
+            "sd": {
+                "impact": "هن عرصي ۾ سيلابي نقصان جي ڪا اطلاع ناهي",
+                "source": (
+                    "NDMA Monsoon 2020 Daily SITREP نمبر 045، تاريخ 9 آگسٽ 2020، "
+                    "PMD برسات جو ضميمو B (https://www.ndma.gov.pk/storage/sitreps/September2020/9y0Bmj0Ri5QMx5zX05bM.pdf)"
+                ),
+            },
+        },
     },
     {
         "id": "nawabshah_sba_jul2022_nonflood",
@@ -192,7 +355,44 @@ NON_FLOOD_CASES = [
             "NDMA Monsoon 2022 Daily SITREP No. 031, covering 14-15 Jul 2022 "
             "(https://reliefweb.int/report/pakistan/ndma-monsoon-2022-daily-situation-report-no-031-1300-hrs-14-july-2022-1300-hrs-15-july-2022)"
         ),
+        "i18n": {
+            "ur": {
+                "rainfall_caveat": (
+                    "نقصان کے حوالے سے 'کوئی اطلاع نہیں' (NTR) کی تصدیق ہو چکی ہے "
+                    "(اس SITREP کی واقعات کی فہرست میں SBA کا ذکر ہی نہیں)۔ "
+                    "60 ملی میٹر کا عدد خود PMD کی بارش کی جدول سے آزادانہ طور پر "
+                    "تصدیق شدہ نہیں — اس پر نشان لگایا گیا ہے، مسئلہ حل نہیں ہوا۔"
+                ),
+                "impact": "اس SITREP میں شہید بینظیرآباد کے لیے کسی نقصان یا واقعے کی اطلاع نہیں",
+                "source": (
+                    "NDMA Monsoon 2022 Daily SITREP نمبر 031، 14-15 جولائی 2022 کا احاطہ "
+                    "(https://reliefweb.int/report/pakistan/ndma-monsoon-2022-daily-situation-report-no-031-1300-hrs-14-july-2022-1300-hrs-15-july-2022)"
+                ),
+            },
+            "sd": {
+                "rainfall_caveat": (
+                    "نقصان جي حوالي سان 'ڪا اطلاع ناهي' (NTR) جي تصديق ٿي چڪي آهي "
+                    "(هن SITREP جي واقعن واري فهرست ۾ SBA جو ذڪر ئي ناهي). "
+                    "60 ملي ميٽر جو انگ پاڻ PMD جي برسات واري جدول سان آزاد طور "
+                    "تصديق ٿيل ناهي — ان تي نشان لڳايو ويو آهي، مسئلو حل نه ٿيو آهي."
+                ),
+                "impact": "هن SITREP ۾ شهيد بينظيرآباد لاءِ ڪنهن نقصان يا واقعي جي اطلاع ناهي",
+                "source": (
+                    "NDMA Monsoon 2022 Daily SITREP نمبر 031، 14-15 جولاءِ 2022 جو احاطو "
+                    "(https://reliefweb.int/report/pakistan/ndma-monsoon-2022-daily-situation-report-no-031-1300-hrs-14-july-2022-1300-hrs-15-july-2022)"
+                ),
+            },
+        },
     },
 ]
 
 ALL_CASES = FLOOD_CASES + NON_FLOOD_CASES
+
+
+def case_text(case, field, lang):
+    """Return case[field] in `lang`, falling back to the English original."""
+    if lang != "en":
+        translated = case.get("i18n", {}).get(lang, {}).get(field)
+        if translated:
+            return translated
+    return case.get(field)
