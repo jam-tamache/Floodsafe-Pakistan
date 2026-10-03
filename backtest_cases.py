@@ -40,7 +40,7 @@ FLOOD_CASES = [
             "measured 72h figure."
         ),
         "actual_outcome": "flood",
-        "impact": "41 deaths (final toll)",
+        "impact": "40 deaths over the three-day spell (Dawn, 28 Aug 2020)",
         "source": (
             "PMD Pakistan Monthly Climate Summary, August 2020 "
             "(https://cdpc.pmd.gov.pk/Pakistan_Monthly_Climate_Summary_August_2020.pdf); "
@@ -56,7 +56,7 @@ FLOOD_CASES = [
                     "کراچی-فیصل پر اگست کا پورا کل 588.0 ملی میٹر تھا۔ "
                     "231.0 ملی میٹر کو کم از کم حد سمجھیں، ناپا ہوا 72 گھنٹے کا عدد نہیں۔"
                 ),
-                "impact": "41 اموات (حتمی تعداد)",
+                "impact": "تین روزہ سلسلے میں 40 اموات (Dawn، 28 اگست 2020)",
                 "source": (
                     "PMD Pakistan Monthly Climate Summary، اگست 2020 "
                     "(https://cdpc.pmd.gov.pk/Pakistan_Monthly_Climate_Summary_August_2020.pdf)؛ "
@@ -72,7 +72,7 @@ FLOOD_CASES = [
                     "ڪراچي-فيصل تي آگسٽ جو پورو ڪل 588.0 ملي ميٽر هو. "
                     "231.0 ملي ميٽر کي گهٽ ۾ گهٽ حد سمجهو، ماپيل 72 ڪلاڪن جو انگ نه."
                 ),
-                "impact": "41 موت (حتمي تعداد)",
+                "impact": "ٽن ڏينهن جي سلسلي ۾ 40 موت (Dawn، 28 آگسٽ 2020)",
                 "source": (
                     "PMD Pakistan Monthly Climate Summary، آگسٽ 2020 "
                     "(https://cdpc.pmd.gov.pk/Pakistan_Monthly_Climate_Summary_August_2020.pdf)؛ "
