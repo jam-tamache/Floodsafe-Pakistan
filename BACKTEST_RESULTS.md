@@ -20,7 +20,7 @@ The model also does not beat the simple rainfall baseline (see below). The terra
 
 | Case | Type | Rain (mm) | Score | Outcome |
 |---|---|---|---|---|
-| Karachi, 24-27 Aug 2020 | Flood | 231.0 (single-day floor) | 84.0 Very High | Hit |
+| Karachi, 24-27 Aug 2020 | Flood | 231.0 (PMD 24h reading, dated 28 Aug) | 84.0 Very High | Hit |
 | Nawabshah/SBA, 23-25 Aug 2022 | Flood | 137 | 74.2 High | Hit |
 | Hyderabad, 2-3 Aug 2026 | Flood | 89 | 45.4 Moderate | Hit (weakest) |
 | Mirpurkhas, 2-3 Aug 2026 | Flood | 111 | 76.8 Very High | Hit |
@@ -47,11 +47,11 @@ The baseline is at least as good as the model on every count and better on false
 
 ## Deviations from the written protocol
 
-1. Rainfall comes from official NDMA/PDMA/PMD sources, not ERA5/Open-Meteo. This was forced by network limits in the working environment and decided before any model run, but it is still a deviation.
+1. Rainfall comes from official NDMA/PDMA/PMD documents, except the three Aug 2026 cases (Hyderabad, Mirpurkhas, Umerkot), which come from Dawn reporting (3 Aug 2026). It does not come from ERA5/Open-Meteo. This was forced by network limits in the working environment and decided before any model run, but it is still a deviation.
 2. 9 cases in total against the required 10-12.
 3. 3 non-flood cases against the required 5.
 4. The `arid_plains_desert` group is **untested**. Its only case (Jacobabad) was skipped, and it was not filled with weak cases.
-5. Karachi's 231 mm is a single-day floor, not a genuine 72h total.
+5. Karachi's 231.0 mm is PMD's 24-hour reading at Karachi-Faisal. PMD dates it 28 Aug 2020, one day after the case window (24-27 Aug). It is not a 72h total, and the true 72h total is unconfirmed. The case window was not changed after the results were seen. The rain score is at its ceiling (84.0, still a Hit), so this does not change the result.
 
 ## Limitations
 
