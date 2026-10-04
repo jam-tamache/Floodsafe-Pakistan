@@ -33,51 +33,51 @@ FLOOD_CASES = [
         "date_window": "2020-08-24 to 2020-08-27",
         "rainfall_mm": 231.0,
         "rainfall_caveat": (
-            "231.0mm is PMD's official single-day record at Karachi-Faisal "
-            "(24 Aug – 27 Aug spell), not a confirmed 72h total. True 72h "
-            "total is unconfirmed and likely higher — Karachi-Faisal's full "
-            "August total was 588.0mm. Treat 231.0mm as a floor, not a "
+            "231.0mm is PMD's official 24-hour record at Karachi-Faisal, "
+            "dated 28 Aug 2020 by PMD. That date is one day after this case "
+            "window (24 Aug – 27 Aug). It is not a confirmed 72h total. "
+            "True 72h total is unconfirmed and likely higher — Karachi-Faisal's "
+            "full August total was 588.0mm. Treat 231.0mm as a floor, not a "
             "measured 72h figure."
         ),
         "actual_outcome": "flood",
         "impact": "40 deaths over the three-day spell (Dawn, 28 Aug 2020)",
         "source": (
-            "PMD Pakistan Monthly Climate Summary, August 2020 "
-            "(https://cdpc.pmd.gov.pk/Pakistan_Monthly_Climate_Summary_August_2020.pdf); "
-            "Dawn, 28 Aug 2020 (https://www.dawn.com/news/1576798); "
-            "cross-checked against Wikipedia 2020 Karachi floods summary"
+            "PMD, 'State of Pakistan's Climate in 2020' "
+            "(https://cdpc.pmd.gov.pk/Pakistan_Climate_2020.pdf); "
+            "Dawn, 28 Aug 2020 (https://www.dawn.com/news/1576798)"
         ),
         "i18n": {
             "ur": {
                 "rainfall_caveat": (
-                    "231.0 ملی میٹر کراچی-فیصل پر PMD کا سرکاری ایک دن کا ریکارڈ ہے "
-                    "(24 تا 27 اگست کا سلسلہ)، تصدیق شدہ 72 گھنٹے کا کل نہیں۔ "
+                    "231.0 ملی میٹر کراچی-فیصل پر PMD کا سرکاری 24 گھنٹے کا ریکارڈ ہے، "
+                    "جسے PMD نے 28 اگست 2020 کی تاریخ دی ہے۔ یہ تاریخ اس کیس کی مدت "
+                    "(24 تا 27 اگست) سے ایک دن بعد ہے۔ یہ تصدیق شدہ 72 گھنٹے کا کل نہیں۔ "
                     "72 گھنٹے کا اصل کل غیر تصدیق شدہ اور غالباً زیادہ ہے — "
                     "کراچی-فیصل پر اگست کا پورا کل 588.0 ملی میٹر تھا۔ "
                     "231.0 ملی میٹر کو کم از کم حد سمجھیں، ناپا ہوا 72 گھنٹے کا عدد نہیں۔"
                 ),
                 "impact": "تین روزہ سلسلے میں 40 اموات (Dawn، 28 اگست 2020)",
                 "source": (
-                    "PMD Pakistan Monthly Climate Summary، اگست 2020 "
-                    "(https://cdpc.pmd.gov.pk/Pakistan_Monthly_Climate_Summary_August_2020.pdf)؛ "
-                    "Dawn، 28 اگست 2020 (https://www.dawn.com/news/1576798)؛ "
-                    "ویکیپیڈیا کے 2020 کراچی سیلاب کے خلاصے سے بھی ملایا گیا"
+                    "PMD، 'State of Pakistan's Climate in 2020' "
+                    "(https://cdpc.pmd.gov.pk/Pakistan_Climate_2020.pdf)؛ "
+                    "Dawn، 28 اگست 2020 (https://www.dawn.com/news/1576798)"
                 ),
             },
             "sd": {
                 "rainfall_caveat": (
-                    "231.0 ملي ميٽر ڪراچي-فيصل تي PMD جو سرڪاري هڪ ڏينهن جو رڪارڊ آهي "
-                    "(24 کان 27 آگسٽ جو سلسلو)، تصديق ٿيل 72 ڪلاڪن جو ڪل ناهي. "
+                    "231.0 ملي ميٽر ڪراچي-فيصل تي PMD جو سرڪاري 24 ڪلاڪن جو رڪارڊ آهي، "
+                    "جنهن کي PMD 28 آگسٽ 2020 جي تاريخ ڏني آهي. هي تاريخ هن ڪيس جي مدي "
+                    "(24 کان 27 آگسٽ) کان هڪ ڏينهن پوءِ آهي. هي تصديق ٿيل 72 ڪلاڪن جو ڪل ناهي. "
                     "72 ڪلاڪن جو اصل ڪل غير تصديق ٿيل ۽ غالباً وڌيڪ آهي — "
                     "ڪراچي-فيصل تي آگسٽ جو پورو ڪل 588.0 ملي ميٽر هو. "
                     "231.0 ملي ميٽر کي گهٽ ۾ گهٽ حد سمجهو، ماپيل 72 ڪلاڪن جو انگ نه."
                 ),
                 "impact": "ٽن ڏينهن جي سلسلي ۾ 40 موت (Dawn، 28 آگسٽ 2020)",
                 "source": (
-                    "PMD Pakistan Monthly Climate Summary، آگسٽ 2020 "
-                    "(https://cdpc.pmd.gov.pk/Pakistan_Monthly_Climate_Summary_August_2020.pdf)؛ "
-                    "Dawn، 28 آگسٽ 2020 (https://www.dawn.com/news/1576798)؛ "
-                    "وڪيپيڊيا جي 2020 ڪراچي سيلاب جي خلاصي سان به ڀيٽيو ويو"
+                    "PMD، 'State of Pakistan's Climate in 2020' "
+                    "(https://cdpc.pmd.gov.pk/Pakistan_Climate_2020.pdf)؛ "
+                    "Dawn، 28 آگسٽ 2020 (https://www.dawn.com/news/1576798)"
                 ),
             },
         },
