@@ -98,7 +98,7 @@ TRANSLATIONS = {
         "error_city": "We couldn't find this location in our supported database.",
         "error_city_outside_coverage": (
             "This location is recognized, but our current risk model has only "
-            "been validated for selected locations in Sindh."
+            "been historically back-tested on selected flood cases in Sindh."
         ),
         "forecast_error_unavailable": "We couldn't fetch a rainfall forecast right now. Try exploring a scenario instead.",
         "source_forecast": "Based on forecasted rainfall for the next {hours}h: {mm}mm expected.",
@@ -196,7 +196,7 @@ TRANSLATIONS = {
         "about_lede": "FloodSafe Pakistan is a scenario-based flood risk awareness tool, built to help people in Sindh understand how local rainfall could translate into flood risk.",
         "about_warning_heading": "Not an Official Warning",
         "about_warning_body": "FloodSafe does not predict flooding with certainty and is not a substitute for official warnings from PDMA Sindh or your local authorities.",
-        "about_callout": "Cities outside Sindh are shown on the map for geographic context only and are not risk-scored, for the same reason above — their terrain hasn't been validated against this model yet.",
+        "about_callout": "Cities outside Sindh are shown on the map for geographic context only and are not risk-scored, for the same reason above — the model has only been back-tested on selected Sindh flood cases, so it has not been tested on their terrain.",
         # NEW - About-page "why" section + link to the /floods-2022 page.
         # The 70 percent figure is from the World Bank/UNDP PDNA (Oct 2022);
         # it is cited on the floods_2022 page, which about_floods_link opens.
@@ -285,11 +285,11 @@ TRANSLATIONS = {
         "methodology_limitations_heading": "Known limitations",
         "methodology_limitations": [
             "The spacing between regional rainfall thresholds is still developer judgment, not independently sourced",
-            "The model has not yet been checked against real, documented flood events in Sindh",
+            "The model was back-tested on only 8 selected Sindh cases: it caught every flood but gave false alarms on all 3 no-flood days, and did no better than a simple rainfall rule (see the Back-test page)",
             "A small number of cities' elevation values came from a backup data source instead of the primary one, though both use comparable satellite-based measurements",
         ],
-        "methodology_validation_heading": "What \"validated\" means here",
-        "methodology_validation_body": "In this project, it means the rainfall thresholds are tied to an official government classification through a stated method, and the scoring code is covered by automated tests. It does not mean the model has been checked against real floods in Sindh yet — that comparison is planned for after this first version.",
+        "methodology_validation_heading": "What \"back-tested\" means here",
+        "methodology_validation_body": "In this project, the rainfall thresholds are tied to an official government classification through a stated method, and the scoring code is covered by automated tests. Separately, the model was historically back-tested on selected Sindh flood cases (and a few days with no flood), using a pass/fail rule written before the results. It caught every flood but gave false alarms on every no-flood day, so it failed that rule. This is a prototype, not a proven warning system. See the Back-test page for the full results.",
 
         # Back-test page text (moved from templates/bt_strings.html).
         # ur/sd are UNREVIEWED drafts: a native speaker must read them.
@@ -324,7 +324,7 @@ TRANSLATIONS = {
             "fair1": "We wrote the rules before we had any results. They were saved on 24 Sep 2026.",
             "fair1l": "See the saved record",
             "fair1b": "A warning means a score above 25 out of 100.",
-            "fair2": "{s} of {t} cases were scored. Jacobabad (a 2022 flood) has no rain measurement, only satellite pictures, so we left it out instead of guessing. Rain figures come from official Pakistani sources (NDMA, PDMA, PMD).",
+            "fair2": "{s} of {t} cases were scored. Jacobabad (a 2022 flood) has no rain measurement, only satellite pictures, so we left it out instead of guessing. Rain figures come from official Pakistani sources (NDMA, PDMA, PMD), except three August 2026 cases taken from Dawn reporting.",
             "cmp": "Would a simple rain rule do better?",
             "cmpl": "The simple rule ignores the land completely. It warns whenever 3 days of rain reach {mm} mm. Here is how both did on the same {n} cases.",
             "th_res": "Result",
@@ -336,7 +336,7 @@ TRANSLATIONS = {
             "d1": "Read before relying on these results",
             "lims": [
                 "There are few cases: we planned 10 to 12 and scored 9, with 3 no-flood days instead of 5. No percentage here is reliable.",
-                "Rain comes from Pakistani government sources, not the satellite data we planned to use. We decided this before running the model.",
+                "Rain comes from Pakistani government sources (three 2026 cases from Dawn reporting), not the satellite data we planned to use. We decided this before running the model.",
                 "Big floods are better recorded than quiet days, which favors the flood cases.",
                 "We used measured rain, not forecasts. Real forecasts are less accurate, so real results would be worse.",
                 "Dry desert areas were not tested, and one rain figure (Nawabshah, 60 mm) is not yet verified."
@@ -473,8 +473,8 @@ TRANSLATIONS = {
         "error_rainfall": "براہ کرم درست بارش درج کریں (ایک مثبت نمبر)۔",
         "error_city": "یہ مقام ہمارے ڈیٹا بیس میں نہیں ملا۔",
         "error_city_outside_coverage": (
-            "یہ مقام تسلیم شدہ ہے، لیکن ہمارا موجودہ رسک ماڈل فی الحال صرف "
-            "سندھ کے منتخب مقامات کے لیے تصدیق شدہ ہے۔"
+            "یہ مقام تسلیم شدہ ہے، لیکن ہمارے موجودہ رسک ماڈل کو ماضی کے "
+            "صرف سندھ کے منتخب سیلابی کیسز پر بیک ٹیسٹ کیا گیا ہے۔"
         ),
         "forecast_error_unavailable": "ہم اس وقت بارش کی پیشگوئی حاصل نہیں کر سکے۔ براہ کرم اس کے بجائے ایک منظرنامہ آزمائیں۔",
         "source_forecast": "اگلے {hours} گھنٹوں کی پیشگوئی شدہ بارش پر مبنی: متوقع {mm} ملی میٹر۔",
@@ -557,7 +557,7 @@ TRANSLATIONS = {
         "about_lede": "فلڈ سیف پاکستان ایک منظرنامے پر مبنی سیلاب کے خطرے سے آگاہی کا ٹول ہے، جو سندھ کے لوگوں کو یہ سمجھنے میں مدد دینے کے لیے بنایا گیا ہے کہ مقامی بارش کس طرح سیلاب کے خطرے میں تبدیل ہو سکتی ہے۔",
         "about_warning_heading": "یہ کوئی سرکاری وارننگ نہیں ہے",
         "about_warning_body": "فلڈ سیف یقین کے ساتھ سیلاب کی پیشگوئی نہیں کرتا اور PDMA سندھ یا آپ کے مقامی حکام کی سرکاری وارننگز کا متبادل نہیں ہے۔",
-        "about_callout": "سندھ سے باہر کے شہر صرف جغرافیائی حوالے کے لیے نقشے پر دکھائے گئے ہیں اور ان کا خطرہ اسکور نہیں کیا گیا - اسی وجہ سے جیسا کہ اوپر بتایا گیا، ان کی زمینی خصوصیات ابھی اس ماڈل کے خلاف تصدیق شدہ نہیں ہیں۔",
+        "about_callout": "سندھ سے باہر کے شہر صرف جغرافیائی حوالے کے لیے نقشے پر دکھائے گئے ہیں اور ان کا خطرہ اسکور نہیں کیا گیا - اسی وجہ سے جیسا کہ اوپر بتایا گیا، ماڈل کو صرف سندھ کے منتخب سیلابی کیسز پر بیک ٹیسٹ کیا گیا ہے، اس لیے ان کی زمینی خصوصیات پر اسے جانچا نہیں گیا۔",
         # NEW - UNREVIEWED by a native speaker (my draft), same as the rest
         # of the backlog.
         "about_why_heading": "میں نے فلڈ سیف کیوں بنایا",
@@ -642,11 +642,11 @@ TRANSLATIONS = {
         "methodology_limitations_heading": "معلوم حدود",
         "methodology_limitations": [
             "علاقائی بارش کی حدوں کے درمیان فرق اب بھی ڈویلپر کا فیصلہ ہے، کوئی آزادانہ ذریعہ نہیں",
-            "ماڈل کو ابھی تک سندھ کے حقیقی، دستاویزی سیلابی واقعات کے خلاف نہیں جانچا گیا",
+            "ماڈل کو سندھ کے صرف 8 منتخب کیسز پر بیک ٹیسٹ کیا گیا: اس نے ہر سیلاب پکڑا مگر سیلاب کے بغیر تینوں دنوں پر غلط الارم دیا، اور ایک سادہ بارش کے اصول سے بہتر نہیں رہا (بیک ٹیسٹ صفحہ دیکھیں)",
             "چند شہروں کی بلندی کی قدریں بنیادی ذریعے کے بجائے ایک متبادل ڈیٹا ذریعے سے حاصل کی گئیں، اگرچہ دونوں موازنہ کے قابل سیٹلائٹ پر مبنی پیمائش استعمال کرتے ہیں",
         ],
-        "methodology_validation_heading": "یہاں \"تصدیق شدہ\" کا کیا مطلب ہے",
-        "methodology_validation_body": "اس منصوبے میں، اس کا مطلب یہ ہے کہ بارش کی حدیں ایک بیان کردہ طریقے کے ذریعے ایک سرکاری درجہ بندی سے منسلک ہیں، اور اسکورنگ کوڈ خودکار ٹیسٹس سے ڈھکا ہوا ہے۔ اس کا یہ مطلب نہیں کہ ماڈل کو سندھ میں حقیقی سیلابوں کے خلاف جانچا گیا ہے - یہ موازنہ اس پہلے ورژن کے بعد کے لیے مجوزہ ہے۔",
+        "methodology_validation_heading": "یہاں \"بیک ٹیسٹ\" کا کیا مطلب ہے",
+        "methodology_validation_body": "اس منصوبے میں بارش کی حدیں ایک بیان کردہ طریقے کے ذریعے ایک سرکاری درجہ بندی سے منسلک ہیں، اور اسکورنگ کوڈ خودکار ٹیسٹس سے ڈھکا ہوا ہے۔ اس کے علاوہ، ماڈل کو ماضی کے سندھ کے منتخب سیلابی کیسز (اور سیلاب کے بغیر چند دنوں) پر بیک ٹیسٹ کیا گیا، ایسے کامیابی اور ناکامی کے اصول کے ساتھ جو نتائج سے پہلے لکھا گیا تھا۔ اس نے ہر سیلاب پکڑا مگر سیلاب کے بغیر ہر دن پر غلط الارم دیا، اس لیے وہ اس اصول پر پورا نہیں اترا۔ یہ ایک تجرباتی نمونہ ہے، ثابت شدہ وارننگ سسٹم نہیں۔ مکمل نتائج کے لیے بیک ٹیسٹ صفحہ دیکھیں۔",
 
         # Back-test page text (moved from templates/bt_strings.html).
         # ur/sd are UNREVIEWED drafts: a native speaker must read them.
@@ -681,7 +681,7 @@ TRANSLATIONS = {
             "fair1": "ہم نے نتائج آنے سے پہلے اصول لکھ لیے تھے۔ وہ 24 ستمبر 2026 کو محفوظ ہوئے۔",
             "fair1l": "محفوظ ریکارڈ دیکھیں",
             "fair1b": "الرٹ کا مطلب ہے 100 میں سے 25 سے زیادہ اسکور۔",
-            "fair2": "{t} میں سے {s} کیسز کا اسکور بنا۔ جیکب آباد (2022 کا سیلاب) کی بارش ناپی نہیں گئی، صرف سیٹلائٹ تصاویر ہیں، اس لیے ہم نے اندازہ لگانے کے بجائے اسے شامل نہیں کیا۔ بارش کے اعداد پاکستان کے سرکاری اداروں (NDMA، PDMA، PMD) سے ہیں۔",
+            "fair2": "{t} میں سے {s} کیسز کا اسکور بنا۔ جیکب آباد (2022 کا سیلاب) کی بارش ناپی نہیں گئی، صرف سیٹلائٹ تصاویر ہیں، اس لیے ہم نے اندازہ لگانے کے بجائے اسے شامل نہیں کیا۔ بارش کے اعداد پاکستان کے سرکاری اداروں (NDMA، PDMA، PMD) سے ہیں، سوائے اگست 2026 کے تین کیسز کے جو Dawn کی رپورٹنگ سے لیے گئے۔",
             "cmp": "کیا سادہ بارش کا اصول بہتر رہتا؟",
             "cmpl": "سادہ اصول زمین کو بالکل نہیں دیکھتا۔ جب 3 دن کی بارش {mm} ملی میٹر تک پہنچے تو خبردار کرتا ہے۔ انہی {n} کیسز پر دونوں کا نتیجہ یہ ہے۔",
             "th_res": "نتیجہ",
@@ -693,7 +693,7 @@ TRANSLATIONS = {
             "d1": "نتائج پر بھروسا کرنے سے پہلے پڑھیں",
             "lims": [
                 "کیسز کم ہیں: منصوبہ 10 سے 12 کا تھا، اسکور 9 کا ہوا، اور بغیر سیلاب کے 5 کی جگہ 3 دن ملے۔ یہاں کوئی فیصد قابلِ بھروسا نہیں۔",
-                "بارش کا ڈیٹا پاکستانی سرکاری ذرائع سے ہے، اس سیٹلائٹ ڈیٹا سے نہیں جو ہم نے سوچا تھا۔ یہ فیصلہ ماڈل چلانے سے پہلے کیا گیا۔",
+                "بارش کا ڈیٹا پاکستانی سرکاری ذرائع سے ہے (2026 کے تین کیسز Dawn کی رپورٹنگ سے)، اس سیٹلائٹ ڈیٹا سے نہیں جو ہم نے سوچا تھا۔ یہ فیصلہ ماڈل چلانے سے پہلے کیا گیا۔",
                 "بڑے سیلاب پرسکون دنوں سے بہتر ریکارڈ ہوتے ہیں، اس سے سیلاب والے کیسز کو فائدہ ملتا ہے۔",
                 "ہم نے ناپی گئی بارش استعمال کی، پیشگوئی نہیں۔ حقیقی پیشگوئی کم درست ہوتی ہے، اس لیے اصل نتیجہ اس سے بدتر ہوگا۔",
                 "خشک صحرائی علاقوں کا ٹیسٹ نہیں ہوا، اور ایک بارش کا عدد (نوابشاہ، 60 ملی میٹر) ابھی تصدیق شدہ نہیں۔"
@@ -830,8 +830,8 @@ TRANSLATIONS = {
         "error_rainfall": "مهرباني ڪري صحيح برسات داخل ڪريو (هڪ مثبت انگ).",
         "error_city": "هي هنڌ اسان جي ڊيٽابيس ۾ نه ملي سگهيو.",
         "error_city_outside_coverage": (
-            "هي هنڌ سڃاتل آهي، پر اسان جو موجوده رسڪ ماڊل فقط سنڌ جي "
-            "چونڊيل هنڌن لاءِ تصديق ٿيل آهي."
+            "هي هنڌ سڃاتل آهي، پر اسان جي موجوده رسڪ ماڊل کي ماضي جي "
+            "رڳو سنڌ جي چونڊيل سيلابي ڪيسن تي بيڪ ٽيسٽ ڪيو ويو آهي."
         ),
         "forecast_error_unavailable": "اسان هن وقت برسات جي اڳڪٿي حاصل نه ڪري سگهياسين. مهرباني ڪري ان جي بدران هڪ منظرنامو آزمايو.",
         "source_forecast": "ايندڙ {hours} ڪلاڪن جي اڳڪٿي ٿيل برسات تي ٻڌل: متوقع {mm} ملي ميٽر.",
@@ -915,7 +915,7 @@ TRANSLATIONS = {
         "about_lede": "فلڊ سيف پاڪستان هڪ منظرنامي تي ٻڌل سيلاب جي خطري بابت آگاهي جو اوزار آهي، جيڪو سنڌ جي ماڻهن کي اهو سمجهڻ ۾ مدد ڏيڻ لاءِ ٺاهيو ويو آهي ته مقامي برسات ڪيئن سيلاب جي خطري ۾ تبديل ٿي سگهي ٿي.",
         "about_warning_heading": "هي ڪا سرڪاري وارننگ ناهي",
         "about_warning_body": "فلڊ سيف يقين سان سيلاب جي اڳڪٿي نٿو ڪري ۽ PDMA سنڌ يا توهان جي مقامي اختيارين جي سرڪاري وارننگن جو متبادل ناهي.",
-        "about_callout": "سنڌ کان ٻاهر جا شهر رڳو جاگرافيائي حوالي لاءِ نقشي تي ڏيکاريا ويا آهن ۽ انهن جو خطرو اسڪور نه ڪيو ويو آهي - ساڳئي سبب مطابق جيئن مٿي ٻڌايو ويو، سندن زميني خاصيتون اڃا هن ماڊل خلاف تصديق ٿيل ناهن.",
+        "about_callout": "سنڌ کان ٻاهر جا شهر رڳو جاگرافيائي حوالي لاءِ نقشي تي ڏيکاريا ويا آهن ۽ انهن جو خطرو اسڪور نه ڪيو ويو آهي - ساڳئي سبب مطابق جيئن مٿي ٻڌايو ويو، ماڊل کي رڳو سنڌ جي چونڊيل سيلابي ڪيسن تي بيڪ ٽيسٽ ڪيو ويو آهي، تنهنڪري سندن زميني خاصيتن تي ان کي جاچيو نه ويو آهي.",
         # NEW - UNREVIEWED by a native speaker (my draft; my Sindhi is weaker
         # than my Urdu). Uses "سيلاب" for flood to match the rest of this
         # file, although "ٻوڏ" is the more idiomatic Sindhi word - a native
@@ -1002,11 +1002,11 @@ TRANSLATIONS = {
         "methodology_limitations_heading": "ڄاڻايل حدون",
         "methodology_limitations": [
             "علائقائي برسات جي حدن جي وچ ۾ فرق اڃا به ڊولپر جو فيصلو آهي، ڪو آزاد ذريعو ناهي",
-            "ماڊل کي اڃا تائين سنڌ جي حقيقي، دستاويزي سيلابي واقعن خلاف نه جاچيو ويو آهي",
+            "ماڊل کي سنڌ جي رڳو 8 چونڊيل ڪيسن تي بيڪ ٽيسٽ ڪيو ويو: هن هر سيلاب پڪڙيو پر سيلاب کان سواءِ ٽنهي ڏينهن تي غلط الارم ڏنو، ۽ هڪ سادي برسات واري اصول کان بهتر نه رهيو (بيڪ ٽيسٽ صفحو ڏسو)",
             "ڪجهه شهرن جي بلندي جون قدرون بنيادي ذريعي بدران هڪ متبادل ڊيٽا ذريعي مان حاصل ڪيون ويون، جيتوڻيڪ ٻئي ذريعا مقابلي جوڳا سيٽلائيٽ تي ٻڌل ماپون استعمال ڪن ٿا",
         ],
-        "methodology_validation_heading": "هتي \"تصديق ٿيل\" جو مطلب ڇا آهي",
-        "methodology_validation_body": "هن منصوبي ۾، ان جو مطلب اهو آهي ته برسات جون حدون هڪ ٻڌايل طريقي ذريعي هڪ سرڪاري درجه بندي سان ڳنڍيل آهن، ۽ اسڪورنگ ڪوڊ خودڪار ٽيسٽن سان ڍڪيل آهي. ان جو اهو مطلب ناهي ته ماڊل کي سنڌ ۾ حقيقي سيلابن خلاف جاچيو ويو آهي - هي مقابلو هن پهرين ورجن کان پوءِ لاءِ رٿيل آهي.",
+        "methodology_validation_heading": "هتي \"بيڪ ٽيسٽ\" جو مطلب ڇا آهي",
+        "methodology_validation_body": "هن منصوبي ۾ برسات جون حدون هڪ ٻڌايل طريقي ذريعي هڪ سرڪاري درجه بندي سان ڳنڍيل آهن، ۽ اسڪورنگ ڪوڊ خودڪار ٽيسٽن سان ڍڪيل آهي. ان کان علاوه، ماڊل کي ماضي جي سنڌ جي چونڊيل سيلابي ڪيسن (۽ سيلاب کان سواءِ ڪجهه ڏينهن) تي بيڪ ٽيسٽ ڪيو ويو، هڪ اهڙي ڪامياب يا ناڪام ٿيڻ جي اصول سان جيڪو نتيجن کان اڳ لکيو ويو هو. هن هر سيلاب پڪڙيو پر سيلاب کان سواءِ هر ڏينهن تي غلط الارم ڏنو، تنهنڪري اهو ان اصول تي پورو نه لٿو. هي هڪ تجرباتي نمونو آهي، ثابت ٿيل وارننگ سسٽم نه. مڪمل نتيجن لاءِ بيڪ ٽيسٽ صفحو ڏسو.",
 
         # Back-test page text (moved from templates/bt_strings.html).
         # ur/sd are UNREVIEWED drafts: a native speaker must read them.
@@ -1041,7 +1041,7 @@ TRANSLATIONS = {
             "fair1": "اسان نتيجن کان اڳ اصول لکي ڇڏيا هئا. اهي 24 سيپٽمبر 2026 تي محفوظ ٿيا.",
             "fair1l": "محفوظ رڪارڊ ڏسو",
             "fair1b": "الرٽ جو مطلب آهي 100 مان 25 کان وڌيڪ اسڪور.",
-            "fair2": "{t} مان {s} ڪيسن جو اسڪور ٺهيو. جيڪب آباد (2022 جو سيلاب) جي برسات ماپي نه وئي، رڳو سيٽلائيٽ تصويرون آهن، تنهنڪري اسان اندازو لڳائڻ بدران ان کي شامل نه ڪيو. برسات جا انگ پاڪستان جي سرڪاري اداري (NDMA، PDMA، PMD) مان آهن.",
+            "fair2": "{t} مان {s} ڪيسن جو اسڪور ٺهيو. جيڪب آباد (2022 جو سيلاب) جي برسات ماپي نه وئي، رڳو سيٽلائيٽ تصويرون آهن، تنهنڪري اسان اندازو لڳائڻ بدران ان کي شامل نه ڪيو. برسات جا انگ پاڪستان جي سرڪاري اداري (NDMA، PDMA، PMD) مان آهن، سواءِ آگسٽ 2026 جي ٽن ڪيسن جي جيڪي Dawn جي رپورٽنگ مان ورتا ويا.",
             "cmp": "ڇا سادو برسات وارو اصول بهتر رهي ها؟",
             "cmpl": "سادو اصول زمين کي بلڪل نٿو ڏسي. جڏهن 3 ڏينهن جي برسات {mm} ملي ميٽر تائين پهچي ته خبردار ڪري ٿو. ساڳين {n} ڪيسن تي ٻنهي جو نتيجو هي آهي.",
             "th_res": "نتيجو",
@@ -1053,7 +1053,7 @@ TRANSLATIONS = {
             "d1": "نتيجن تي ڀروسو ڪرڻ کان اڳ پڙهو",
             "lims": [
                 "ڪيس ٿورا آهن: منصوبو 10 کان 12 جو هو، اسڪور 9 جو ٿيو، ۽ سيلاب کان سواءِ 5 جي بدران 3 ڏينهن مليا. هتي ڪو به سيڪڙو ڀروسي جوڳو ناهي.",
-                "برسات جو ڊيٽا پاڪستان جي سرڪاري ذريعن مان آهي، ان سيٽلائيٽ ڊيٽا مان نه جيڪو اسان سوچيو هو. اهو فيصلو ماڊل هلائڻ کان اڳ ڪيو ويو.",
+                "برسات جو ڊيٽا پاڪستان جي سرڪاري ذريعن مان آهي (2026 جا ٽي ڪيس Dawn جي رپورٽنگ مان)، ان سيٽلائيٽ ڊيٽا مان نه جيڪو اسان سوچيو هو. اهو فيصلو ماڊل هلائڻ کان اڳ ڪيو ويو.",
                 "وڏا سيلاب پرسڪون ڏينهن کان بهتر رڪارڊ ٿيندا آهن، ان سان سيلاب وارن ڪيسن کي فائدو ملي ٿو.",
                 "اسان ماپيل برسات استعمال ڪئي، اڳڪٿي نه. حقيقي اڳڪٿي گھٽ صحيح هوندي آهي، تنهنڪري اصل نتيجو ان کان خراب هوندو.",
                 "سڪل ريگستاني علائقن جي ٽيسٽ نه ٿي، ۽ هڪ برسات جو انگ (نوابشاهه، 60 ملي ميٽر) اڃا تصديق ٿيل ناهي."
