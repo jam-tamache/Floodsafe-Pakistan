@@ -36,7 +36,7 @@ FLOOD_CASES = [
             "231.0mm is PMD's official 24-hour record at Karachi-Faisal, "
             "dated 28 Aug 2020 by PMD. That date is one day after this case "
             "window (24 Aug – 27 Aug). It is not a confirmed 72h total. "
-            "True 72h total is unconfirmed and likely higher — Karachi-Faisal's "
+            "True 72h total is unconfirmed and likely higher: Karachi-Faisal's "
             "full August total was 588.0mm. Treat 231.0mm as a floor, not a "
             "measured 72h figure."
         ),
@@ -53,7 +53,7 @@ FLOOD_CASES = [
                     "231.0 ملی میٹر کراچی-فیصل پر PMD کا سرکاری 24 گھنٹے کا ریکارڈ ہے، "
                     "جسے PMD نے 28 اگست 2020 کی تاریخ دی ہے۔ یہ تاریخ اس کیس کی مدت "
                     "(24 تا 27 اگست) سے ایک دن بعد ہے۔ یہ تصدیق شدہ 72 گھنٹے کا کل نہیں۔ "
-                    "72 گھنٹے کا اصل کل غیر تصدیق شدہ اور غالباً زیادہ ہے — "
+                    "72 گھنٹے کا اصل کل غیر تصدیق شدہ اور غالباً زیادہ ہے: "
                     "کراچی-فیصل پر اگست کا پورا کل 588.0 ملی میٹر تھا۔ "
                     "231.0 ملی میٹر کو کم از کم حد سمجھیں، ناپا ہوا 72 گھنٹے کا عدد نہیں۔"
                 ),
@@ -69,7 +69,7 @@ FLOOD_CASES = [
                     "231.0 ملي ميٽر ڪراچي-فيصل تي PMD جو سرڪاري 24 ڪلاڪن جو رڪارڊ آهي، "
                     "جنهن کي PMD 28 آگسٽ 2020 جي تاريخ ڏني آهي. هي تاريخ هن ڪيس جي مدي "
                     "(24 کان 27 آگسٽ) کان هڪ ڏينهن پوءِ آهي. هي تصديق ٿيل 72 ڪلاڪن جو ڪل ناهي. "
-                    "72 ڪلاڪن جو اصل ڪل غير تصديق ٿيل ۽ غالباً وڌيڪ آهي — "
+                    "72 ڪلاڪن جو اصل ڪل غير تصديق ٿيل ۽ غالباً وڌيڪ آهي: "
                     "ڪراچي-فيصل تي آگسٽ جو پورو ڪل 588.0 ملي ميٽر هو. "
                     "231.0 ملي ميٽر کي گهٽ ۾ گهٽ حد سمجهو، ماپيل 72 ڪلاڪن جو انگ نه."
                 ),
@@ -93,7 +93,7 @@ FLOOD_CASES = [
         "rainfall_caveat": (
             "137.0mm is the SBA station reading for the 24-25 Aug 24h "
             "window (NDMA SITREP-073). Damage figures below are a snapshot "
-            "as of 23-24 Aug — one day earlier, same ongoing flood spell "
+            "as of 23-24 Aug: one day earlier, same ongoing flood spell "
             "(started 17 Aug), not the identical 24h window."
         ),
         "actual_outcome": "flood",
@@ -109,7 +109,7 @@ FLOOD_CASES = [
                 "rainfall_caveat": (
                     "137.0 ملی میٹر 24-25 اگست کے 24 گھنٹوں کے لیے SBA اسٹیشن کی "
                     "ریڈنگ ہے (NDMA SITREP-073)۔ نقصان کے اعداد 23-24 اگست تک کا "
-                    "اسنیپ شاٹ ہیں — ایک دن پہلے کے، اسی جاری سیلابی سلسلے "
+                    "اسنیپ شاٹ ہیں: ایک دن پہلے کے، اسی جاری سیلابی سلسلے "
                     "(17 اگست سے شروع) کے، بالکل وہی 24 گھنٹے نہیں۔"
                 ),
                 "impact": "54,962 گھر جزوی طور پر تباہ، 23,000 مکمل تباہ، 696 مویشی ہلاک (23-24 اگست تک)",
@@ -124,7 +124,7 @@ FLOOD_CASES = [
                 "rainfall_caveat": (
                     "137.0 ملي ميٽر 24-25 آگسٽ جي 24 ڪلاڪن لاءِ SBA اسٽيشن جي "
                     "ريڊنگ آهي (NDMA SITREP-073). نقصان جا انگ 23-24 آگسٽ تائين جو "
-                    "اسنيپ شاٽ آهن — هڪ ڏينهن اڳ جا، ساڳئي جاري سيلابي سلسلي "
+                    "اسنيپ شاٽ آهن: هڪ ڏينهن اڳ جا، ساڳئي جاري سيلابي سلسلي "
                     "(17 آگسٽ کان شروع) جا، بلڪل اهي 24 ڪلاڪ نه."
                 ),
                 "impact": "54,962 گهر جزوي طور تباهه، 23,000 مڪمل تباهه، 696 ڍور ضايع (23-24 آگسٽ تائين)",
@@ -146,7 +146,7 @@ FLOOD_CASES = [
         "date_window": "2022-08-28",
         "rainfall_mm": None,
         "rainfall_caveat": (
-            "No rain-gauge rainfall figure was found for this case — it is "
+            "No rain-gauge rainfall figure was found for this case: it is "
             "satellite-confirmed inundation (Sentinel-1 SAR), not a rainfall "
             "reading. Cannot be run through check_risk()'s rainfall-based "
             "scoring as-is; usable only if the back-test separately checks "
@@ -167,7 +167,7 @@ FLOOD_CASES = [
             # title, URL), so the English original is shown in every language.
             "ur": {
                 "rainfall_caveat": (
-                    "اس کیس کے لیے بارش ناپنے والے آلے کا کوئی عدد نہیں ملا — یہ "
+                    "اس کیس کے لیے بارش ناپنے والے آلے کا کوئی عدد نہیں ملا۔ یہ "
                     "سیٹلائٹ (Sentinel-1 SAR) سے تصدیق شدہ زیرِ آب علاقہ ہے، بارش کی "
                     "ریڈنگ نہیں۔ اسے بارش پر مبنی اسکورنگ میں جوں کا توں نہیں چلایا "
                     "جا سکتا؛ یہ تبھی کارآمد ہے جب بیک ٹیسٹ بلندی/زمین کے منطق کو "
@@ -177,7 +177,7 @@ FLOOD_CASES = [
             },
             "sd": {
                 "rainfall_caveat": (
-                    "هن ڪيس لاءِ برسات ماپڻ واري اوزار جو ڪو انگ نه مليو — هي "
+                    "هن ڪيس لاءِ برسات ماپڻ واري اوزار جو ڪو انگ نه مليو. هي "
                     "سيٽلائيٽ (Sentinel-1 SAR) مان تصديق ٿيل پاڻيءَ هيٺ آيل علائقو آهي، "
                     "برسات جي ريڊنگ نه. ان کي برسات تي ٻڌل اسڪورنگ ۾ جيئن آهي تيئن "
                     "نٿو هلائي سگهجي؛ هي تڏهن ڪم جو آهي جڏهن بيڪ ٽيسٽ بلندي/زمين جي "
@@ -201,7 +201,7 @@ FLOOD_CASES = [
         "source": (
             "Dawn, 3 Aug 2026, 'Sindh CM Murad orders emergency steps as downpour "
             "wreaks havoc in several districts' (https://www.dawn.com/news/2020214) "
-            "— verified against full article text, not a snippet"
+            "(verified against full article text, not a snippet)"
         ),
         "i18n": {
             "ur": {
@@ -209,7 +209,7 @@ FLOOD_CASES = [
                 "source": (
                     "Dawn، 3 اگست 2026، 'Sindh CM Murad orders emergency steps as downpour "
                     "wreaks havoc in several districts' (https://www.dawn.com/news/2020214) "
-                    "— مکمل مضمون کے متن سے تصدیق کی گئی، صرف اقتباس سے نہیں"
+                    "(مکمل مضمون کے متن سے تصدیق کی گئی، صرف اقتباس سے نہیں)"
                 ),
             },
             "sd": {
@@ -217,7 +217,7 @@ FLOOD_CASES = [
                 "source": (
                     "Dawn، 3 آگسٽ 2026، 'Sindh CM Murad orders emergency steps as downpour "
                     "wreaks havoc in several districts' (https://www.dawn.com/news/2020214) "
-                    "— پورو مضمون پڙهي تصديق ڪئي وئي، رڳو اقتباس مان نه"
+                    "(پورو مضمون پڙهي تصديق ڪئي وئي، رڳو اقتباس مان نه)"
                 ),
             },
         },
@@ -346,7 +346,7 @@ NON_FLOOD_CASES = [
         "rainfall_caveat": (
             "Damage-side NTR is confirmed (SBA is not mentioned in this SITREP's "
             "incident list at all). The 60mm rainfall figure itself has NOT been "
-            "independently verified against a PMD rainfall table — flagged, not "
+            "independently verified against a PMD rainfall table: flagged, not "
             "resolved."
         ),
         "actual_outcome": "no_flood",
@@ -361,7 +361,7 @@ NON_FLOOD_CASES = [
                     "نقصان کے حوالے سے 'کوئی اطلاع نہیں' (NTR) کی تصدیق ہو چکی ہے "
                     "(اس SITREP کی واقعات کی فہرست میں SBA کا ذکر ہی نہیں)۔ "
                     "60 ملی میٹر کا عدد خود PMD کی بارش کی جدول سے آزادانہ طور پر "
-                    "تصدیق شدہ نہیں — اس پر نشان لگایا گیا ہے، مسئلہ حل نہیں ہوا۔"
+                    "تصدیق شدہ نہیں۔ اس پر نشان لگایا گیا ہے، مسئلہ حل نہیں ہوا۔"
                 ),
                 "impact": "اس SITREP میں شہید بینظیرآباد کے لیے کسی نقصان یا واقعے کی اطلاع نہیں",
                 "source": (
@@ -374,7 +374,7 @@ NON_FLOOD_CASES = [
                     "نقصان جي حوالي سان 'ڪا اطلاع ناهي' (NTR) جي تصديق ٿي چڪي آهي "
                     "(هن SITREP جي واقعن واري فهرست ۾ SBA جو ذڪر ئي ناهي). "
                     "60 ملي ميٽر جو انگ پاڻ PMD جي برسات واري جدول سان آزاد طور "
-                    "تصديق ٿيل ناهي — ان تي نشان لڳايو ويو آهي، مسئلو حل نه ٿيو آهي."
+                    "تصديق ٿيل ناهي. ان تي نشان لڳايو ويو آهي، مسئلو حل نه ٿيو آهي."
                 ),
                 "impact": "هن SITREP ۾ شهيد بينظيرآباد لاءِ ڪنهن نقصان يا واقعي جي اطلاع ناهي",
                 "source": (

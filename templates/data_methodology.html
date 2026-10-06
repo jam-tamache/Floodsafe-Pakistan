@@ -3,119 +3,154 @@
 {% block title %}{{ t.methodology_title }} - FloodSafe Pakistan{% endblock %}
 
 {% block content %}
-<div class="info-page">
-    <h1>{{ t.methodology_title }}</h1>
-    <p class="info-lede">{{ t.methodology_lede }}</p>
+<style>
+.dm{max-width:1000px;margin:0 auto;padding-bottom:2rem}
+.dm h1,.dm h2{font-family:Georgia,"Times New Roman",serif}
+.dm-hero{background:linear-gradient(135deg,#0b3f45,#0f5560);color:#fff;border-radius:22px;padding:2.2rem 2rem}
+.dm-hero h1{margin:0 0 .6rem;font-size:clamp(1.9rem,4vw,2.6rem);color:#fff}
+.dm-hero p{margin:0 0 1.4rem;max-width:62ch;opacity:.92;line-height:1.6}
+.dm-chips{display:flex;gap:.8rem;flex-wrap:wrap}
+.dm-chip{flex:1 1 240px;background:rgba(255,255,255,.1);border-radius:14px;padding:.9rem 1rem;border-inline-start:4px solid}
+.dm-chip.pass{border-color:#4cc38a}
+.dm-chip.fail{border-color:#ff6b6b}
+.dm-chip b{display:block;margin-bottom:.2rem}
+.dm-chip span{font-size:.92rem;opacity:.88}
+.dm-card{background:rgba(255,255,255,.78);border-radius:18px;padding:1.4rem 1.5rem;margin-top:1rem;box-shadow:0 1px 3px rgba(11,63,69,.08)}
+.dm-card h2{margin:0 0 .6rem;font-size:1.3rem;color:#0b4a50}
+.dm-card p{line-height:1.65;margin:0 0 .6rem}
+.dm-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+.dm-barwrap{position:relative;margin:1.6rem 0 1.8rem}
+.dm-bar{display:flex;height:36px;border-radius:10px;overflow:hidden}
+.dm-bar i{display:flex;align-items:center;justify-content:center;font-style:normal;font-size:.78rem;color:#fff;white-space:nowrap;overflow:hidden}
+.dm-bar .r{width:54%;background:#127c86}
+.dm-bar .e{width:30%;background:#e08a1e}
+.dm-bar .x{width:16%;background:repeating-linear-gradient(45deg,#cfe5e1,#cfe5e1 6px,#e6f2ef 6px,#e6f2ef 12px)}
+.dm-mark{position:absolute;top:100%;height:10px;width:2px;background:#0b3f45;inset-inline-start:var(--p)}
+.dm-mark span{position:absolute;top:100%;margin-top:2px;font-size:.78rem;font-weight:700;color:#0b3f45;transform:translateX(-50%)}
+.dm-tiers{display:flex;gap:.5rem;flex-wrap:wrap}
+.dm-row{display:grid;grid-template-columns:minmax(150px,1fr) 2fr;gap:1rem;align-items:center;padding:.8rem 0;border-top:1px solid rgba(11,63,69,.1)}
+.dm-row b{color:#0b4a50}
+.dm-ltr{direction:ltr}
+.dm-track{height:12px;border-radius:6px;background:linear-gradient(to right,#9bd8b0 0 var(--m),#ffd66b var(--m) var(--h),#ff9a5c var(--h) 100%)}
+.dm-vals{display:flex;justify-content:space-between;font-size:.84rem;margin-top:.35rem;color:#33585c}
+.dm-note{font-size:.88rem;font-style:italic;color:#33585c}
+.dm-more{margin-top:1rem}
+.dm-more details{background:rgba(255,255,255,.78);border-radius:14px;margin-top:.6rem;padding:0 1.5rem}
+.dm-more summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 0;font-weight:700;color:#0b4a50}
+.dm-more summary::-webkit-details-marker{display:none}
+.dm-more summary::after{content:"+";font-size:1.4rem;color:#e08a1e}
+.dm-more details[open] summary::after{content:"\2212"}
+.dm-more details p{margin:0;padding-bottom:1.3rem;line-height:1.65}
+.dm-tags{list-style:none;padding:0;margin:0}
+.dm-tags li{display:inline-block;background:#e6f2ef;border-radius:999px;padding:.3rem .8rem;margin:.2rem;font-size:.88rem}
+.dm-card ul.dm-list{padding-inline-start:1.2rem;margin:0}
+.dm-card ul.dm-list li{margin-bottom:.5rem;line-height:1.55}
+.dm-verdict{border-inline-start:5px solid #e08a1e}
+@media(max-width:720px){.dm-grid{grid-template-columns:1fr}.dm-row{grid-template-columns:1fr}.dm-hero{padding:1.6rem 1.2rem}}
+</style>
 
-    <div class="info-grid">
-        <div class="info-card">
-            <span class="info-card-icon">&#128205;</span>
-            <h3>{{ t.methodology_scope_heading }}</h3>
-            <p>{{ t.methodology_scope_body }}</p>
+<div class="dm">
+
+    <section class="dm-hero">
+        <h1>{{ t.methodology_title }}</h1>
+        <p>{{ t.methodology_lede }}</p>
+        <div class="dm-chips">
+            <div class="dm-chip pass"><b>{{ t.bt.c1t }}</b><span>{{ t.bt.c1x }}</span></div>
+            <div class="dm-chip fail"><b>{{ t.bt.c2t }}</b><span>{{ t.bt.c2x }}</span></div>
         </div>
+    </section>
 
-        <div class="info-card">
-            <span class="info-card-icon">&#9888;</span>
-            <h3>{{ t.methodology_not_prediction_heading }}</h3>
+    <div class="dm-grid">
+        <section class="dm-card">
+            <h2>{{ t.methodology_not_prediction_heading }}</h2>
             <p>{{ t.methodology_not_prediction_body }}</p>
-        </div>
-
-        <div class="info-card info-card-full">
-            <span class="info-card-icon">&#129518;</span>
-            <h3>{{ t.methodology_how_heading }}</h3>
-            <p>{{ t.methodology_how_body }}</p>
-            <div class="info-tier-row">
-                <span class="risk-badge risk-low">{{ t.risk_levels["Low Risk"] }}</span>
-                <span class="risk-badge risk-moderate">{{ t.risk_levels["Moderate Risk"] }}</span>
-                <span class="risk-badge risk-high">{{ t.risk_levels["High Risk"] }}</span>
-                <span class="risk-badge risk-very-high">{{ t.risk_levels["Very High Risk"] }}</span>
-            </div>
-        </div>
-
-        <div class="info-card">
-            <h3>{{ t.methodology_72h_heading }}</h3>
-            <p>{{ t.methodology_72h_body }}</p>
-        </div>
-
-        <div class="info-card info-card-full">
-            <h3>{{ t.methodology_rainfall_heading }}</h3>
-            <p>{{ t.methodology_rainfall_body_1 }}</p>
-            <p>{{ t.methodology_rainfall_body_2 }}</p>
-
-            <div class="methodology-table-wrap">
-                <table class="methodology-table">
-                    <thead>
-                        <tr>
-                            <th>{{ t.methodology_table_region_header }}</th>
-                            <th>{{ t.methodology_table_low_header }}</th>
-                            <th>{{ t.methodology_table_medium_header }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for region in regions %}
-                        <tr>
-                            <td>{{ t.terrain_profile_labels[region.label] }}</td>
-                            <td>{{ region.low_max }}mm</td>
-                            <td>{{ region.medium_max }}mm</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <!-- NEW: clarifies that Very High Risk isn't a missing 4th
-                 column - it's not a rainfall threshold at all, it comes
-                 from the combined score, explained in the dead-zone /
-                 ceiling cards below. Without this, the table alone reads
-                 as if the model only has 3 tiers. -->
-            <p class="info-note">{{ t.methodology_table_tier_note }}</p>
-            <p class="info-note">{{ t.methodology_rainfall_note }}</p>
-        </div>
-
-        <div class="info-card info-card-full">
-            <h3>{{ t.methodology_example_heading }}</h3>
-            <p>{{ t.methodology_example_body }}</p>
-        </div>
-
-        <div class="info-card">
-            <h3>{{ t.methodology_deadzone_heading }}</h3>
-            <p>{{ t.methodology_deadzone_body }}</p>
-        </div>
-
-        <div class="info-card">
-            <h3>{{ t.methodology_ceiling_heading }}</h3>
-            <p>{{ t.methodology_ceiling_body }}</p>
-        </div>
-
-        <div class="info-card">
-            <h3>{{ t.methodology_elevation_heading }}</h3>
-            <p>{{ t.methodology_elevation_body }}</p>
-        </div>
-
-        <div class="info-card">
-            <h3>{{ t.methodology_not_modeled_heading }}</h3>
-            <ul>
-                {% for item in t.methodology_not_modeled %}
-                <li>{{ item }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="info-card">
-            <h3>{{ t.methodology_limitations_heading }}</h3>
-            <ul>
-                {% for item in t.methodology_limitations %}
-                <li>{{ item }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="info-card info-card-full">
-            <div class="info-callout">
-                <strong>{{ t.methodology_validation_heading }}</strong><br>
-                {{ t.methodology_validation_body }}
-            </div>
-        </div>
+        </section>
+        <section class="dm-card">
+            <h2>{{ t.methodology_scope_heading }}</h2>
+            <p>{{ t.methodology_scope_body }}</p>
+        </section>
     </div>
+
+    <section class="dm-card">
+        <h2>{{ t.methodology_how_heading }}</h2>
+        <p>{{ t.methodology_how_body }}</p>
+        <div class="dm-barwrap dm-ltr">
+            <div class="dm-bar">
+                <i class="r">{{ t.impact_rainfall_label }} &middot; 54 {{ t.impact_points_unit }}</i>
+                <i class="e">{{ t.impact_elevation_label }} &middot; 30 {{ t.impact_points_unit }}</i>
+                <i class="x"></i>
+            </div>
+            <div class="dm-mark" style="--p:25%"><span>25</span></div>
+            <div class="dm-mark" style="--p:75%"><span>75</span></div>
+        </div>
+        <div class="dm-tiers">
+            <span class="risk-badge risk-low">{{ t.risk_levels["Low Risk"] }}</span>
+            <span class="risk-badge risk-moderate">{{ t.risk_levels["Moderate Risk"] }}</span>
+            <span class="risk-badge risk-high">{{ t.risk_levels["High Risk"] }}</span>
+            <span class="risk-badge risk-very-high">{{ t.risk_levels["Very High Risk"] }}</span>
+        </div>
+    </section>
+
+    <section class="dm-card">
+        <h2>{{ t.methodology_rainfall_heading }}</h2>
+        <p>{{ t.methodology_rainfall_body_1 }}</p>
+        <p>{{ t.methodology_rainfall_body_2 }}</p>
+        {% for region in regions %}
+        <div class="dm-row">
+            <b>{{ t.terrain_profile_labels[region.label] }}</b>
+            <div class="dm-ltr">
+                <div class="dm-track" style="--m:{{ ([region.low_max / 150 * 100, 100]|min)|round(1) }}%;--h:{{ ([region.medium_max / 150 * 100, 100]|min)|round(1) }}%"></div>
+                <div class="dm-vals"><span>&#128993; {{ region.low_max }} {{ t.unit_mm }}</span><span>&#128992; {{ region.medium_max }} {{ t.unit_mm }}</span></div>
+            </div>
+        </div>
+        {% endfor %}
+        <p class="dm-note">&#128993; {{ t.methodology_table_low_header }} &nbsp;&middot;&nbsp; &#128992; {{ t.methodology_table_medium_header }}</p>
+        <p class="dm-note">{{ t.methodology_rainfall_note }}</p>
+    </section>
+
+    <div class="dm-more">
+        <details>
+            <summary>{{ t.methodology_72h_heading }}</summary>
+            <p>{{ t.methodology_72h_body }}</p>
+        </details>
+        <details>
+            <summary>{{ t.methodology_example_heading }}</summary>
+            <p>{{ t.methodology_example_body }}</p>
+        </details>
+        <details>
+            <summary>{{ t.methodology_elevation_heading }}</summary>
+            <p>{{ t.methodology_elevation_body }}</p>
+        </details>
+        <details>
+            <summary>{{ t.methodology_deadzone_heading }}</summary>
+            <p>{{ t.methodology_deadzone_body }}</p>
+        </details>
+        <details>
+            <summary>{{ t.methodology_ceiling_heading }}</summary>
+            <p>{{ t.methodology_ceiling_body }}</p>
+            <p>{{ t.methodology_table_tier_note }}</p>
+        </details>
+    </div>
+
+    <div class="dm-grid">
+        <section class="dm-card">
+            <h2>{{ t.methodology_not_modeled_heading }}</h2>
+            <ul class="dm-tags">
+                {% for item in t.methodology_not_modeled %}<li>{{ item }}</li>{% endfor %}
+            </ul>
+        </section>
+        <section class="dm-card">
+            <h2>{{ t.methodology_limitations_heading }}</h2>
+            <ul class="dm-list">
+                {% for item in t.methodology_limitations %}<li>{{ item }}</li>{% endfor %}
+            </ul>
+        </section>
+    </div>
+
+    <section class="dm-card dm-verdict">
+        <h2>{{ t.methodology_validation_heading }}</h2>
+        <p>{{ t.methodology_validation_body }}</p>
+    </section>
 
     <a href="{{ url_for('home', lang=lang) }}" class="back-link">{{ t.back_link }}</a>
 </div>

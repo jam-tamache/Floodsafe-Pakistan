@@ -99,12 +99,12 @@
         }
         // FIX (earlier session): previously recomputed color here via a
         // stale 3-tier { high, medium, low } object keyed off
-        // risk_level_key.split(' ')[0].toLowerCase() — broke for
+        // risk_level_key.split(' ')[0].toLowerCase(). That broke for
         // "Moderate Risk" (-> "moderate", no match) and "Very High Risk"
         // (-> "very", no match), both silently falling back to the same
         // grey used for non-Sindh MAP_ONLY_CITIES. risk_color is computed
         // once, correctly, server-side in risk_check.py's RISK_COLORS
-        // dict and already sent per city — use it directly instead of
+        // dict and already sent per city, so use it directly instead of
         // re-deriving it here. Do not reintroduce a second color mapping
         // in this file; if the tiers ever change again, RISK_COLORS in
         // risk_check.py is the only place that should need an update.
