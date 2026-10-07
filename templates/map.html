@@ -24,23 +24,16 @@
 {% endblock %}
 
 {% block content %}
-<!-- FIX: h1/p/legend/map previously had no shared container - the
-     paragraph and #map stretched to the full content width while the
-     legend sat inside its own max-width:1200/margin:auto box, so on wide
-     screens the legend looked indented relative to everything around it.
-     Wrapped in one .map-page container so every element shares the same
-     left/right edges. -->
+<!-- One container so the heading, intro, legend and map share the same
+     left and right edges. -->
 <div class="map-page">
     <h1>{{ t.map_title }}</h1>
     <p class="map-intro">{{ t.map_intro }}</p>
 
-    <!-- Legend for this page's 5 possible marker states (4 scored risk
-         tiers + grey unscored). Colors here must match RISK_COLORS in
-         risk_check.py and MAP_ONLY_COLOR in the script below - see
-         .map-legend-dot-* in style.css, which is the single source of
-         truth for these hexes. If the tiers or the unscored color ever
-         change, update style.css only - do not add a second color
-         mapping here. -->
+    <!-- Legend for the five marker states: four risk levels plus grey for
+         cities that are not scored. The colors must match RISK_COLORS in
+         risk_check.py and MAP_ONLY_COLOR in the script below. Change them
+         in style.css (.map-legend-dot-*), not here. -->
     <div class="map-legend map-legend-full">
         <span class="map-legend-item map-legend-item-low">
             <span class="map-legend-dot map-legend-dot-low"></span>{{ t.legend_low }}
@@ -77,11 +70,8 @@
     const cities = {{ cities | tojson }};
 
     cities.forEach(function (c) {
-        // FIX (this session): popups/tooltips used c.city, the raw English
-        // name from city_coordinates.csv, so ur/sd pages showed Latin-script
-        // city names. risk_check.py's map_view() now sends city_display
-        // (translated via translations.py's city_names). Falls back to
-        // c.city if it's ever missing.
+        // city_display is the translated name sent by map_view() in
+        // risk_check.py. Falls back to the English name.
         const cityName = c.city_display || c.city;
 
         if (!c.scored) {
@@ -97,17 +87,9 @@
             .bindTooltip(cityName, { permanent: false });
             return;
         }
-        // FIX (earlier session): previously recomputed color here via a
-        // stale 3-tier { high, medium, low } object keyed off
-        // risk_level_key.split(' ')[0].toLowerCase(). That broke for
-        // "Moderate Risk" (-> "moderate", no match) and "Very High Risk"
-        // (-> "very", no match), both silently falling back to the same
-        // grey used for non-Sindh MAP_ONLY_CITIES. risk_color is computed
-        // once, correctly, server-side in risk_check.py's RISK_COLORS
-        // dict and already sent per city, so use it directly instead of
-        // re-deriving it here. Do not reintroduce a second color mapping
-        // in this file; if the tiers ever change again, RISK_COLORS in
-        // risk_check.py is the only place that should need an update.
+        // risk_color is worked out once on the server (RISK_COLORS in
+        // risk_check.py), so it is used as sent. Do not add a second
+        // color mapping in this file.
         L.circleMarker([c.lat, c.lon], {
             radius: 8,
             fillColor: c.risk_color,
