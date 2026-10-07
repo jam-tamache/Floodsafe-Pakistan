@@ -1,26 +1,25 @@
 """
 Back-test case data for FloodSafe Pakistan (model tag: model-v1).
 
-Each case is a real, dated, sourced event. `city` matches the exact lowercase
-key used in risk_check.py's REGIONAL_PROFILES / normalize_city(), so a case
-can be run straight through check_risk() / _compute_risk_core() with no name
-translation needed.
+Each case is a dated, sourced event. `city` is the same lowercase key that
+risk_check.py uses in REGIONAL_PROFILES and normalize_city(), so a case can
+go straight into check_risk() or _compute_risk_core().
 
-ERA5/Open-Meteo was the original plan (per BACKTEST_PROTOCOL.md) but is not
-reachable from this environment. Rainfall figures below are the official
-station readings already sourced from NDMA/PDMA/PMD documents instead.
-Every number traces to a named government document. See `source` on each case.
+BACKTEST_PROTOCOL.md planned ERA5/Open-Meteo for rainfall, but it could not
+be reached. The rainfall figures here are official station readings from
+NDMA, PDMA and PMD documents instead. Each case names its document in
+`source`.
 
-`rainfall_mm` is what should be fed into check_risk() as the 72h input.
-Where the real 72h total isn't confirmed, `rainfall_mm` is left as the best
-available official floor and `rainfall_caveat` explains the gap.
+`rainfall_mm` is the 72h input for check_risk(). Where the real 72h total is
+not confirmed, it holds the best official figure and `rainfall_caveat`
+explains the gap.
 
-TRANSLATIONS: the English fields (`rainfall_caveat`, `impact`, `source`) are
-the reference text and are unchanged. Each case also has an `i18n` dict with
-"ur" and "sd" versions of those three fields. A missing key means "use the
-English text". Publication names, document numbers and URLs stay in English
-so every source remains traceable. ur/sd are UNREVIEWED drafts: a native
-speaker must read them (Sindhi is weakest).
+Translations: the English fields (`rainfall_caveat`, `impact`, `source`) are
+the reference text. Each case also has an `i18n` dict with "ur" and "sd"
+versions of them. A missing key means the English text is used. Publication
+names, document numbers and URLs stay in English so every source can be
+traced. The ur/sd text is unreviewed: a native speaker must read it (Sindhi
+is weakest).
 """
 
 FLOOD_CASES = [
@@ -163,8 +162,8 @@ FLOOD_CASES = [
             "(https://www.nature.com/articles/s41598-023-30347-y)"
         ),
         "i18n": {
-            # No "source" key: it is a bibliographic citation (author, journal,
-            # title, URL), so the English original is shown in every language.
+            # No "source" key: it is a citation, so the English original is
+            # shown in every language.
             "ur": {
                 "rainfall_caveat": (
                     "اس کیس کے لیے بارش ناپنے والے آلے کا کوئی عدد نہیں ملا۔ یہ "
@@ -390,7 +389,7 @@ ALL_CASES = FLOOD_CASES + NON_FLOOD_CASES
 
 
 def case_text(case, field, lang):
-    """Return case[field] in `lang`, falling back to the English original."""
+    """Return case[field] in `lang`, or the English original if there is none."""
     if lang != "en":
         translated = case.get("i18n", {}).get(lang, {}).get(field)
         if translated:
