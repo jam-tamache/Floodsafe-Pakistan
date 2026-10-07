@@ -10,9 +10,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def load_city_coordinates():
-    """Loads city_coordinates.csv into a list of dicts for the Leaflet map.
-    Kept separate from elevation_data.py's loading since this is purely
-    display data (name/lat/lon/profile), not used in any risk calculation.
+    """Reads city_coordinates.csv for the Leaflet map.
+    This is display data only (name, lat, lon, profile). It is not used
+    in any risk calculation.
     """
     cities = []
     try:
@@ -20,7 +20,7 @@ def load_city_coordinates():
             reader = csv.DictReader(f)
             for row in reader:
                 if row.get("status") != "OK":
-                    continue  # skip any row not marked OK, don't guess
+                    continue  # skip rows not marked OK
                 cities.append({
                     "city": row["city"],
                     "profile_key": row["profile_key"],
@@ -28,35 +28,30 @@ def load_city_coordinates():
                     "lon": float(row["lon"]),
                 })
     except FileNotFoundError:
-        pass  # map route below handles an empty list gracefully
+        pass  # the map route handles an empty list
     return cities
 
 
 CITY_COORDINATES = load_city_coordinates()
 
-# Flat city -> (lat, lon) lookup, built once at startup, so the result page
-# can place a single marker for the checked city without re-reading the CSV
-# or re-deriving anything. Keys are normalized (lowercase) to match
-# normalize_city()'s output, since city names arrive from user input /
-# query strings in inconsistent casing.
+# city -> (lat, lon), built once at startup so the result page can place
+# a marker without re-reading the CSV. Keys are lowercase to match
+# normalize_city().
 _CITY_COORDS_LOOKUP = {c["city"]: (c["lat"], c["lon"]) for c in CITY_COORDINATES}
 from dotenv import load_dotenv
 from translations import get_translation, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 import elevation_data
 
-# Back-test case data (pure data, no logic) for the /back-test replay pages.
-# If the file is missing on the server the site still runs; /back-test just
-# shows no cases instead of crashing.
+# Back-test case data for the /back-test pages. If the file is missing,
+# the site still runs and /back-test just shows no cases.
 try:
     from backtest_cases import ALL_CASES as BACKTEST_CASES
 except ImportError:
     BACKTEST_CASES = []
 
 
-# Returns case[field] in the active language (ur/sd text lives in
-# backtest_cases.py under each case's "i18n" dict). Falls back to the
-# English field if a translation is missing, or if an older
-# backtest_cases.py without case_text() is still on the server.
+# Returns case[field] in the chosen language. Falls back to English if a
+# translation is missing or backtest_cases.py has no case_text().
 def _case_text(case, field, lang):
     return case.get(field)
 
@@ -66,31 +61,21 @@ try:
 except ImportError:
     pass
 
-load_dotenv()  # reads variables from a .env file in the same folder as this script
+load_dotenv()  # reads variables from the .env file
 
 app = Flask(__name__)
 
 # ---- Regional terrain-based rainfall risk profiles ----
 #
-# IMPORTANT - methodology honesty note:
-# The low_max/medium_max thresholds below are PROJECT-DEFINED SCENARIO
-# THRESHOLDS, not official PMD/NDMA figures. They were originally
-# commented as "PMD/NDMA-style" - that phrasing was misleading and has
-# been corrected. If you cannot point to a specific published source that
-# justifies an exact number, do not describe it as official anywhere in
-# the app or scholarship writeup. Document the actual reasoning behind
-# these numbers in METHODOLOGY.md before submission - "why does 55mm
-# become a boundary" needs a real answer, not "it seemed reasonable."
+# The low_max / medium_max values are project-defined scenario thresholds,
+# not official PMD or NDMA numbers. See METHODOLOGY.md for how they were
+# chosen. Do not describe them as official anywhere.
 #
-# Scope: Sindh-focused. Cities/towns below are Sindh's major population
-# centers plus well-known towns. A handful of major non-Sindh cities are
-# tracked only for map context (see MAP_ONLY_CITIES below), not as a claim
-# of full national coverage. Project architecture is designed to extend to
-# the rest of Pakistan; only Sindh is validated for V1.
+# Scope: Sindh. Only Sindh is supported for V1. A few non-Sindh cities are
+# kept for the map only (see MAP_ONLY_CITIES).
 #
-# Internal profile labels below (e.g. "Mega-Urban & Coastal") are used as
-# lookup keys into translations.py's terrain_warnings / terrain_profile_labels
-# dicts - do not rename these without updating translations.py to match.
+# The profile labels (e.g. "Mega-Urban & Coastal") are lookup keys in
+# translations.py. Do not rename them without updating that file.
 
 REGIONAL_PROFILES = {
     "mega_urban_coastal": {
@@ -121,30 +106,17 @@ REGIONAL_PROFILES = {
         "color": "#dc3545",
     },
 }
-# NOTE: "mountainous_rugged" profile was deleted (previously held Gwadar,
-# Pasni, Turbat - all Balochistan, not Sindh, and were the only members).
-# An empty scored category with real thresholds attached was misleading -
-# looked like a validated terrain model with nothing behind it. If Sindh
-# terrain (e.g. Kirthar range areas near Dadu/Jamshoro) genuinely needs a
-# distinct profile, that's a data-backed addition, not a placeholder to
-# keep alive on spec.
+# The old "mountainous_rugged" profile was removed. Its only cities were
+# in Balochistan, not Sindh.
 
-# Cities shown on the map for national context only. They are NOT part of
-# this app's Sindh-focused risk model and must never be silently assigned
-# a rainfall risk profile (previously a bug: they fell into scored profiles
-# and got real thresholds meant for Sindh terrain, e.g. Quetta at 1676m
-# elevation getting Karachi's coastal flood thresholds, or Gwadar getting
-# a "mountainous_rugged" score despite being coastal Balochistan). Risk
-# checks for these cities are explicitly refused - see get_profile() /
-# check_risk(). Per project scope: architecture is Pakistan-wide, but only
-# Sindh is validated for V1 - these stay map markers until real regional
-# data justifies scoring them.
+# Cities shown on the map for context only. They are not part of the Sindh
+# model and must never get a risk score. get_profile() refuses them.
 MAP_ONLY_CITIES = {
     "lahore", "islamabad", "peshawar", "quetta",
     "gwadar", "pasni", "turbat", "sibi", "chaman", "cholistan",
 }
 
-# Build a flat, normalized city -> profile_key lookup once at startup
+# city -> profile_key lookup, built once at startup
 _CITY_TO_PROFILE = {}
 for _key, _profile in REGIONAL_PROFILES.items():
     for _city in _profile["cities"]:
@@ -152,26 +124,24 @@ for _key, _profile in REGIONAL_PROFILES.items():
 
 
 def normalize_city(city):
-    """Lowercase, strip whitespace, and drop a trailing country code like ',PK'."""
+    """Lowercase, trim spaces, and drop a trailing country code like ',PK'."""
     if not city:
         return ""
     city = city.strip().lower()
     if "," in city:
         city = city.split(",")[0].strip()
-    city = " ".join(city.split())  # collapse internal extra spaces
+    city = " ".join(city.split())  # collapse extra spaces
     return city
 
 
 class MapOnlyCityError(Exception):
-    """Raised when a risk check is attempted for a map-context-only city."""
+    """Raised when a risk check is attempted for a map-only city."""
     pass
 
 
 class UnsupportedCityError(Exception):
-    """Raised for a city that is neither in a scored profile nor in
-    MAP_ONLY_CITIES - i.e. genuinely unrecognized by the V1 model. There is
-    no silent fallback profile: an unrecognized city - a typo, a village,
-    a real Pakistani city not yet added - must be refused, not guessed at.
+    """Raised for a city that is not scored and not map-only.
+    There is no fallback profile. An unknown city is refused, not guessed.
     """
     pass
 
@@ -188,19 +158,14 @@ def get_profile(city):
 
 # ---- Elevation scoring ----
 #
-# Per-region elevation ranges, computed once at startup from whatever real
-# data elevation_data.py actually loaded (never hardcoded). A city's
-# elevation is scored RELATIVE TO ITS OWN REGION, not on a single national
-# scale - 7m in coastal Karachi and 7m inland mean different things, so
-# comparing every city on one nationwide min/max would flatten that out.
+# Each city's elevation is scored against the other cities in its own
+# region, not on one national scale. The min and max per region are
+# computed once at startup from the loaded elevation data.
 #
-# If elevation_data.py failed to load (see elevation_data.ELEVATION_LOAD_ERROR)
-# or a specific city has no elevation row, elevation_component() returns
-# (0, False) - the risk score falls back to rainfall alone and the caller
-# is told explicitly that elevation was not used, rather than pretending a
-# neutral score is a real measurement.
+# If elevation data is missing for a city, elevation_component() returns
+# (0, False) and the score uses rainfall only. The result page says so.
 
-_REGION_ELEVATION_RANGES = {}  # profile_key -> (min_m, max_m) across that region's cities with data
+_REGION_ELEVATION_RANGES = {}  # profile_key -> (min_m, max_m)
 
 
 def _build_region_ranges():
@@ -216,64 +181,36 @@ def _build_region_ranges():
 
 _build_region_ranges()
 
-ELEVATION_COMPONENT_MAX = 30  # points contributed by elevation, unchanged this session
-# RAINFALL_COMPONENT_MAX below is DOCUMENTATION ONLY (not read by
-# rainfall_component() itself, which hardcodes its own band values) - kept
-# in sync manually. Real achievable ceiling is ~54, not 70 - see
-# rainfall_component()'s docstring for why. Combined with
-# ELEVATION_COMPONENT_MAX=30, true max total score is ~84/100, not 100 -
-# Very High Risk (75-100) is reachable but only near its low end.
+ELEVATION_COMPONENT_MAX = 30
+# Documentation only: rainfall_component() hardcodes its own values.
+# The real rainfall ceiling is about 54, so the max total score is about
+# 84 out of 100, not 100.
 RAINFALL_COMPONENT_MAX = 54
 
-# Threshold below which rainfall's contribution to the score is considered
-# "negligible" for MESSAGING purposes only - it does NOT change the score
-# itself, only which copy is shown. 2.0 out of the 25-point Low/Moderate
-# rainfall band was chosen as "close enough to zero that a lay reader would
-# call this dry" - e.g. the Sep 11 case of 1.5mm rainfall still
-# contributing ~0.9 points. Revisit this number if it ever produces a
-# false "dry" message for a rainfall total that a reader would actually
-# consider real rain.
-#
-# NEW this session: this threshold now gates THREE things, all via
-# is_dry_conditions() below so they can never disagree with each other:
-#   1. build_plain_explanation()'s "terrain baseline" sentence (existing)
-#   2. the static terrain_warning text (e.g. "Urban drainage systems can
-#      back up quickly...") - describes an active storm, so it is
-#      suppressed when there is no rain
-#   3. the safety_tips list - pre-flood actions written for a rain event,
-#      suppressed when there is no rain
-# This applies to every city, every profile and every risk level.
+# Rainfall points below this count as "dry" for wording only. It does not
+# change the score. It decides three things, through is_dry_conditions():
+#   1. the "terrain baseline" sentence in build_plain_explanation()
+#   2. whether the terrain warning text is shown
+#   3. whether the rain-event safety tips are shown
 RAINFALL_NEGLIGIBLE_THRESHOLD = 2.0
 
 
 def is_dry_conditions(rain_pts):
-    """Single source of truth for "rainfall is negligible". Takes the
-    rainfall POINTS (not mm) because the threshold is defined in points,
-    which makes it scale correctly with each region's own low_max.
+    """True when rainfall is negligible. Takes points, not mm, so it
+    scales with each region's own low_max.
     """
     return rain_pts < RAINFALL_NEGLIGIBLE_THRESHOLD
 
 
 def elevation_component(city, profile_key):
-    """Returns (points_0_to_30, elevation_was_used: bool, elevation_m_or_None).
+    """Returns (points_0_to_30, elevation_was_used, elevation_m_or_None).
 
-    This is the city's RAW terrain-position score: lower elevation within
-    its own region scores higher (more flood risk), since low-lying land
-    pools water. A city at its region's minimum elevation gets the full 30
-    points; at the region's maximum, 0 points. A region with only one
-    elevation value (min == max) can't be scored relatively, so it falls
-    back to a fixed midpoint (15) rather than a division by zero or a
-    fabricated distinction.
+    This is the raw terrain-position score. The lowest city in its region
+    gets 30 points and the highest gets 0. If a region has only one
+    elevation value, it returns the midpoint (15).
 
-    IMPORTANT: this function deliberately knows nothing about rainfall.
-    It answers "where does this city sit in its region", nothing else.
-    Whether/how much that terrain score actually gets added to a risk
-    total is decided one level up, in _compute_risk_core() - see the
-    elevation-rainfall scaling note there for why raw terrain position
-    alone is not allowed to drive the score at 0mm rainfall. Keeping this
-    function pure also means TestElevationComponent in
-    test_risk_scoring.py can keep testing it directly with no rainfall
-    argument at all.
+    It knows nothing about rainfall on purpose. The rainfall scaling
+    happens in _compute_risk_core().
     """
     normalized = normalize_city(city)
     elevation_m = elevation_data.get_elevation(normalized)
@@ -289,36 +226,24 @@ def elevation_component(city, profile_key):
     if region_max == region_min:
         return ELEVATION_COMPONENT_MAX / 2, True, elevation_m
 
-    # Inverse scale: lowest elevation in region -> full points
+    # lowest elevation in the region -> full points
     fraction_high_ground = (elevation_m - region_min) / (region_max - region_min)
     points = ELEVATION_COMPONENT_MAX * (1 - fraction_high_ground)
     return round(points, 1), True, elevation_m
 
 
 def rainfall_component(rainfall_mm, profile):
-    """Returns rainfall's contribution to the 0-100 total score, scaled
-    against this region's own low_max/medium_max.
+    """Returns rainfall's points for the total score, scaled to this
+    region's low_max and medium_max.
 
-    Bands aligned to the 4-tier boundaries (Low 0-25, Moderate 25-50,
-    High 50-75, Very High 75-100):
-    - <= low_max scales 0-25 (Low/Moderate boundary)
-    - low_max..medium_max scales 25-50 (Moderate/High boundary)
-    - > medium_max scales 50 upward, saturating as rainfall approaches
-      2x medium_max - preserves the DELIBERATE "dead zone" documented in
-      METHODOLOGY.md and covered by test_risk_scoring.py: crossing
-      medium_max does NOT by itself flip a city to High Risk.
+    - up to low_max: 0 to 25 points
+    - low_max to medium_max: 25 to 50 points
+    - above medium_max: 50 rising toward 54, reaching it at 2x medium_max
+      (the "dead zone" described in METHODOLOGY.md)
 
-    NOTE: this function's own rounding (to 1 decimal, for display) is
-    fine on its own - the bug that actually caused boundary
-    misclassifications (e.g. nawabshah @ 51mm scoring Low instead of
-    Moderate) was NOT here, it was in _compute_risk_core() rounding
-    score_0_1 to 2 decimals BEFORE classifying it, which silently erased
-    small-but-real excesses past a boundary (25.4/100 = 0.254, correctly
-    Moderate, rounded to display-precision 0.25 BEFORE classification,
-    which incorrectly read as Low). Classification now happens on the
-    unrounded value in _compute_risk_core - see the comment there. Do not
-    "fix" boundary issues by adjusting the numbers here; verify first
-    whether the actual bug is downstream rounding, as it was here twice.
+    Rounding to 1 decimal here is fine. An earlier boundary bug came from
+    rounding the final score before classifying it, not from this
+    function (see _compute_risk_core).
     """
     low_max = profile["low_max"]
     medium_max = profile["medium_max"]
@@ -330,26 +255,16 @@ def rainfall_component(rainfall_mm, profile):
         fraction = (rainfall_mm - low_max) / (medium_max - low_max)
         return round(25 + 25 * fraction, 1)
     else:
-        # Extreme scenarios: approach but do not exceed RAINFALL_COMPONENT_MAX.
-        # excess_range=medium_max is the same somewhat-arbitrary saturation
-        # distance as before (full saturation at 2x medium_max), documented
-        # in METHODOLOGY.md.
+        # full saturation at 2x medium_max, see METHODOLOGY.md
         excess_range = medium_max
         fraction = min((rainfall_mm - medium_max) / excess_range, 1) if excess_range > 0 else 1
         return round(50 + 4 * fraction, 1)
 
 
-# ---- Risk tiers: 4-tier, 0-1 normalized scale ----
+# ---- Risk tiers: 4 tiers on a 0-1 scale ----
 #
-# 4-tier (Low/Moderate/High/Very High) on a 0-1 normalized score, to match
-# the mockup's gauge design Hammad approved (changed from the original
-# 3-tier Low/Medium/High on a raw 0-100 score).
-#
-# RISK_SLUGS exists to fix a real bug: check.html previously derived its
-# CSS class via risk_level_key.split(' ')[0].lower(), which silently broke
-# for "Very High Risk" (-> "risk-very", matching no CSS class, badge
-# renders uncolored). The slug is now computed once here, in Python, and
-# passed straight to the template - no more guessing from a label string.
+# RISK_SLUGS gives the CSS class for each tier. It is set here in Python
+# because deriving it from the label broke "Very High Risk".
 RISK_SLUGS = {
     "Low Risk": "low",
     "Moderate Risk": "moderate",
@@ -357,15 +272,7 @@ RISK_SLUGS = {
     "Very High Risk": "very-high",
 }
 
-# FIX (earlier session): RISK_COLORS is now module-level and used by
-# BOTH check_risk() (scenario/forecast result pages) AND
-# _compute_risk_core() (the map cache, via get_all_city_risk_data()).
-# Previously the color map was a local dict defined only inside
-# check_risk() - the language-independent map-cache path never got a
-# color at all, so every scored city on the map rendered with no color
-# value, indistinguishable from the genuinely-unscored MAP_ONLY_CITIES
-# grey markers. One dict, one place, used everywhere a risk_key needs a
-# color - this class of bug can't reoccur if a 5th tier is ever added.
+# One color table for the result pages and the map cache.
 RISK_COLORS = {
     "Low Risk": "#28a745",
     "Moderate Risk": "#ffc107",
@@ -386,68 +293,22 @@ def score_to_risk_key(score_0_1):
 
 
 def _compute_risk_core(city, rainfall_mm):
-    """Language-independent scoring only - no translation dict involved.
-    Exists so results can be cached once and reused across all three
-    languages, instead of caching a specific language's rendered text.
-    Raises MapOnlyCityError / UnsupportedCityError, same as get_profile().
+    """Scoring only, no translations, so results can be cached and reused
+    in all three languages. Raises MapOnlyCityError or UnsupportedCityError.
 
-    FIXED earlier session (real bug #2 of the same underlying class): the
-    risk tier used to be classified using score_0_1 AFTER it had already
-    been rounded to 2 decimal places for display. That rounding could
-    erase a genuine, real excess past a tier boundary - e.g. total_score
-    25.4 (nawabshah @ 51.0mm, correctly past the Low/Moderate line at 25)
-    produces score_0_1 = 25.4/100 = 0.254, which rounds to 0.25 for
-    display - and 0.25 satisfies score_to_risk_key's "<= 0.25" Low Risk
-    branch, silently reclassifying a Moderate-Risk city as Low. Fixed by
-    classifying on the UNROUNDED total_score/100, and only rounding
-    afterward for the value actually shown to the user (the gauge, the
-    "Score: X/100" text). Classification precision and display precision
-    are two different concerns - conflating them is what broke this.
+    Two fixes are built in here:
 
-    FIXED this session (real bug #3, same underlying class - a value
-    being trusted at face value when it silently meant something
-    different than intended, this time in elevation_component() rather
-    than rounding): elevation_component() scores a city purely on its
-    RELATIVE position within its own region, with no regard to whether
-    any rain is actually happening. That meant any city sitting in
-    roughly the bottom ~17% of its region's elevation range (raw
-    elevation points > 25 out of 30) was guaranteed at least Moderate
-    Risk at 0mm rainfall, on terrain alone. This was not a one-off
-    Karachi edge case - checked against the real city_elevation.csv on
-    file, it affected 7 of ~29 scored cities across all three regions:
-    karachi (9m) and umerkot (17m), each the lowest in their region;
-    mirpurkhas (17m) and tando muhammad khan (18m) in central_plains;
-    kotri and jamshoro (23m each, tied); and tando allahyar (26m,
-    27.3/30 -> just over the 25-point Moderate line). A quarter of all
-    scored cities reading "Moderate Risk" on a bone-dry day is a model
-    defect, not a rare boundary case.
+    1. Rounding. The tier is chosen from the unrounded score. Rounding
+       first turned 0.254 into 0.25 and wrongly gave Low Risk.
 
-    Fix: elevation's contribution to total_score is now scaled by how
-    close rainfall_mm is to this region's own low_max threshold -
-    elevation_rain_fraction = min(rainfall_mm / low_max, 1.0). At 0mm,
-    elevation contributes nothing regardless of terrain (score floors at
-    Low). As rainfall approaches low_max, elevation's full raw weight
-    phases back in linearly, so genuinely wet scenarios are unaffected -
-    e.g. the Karachi worked example in METHODOLOGY.md (25mm, lowest
-    elevation in its region) still lands Moderate Risk, just at 34.4/100
-    instead of the old 45.6/100. low_max is reused here rather than
-    inventing a new threshold - it is already the FFD-anchored boundary
-    documented in METHODOLOGY.md for "some real rain has actually
-    started falling" in this region.
+    2. Elevation. A low-lying city used to score Moderate even at 0 mm of
+       rain. Elevation points are now multiplied by
+       min(rainfall_mm / low_max, 1.0), so at 0 mm elevation adds nothing.
+       See METHODOLOGY.md.
 
-    elevation_component() itself is UNCHANGED by this fix - it still
-    returns the raw, un-scaled 0-30 terrain-position score (see that
-    function's docstring). This function now returns BOTH the raw score
-    (as "elevation_terrain_points", for describing a city's geography -
-    e.g. "this is one of the lowest-lying cities in its region",
-    independent of today's weather) and the rain-scaled score (as
-    "elevation_points", the value actually added to total_score, so that
-    rainfall_points + elevation_points always sums to total_score for
-    anyone checking the "How is this calculated?" breakdown by hand).
-    Callers that were describing a city's terrain position (e.g.
-    build_plain_explanation's "low-lying" vs "elevated" wording) must use
-    elevation_terrain_points, not elevation_points, for that - geography
-    doesn't change just because it isn't raining today.
+    Both values are returned: "elevation_terrain_points" (raw, describes
+    the city) and "elevation_points" (rain-scaled, what was added to the
+    total).
     """
     normalized = normalize_city(city)
     profile = get_profile(city)
@@ -461,55 +322,48 @@ def _compute_risk_core(city, rainfall_mm):
     elevation_rain_fraction = min(rainfall_mm / low_max, 1.0) if low_max > 0 else 1.0
     elev_pts = round(elev_terrain_pts * elevation_rain_fraction, 1)
 
-    total_score = round(rain_pts + elev_pts, 1)   # 0-100, methodology unchanged
+    total_score = round(rain_pts + elev_pts, 1)   # 0-100 scale
 
-    raw_score_0_1 = total_score / 100             # UNROUNDED - used for classification
+    raw_score_0_1 = total_score / 100             # unrounded, used to classify
     risk_key = score_to_risk_key(raw_score_0_1)
-    score_0_1 = round(raw_score_0_1, 2)           # rounded only for display (gauge, etc.)
+    score_0_1 = round(raw_score_0_1, 2)           # rounded for display only
 
     return {
         "profile_key": profile_key,
         "profile_label": profile_label,
         "rainfall_mm": rainfall_mm,
         "rainfall_points": rain_pts,
-        "elevation_points": elev_pts,                     # rain-scaled - what was actually added to total_score
-        "elevation_terrain_points": elev_terrain_pts,      # raw, un-scaled - describes the city's terrain position
+        "elevation_points": elev_pts,                     # rain-scaled, added to the total
+        "elevation_terrain_points": elev_terrain_pts,      # raw terrain position
         "elevation_rain_fraction": elevation_rain_fraction,
         "elevation_used": elevation_used,
         "elevation_m": elevation_m,
-        "dry_conditions": is_dry_conditions(rain_pts),  # NEW - see RAINFALL_NEGLIGIBLE_THRESHOLD note
-        "score": total_score,                # 0-100 - still shown in "How is this calculated?"
-        "score_0_1": score_0_1,              # display-rounded - drives the gauge
+        "dry_conditions": is_dry_conditions(rain_pts),
+        "score": total_score,                # 0-100, shown in "How is this calculated?"
+        "score_0_1": score_0_1,              # drives the gauge
         "risk_level_key": risk_key,
-        "risk_slug": RISK_SLUGS[risk_key],    # fixes the CSS-class bug described above
-        "risk_color": RISK_COLORS[risk_key],  # FIX (earlier session) - see RISK_COLORS note above
+        "risk_slug": RISK_SLUGS[risk_key],
+        "risk_color": RISK_COLORS[risk_key],
     }
 
 
-# Sorted, display-cased list of every scored city, for the home page's
-# city dropdown - built once at startup from REGIONAL_PROFILES itself, so
-# it can never drift out of sync with what the model actually supports.
-# Deliberately excludes MAP_ONLY_CITIES - those aren't scoreable, so
-# offering them in a form whose whole point is getting a score would just
-# recreate the error path a dropdown is supposed to eliminate.
+# Sorted city names for the home page dropdown, built from
+# REGIONAL_PROFILES so it always matches the model. Map-only cities are
+# left out because they cannot be scored.
 SUPPORTED_CITY_DISPLAY_NAMES = sorted({
     city.title() for profile in REGIONAL_PROFILES.values() for city in profile["cities"]
 })
 
 
 def localized_city(city, t):
-    """Display name for `city` in the ACTIVE language, from translations.py's
-    city_names dict (keys are normalized lowercase names). Falls back to the
-    title-cased name for a city with no translation entry, so a missing key
-    degrades to the old English behavior instead of crashing. Previously the
-    result page always showed city.title() - "Karachi" in Latin script even
-    inside Urdu/Sindhi sentences.
+    """City name in the active language from translations.py's city_names.
+    Falls back to the English title-cased name if there is no entry.
     """
     return t.get("city_names", {}).get(normalize_city(city), city.title())
 
 
 def get_lang():
-    """Read ?lang= from the query string, fall back to English if missing/invalid."""
+    """Reads ?lang= from the URL, falls back to English."""
     lang = request.args.get("lang", DEFAULT_LANGUAGE)
     if lang not in SUPPORTED_LANGUAGES:
         lang = DEFAULT_LANGUAGE
@@ -517,40 +371,17 @@ def get_lang():
 
 
 def build_plain_explanation(rainfall_mm, elevation_used, elev_terrain_pts, rain_pts, risk_key, city, risk_level_display, t):
-    """One always-visible sentence explaining WHY the score came out the way
-    it did, in plain language - the raw "Score: 67.0/100 (rainfall 37.0/70,
-    elevation 30.0/30)" breakdown means nothing to someone deciding whether
-    to evacuate. That breakdown still exists (moved behind a "How is this
-    calculated?" toggle in check.html) for people who want the methodology
-    transparency, but this sentence is the thing an ordinary person reads.
+    """One plain-language sentence explaining why the score came out as it
+    did. The detailed breakdown is behind the "How is this calculated?"
+    toggle in check.html.
 
-    elev_terrain_pts is the city's RAW, un-scaled terrain-position score
-    (see elevation_component()) - deliberately NOT the rain-scaled
-    "elevation_points" value from _compute_risk_core(). This function is
-    describing geography ("this city sits low relative to others nearby"),
-    which doesn't change depending on whether it's raining today - only
-    the SCORE's use of that geography changes with rainfall. Passing the
-    rain-scaled value here would make this sentence describe the city's
-    terrain incorrectly on a dry day (e.g. calling Karachi "elevated"
-    simply because today happens to be dry).
+    elev_terrain_pts must be the raw terrain score, not the rain-scaled
+    one, because this sentence describes geography and geography does not
+    change on a dry day.
 
-    Third branch, "terrain baseline", covers the case a city is scored
-    Moderate+ almost entirely off low-lying terrain while rainfall is
-    negligible. Before the elevation-rainfall scaling fix (see
-    _compute_risk_core()'s docstring), this was a common real case - e.g.
-    Badin @ 1.5mm during a dry spell still reading Moderate Risk off
-    elevation alone. After that fix, elevation's contribution is scaled
-    toward zero as rainfall approaches zero, so a low-lying city at
-    genuinely negligible rainfall should no longer reach Moderate+ in the
-    first place - this branch is now expected to be rare-to-unreachable
-    in practice rather than a routine case. Left in place defensively
-    rather than deleted, since "rare" is not the same guarantee as
-    "impossible" (e.g. a single-value region's midpoint fallback in
-    elevation_component could still combine with a borderline rainfall
-    value in an edge case not yet enumerated). Gated on
-    is_dry_conditions(rain_pts) AND risk_key != "Low Risk" - a Low Risk
-    city with negligible rain doesn't need a special caveat, that's just
-    the expected/reassuring case.
+    The first branch ("terrain baseline") is for a Moderate or higher
+    score with almost no rain. After the elevation scaling fix it should
+    rarely happen, so it is kept only as a safety net.
     """
     if elevation_used and is_dry_conditions(rain_pts) and risk_key != "Low Risk":
         position_key = (
@@ -579,37 +410,21 @@ def build_plain_explanation(rainfall_mm, elevation_used, elev_terrain_pts, rain_
 
 
 def check_risk(rainfall_mm, city, t):
-    """t = translation dict for the active language (from translations.py).
-    Raises MapOnlyCityError / UnsupportedCityError - callers must catch
-    both before rendering a result.
+    """Builds the full result for one city and rainfall total, in the
+    language of the translation dict t. Raises MapOnlyCityError or
+    UnsupportedCityError, so callers must catch both.
 
-    NEW this session: when rainfall is negligible (dry_conditions), the
-    static terrain_warning is returned EMPTY and the safety_tips are
-    REPLACED by generic preparedness tips (t["safety_tips_dry"], plus an
-    explanatory t["safety_tips_dry_note"]) instead of the rain-scenario
-    text - an empty tips card on a safety page is a defect. Previously e.g. Karachi at 0.0mm showed
-    "Urban drainage systems can back up quickly - avoid clogged storm
-    drains and underpasses" next to a 0.0 rainfall bar, and "move
-    documents to a high, dry place" as if a storm were imminent. Applies
-    to every profile and every risk level. The score and risk tier are
-    deliberately UNCHANGED - only the copy is gated. check.html must
-    still guard terrain_warning being empty.
+    When conditions are dry, the terrain warning is empty and generic
+    preparedness tips replace the storm tips. The score and tier do not
+    change. check.html must handle an empty terrain_warning.
 
-    Also NEW this session: elevation_note is built from
-    core["elevation_points"] - the RAIN-SCALED elevation score, i.e. what
-    was actually added to total_score - not the raw terrain-position
-    score. See _compute_risk_core()'s docstring for the fix this
-    reflects. The note's wording still needs a human pass in
-    translations.py (en/ur/sd) to make clear that this number can now
-    shift with rainfall, not just with which city was picked - flagged,
-    not done here, since this file has no access to translations.py's
-    actual string content.
+    elevation_note uses the rain-scaled elevation points.
     """
     core = _compute_risk_core(city, rainfall_mm)
     profile_label = core["profile_label"]
     rain_pts = core["rainfall_points"]
-    elev_pts = core["elevation_points"]                     # rain-scaled - matches total_score breakdown
-    elev_terrain_pts = core["elevation_terrain_points"]      # raw - describes geography, not today's score
+    elev_pts = core["elevation_points"]                     # rain-scaled, matches the breakdown
+    elev_terrain_pts = core["elevation_terrain_points"]      # raw terrain position
     elevation_used = core["elevation_used"]
     elevation_m = core["elevation_m"]
     total_score = core["score"]
@@ -619,9 +434,7 @@ def check_risk(rainfall_mm, city, t):
     dry_conditions = core["dry_conditions"]
 
     if elevation_used:
-        # points/max_points added this session so the note can explain that
-        # the bar next to it is POINTS, not meters (str.format ignores
-        # unused kwargs, so an older translation without them still works).
+        # points and max_points tell the reader the bar is points, not meters
         elevation_note = t["elevation_note_available"].format(
             city=localized_city(city, t), elevation=elevation_m, profile=t["terrain_profile_labels"][profile_label],
             points=elev_pts, max_points=ELEVATION_COMPONENT_MAX,
@@ -635,8 +448,8 @@ def check_risk(rainfall_mm, city, t):
     )
 
     return {
-        "risk_level_key": risk_key,   # used for translation lookups
-        "risk_slug": risk_slug,       # used for CSS class (risk-low/moderate/high/very-high)
+        "risk_level_key": risk_key,   # for translation lookups
+        "risk_slug": risk_slug,       # for the CSS class
         "risk_level": risk_level_display,
         "plain_explanation": plain_explanation,
         "rainfall": rainfall_mm,
@@ -658,7 +471,7 @@ def check_risk(rainfall_mm, city, t):
 
 
 def sanitize_rainfall(raw_value):
-    """Returns (valid: bool, value_or_none)."""
+    """Returns (valid, value_or_none)."""
     try:
         value = float(raw_value)
     except (TypeError, ValueError):
@@ -669,16 +482,12 @@ def sanitize_rainfall(raw_value):
 
 
 def check_city_exists_in_pakistan(city):
-    """Validates that `city` is a real, locatable place in Pakistan, using
-    OpenWeatherMap purely as a lookup - NOT for its weather data. Current
-    weather is a live snapshot; this app's rainfall input is a hypothetical
-    scenario, and mixing the two in the result page was confusing users
-    about what was actually being measured. This function only returns
-    True/False plus an error reason; no temp/description is read or kept.
+    """Checks that the city is a real place in Pakistan, using
+    OpenWeatherMap as a lookup only. No weather data is read or kept.
 
-    Returns (is_valid: bool, error_reason: str or None). error_reason is
-    one of "missing_api_key", "timeout", "network_error", "not_found",
-    "not_pakistan", "malformed_response" - or None if is_valid is True.
+    Returns (is_valid, error_reason). error_reason is one of
+    "missing_api_key", "timeout", "network_error", "not_found",
+    "not_pakistan", "malformed_response", or None if valid.
     """
     api_key = os.environ.get("OPENWEATHER_API_KEY")
     if not api_key:
@@ -711,24 +520,15 @@ def check_city_exists_in_pakistan(city):
 
 
 def get_forecast_rainfall(city, hours=72):
-    """Fetches forecasted rainfall total (mm) over the next `hours` hours
-    using OpenWeatherMap's free 5-day/3-hour forecast endpoint, by CITY
-    NAME. Also validates the city exists in Pakistan - no need to call
-    OpenWeatherMap twice for forecast mode, unlike scenario mode which
-    validates separately via check_city_exists_in_pakistan.
-
-    This is the right choice when the city name is arbitrary user input
-    (the /forecast route) - there's no coordinate to fall back on for a
-    city typed by a visitor. For the 38 known map cities, use
-    get_forecast_rainfall_by_coords() instead (see note there for why).
+    """Gets forecast rainfall (mm) for the next `hours` hours from
+    OpenWeatherMap's 5-day/3-hour forecast, looked up by city name. It
+    also checks the city is in Pakistan. Used for /forecast, where the
+    city is typed by the visitor.
 
     Returns (is_valid, rainfall_mm_or_None, error_reason_or_None).
-    error_reason mirrors check_city_exists_in_pakistan's reasons.
 
-    NOTE: this endpoint's `cod` field is a STRING ("200"), and country is
-    nested under data["city"]["country"] - both differ from the current-
-    weather endpoint used above. Do not reuse that validation logic here
-    without adjusting for the shape difference.
+    This endpoint differs from the current-weather one: "cod" is a string
+    and the country is under data["city"]["country"].
     """
     api_key = os.environ.get("OPENWEATHER_API_KEY")
     if not api_key:
@@ -770,28 +570,15 @@ def get_forecast_rainfall(city, hours=72):
 
 
 def get_forecast_rainfall_by_coords(lat, lon, hours=72):
-    """Same as get_forecast_rainfall(), but queries OpenWeatherMap by
-    coordinates instead of city name. Used for the map cache
-    (get_all_city_risk_data) - every city in CITY_COORDINATES was already
-    validated once via Nominatim at CSV-build time, so re-validating by
-    name through OWM's separate, less complete geocoder was redundant AND
-    the actual cause of a real bug: OWM's city-name search doesn't
-    reliably index smaller Sindh towns (Mirpurkhas, Naushahro Feroze,
-    Kashmore, Umerkot all returned "not_found" by name despite being real,
-    correctly-coordinated cities). Querying by lat/lon sidesteps that
-    entire class of failure.
+    """Same as get_forecast_rainfall(), but looked up by coordinates.
+    Used for the map cache. OpenWeatherMap's name search misses some
+    smaller Sindh towns (Mirpurkhas, Umerkot and others), and every city
+    in CITY_COORDINATES already has verified coordinates.
 
-    No country check here - CITY_COORDINATES only contains Pakistani
-    cities by construction, so a "not_pakistan" result isn't a meaningful
-    failure mode on this path.
+    There is no country check because the coordinates are all in Pakistan.
+    /result and /forecast still use the name-based lookups.
 
-    Scope note: this does NOT replace get_forecast_rainfall() or
-    check_city_exists_in_pakistan() - /result and /forecast still take
-    arbitrary user-typed city names with no known coordinate, so they
-    still need name-based lookup and validation.
-
-    Returns (is_valid, rainfall_mm_or_None, error_reason_or_None), same
-    shape as get_forecast_rainfall() for drop-in use in the cache loop.
+    Returns (is_valid, rainfall_mm_or_None, error_reason_or_None).
     """
     api_key = os.environ.get("OPENWEATHER_API_KEY")
     if not api_key:
@@ -829,21 +616,16 @@ def get_forecast_rainfall_by_coords(lat, lon, hours=72):
 
 
 def _render_risk_result(result, city, rainfall, mode, t, lang, forecast_hours=None):
-    """Shared render for both /result (scenario) and /forecast - mode
-    controls which source-note copy is shown, so the user always knows
-    whether the rainfall behind their score was forecasted or hypothetical.
+    """Shared render for /result (scenario) and /forecast. `mode` decides
+    whether the note says the rainfall was forecast or hypothetical.
     """
     if mode == "forecast":
         source_note = t["source_forecast"].format(hours=forecast_hours, mm=rainfall)
     else:
         source_note = t["source_scenario"].format(mm=rainfall)
 
-    # Look up this city's coordinates for the single-marker result-page map.
-    # Not every checked city is guaranteed to be in CITY_COORDINATES (e.g. a
-    # real, correctly-scored city whose name doesn't exactly match the CSV
-    # row for some reason) - city_lat/city_lon come through as None in that
-    # case, and check.html must skip rendering the map rather than guess a
-    # location or crash on a missing value.
+    # Coordinates for the result-page map. If the city is not in the CSV,
+    # these are None and check.html skips the map.
     coords = _CITY_COORDS_LOOKUP.get(normalize_city(city))
     city_lat, city_lon = coords if coords else (None, None)
 
@@ -883,11 +665,9 @@ def about():
 
 @app.route("/floods-2022")
 def floods_2022():
-    """Sourced factual page on the 2022 floods, linked from the About page.
-    Deliberately NOT in the nav (base.html) - it is background reading, not
-    a tool feature. The template is English-only for now; the ur/sd About
-    link text says so. The endpoint name must stay "floods_2022" because
-    about.html calls url_for('floods_2022', ...).
+    """Sourced page on the 2022 floods, linked from About. Not in the nav.
+    English only for now. The endpoint name must stay "floods_2022"
+    because about.html uses url_for('floods_2022').
     """
     lang = get_lang()
     t = get_translation(lang)
@@ -903,13 +683,8 @@ def how_it_works():
 
 @app.route("/data-methodology")
 def data_methodology():
-    """Region thresholds are built from REGIONAL_PROFILES
-    directly rather than typed into the template a second time - this is
-    the exact discipline that would have prevented the earlier dead-zone
-    doc/code mismatch (METHODOLOGY.md claiming a different saturation
-    distance than the code actually used). Dict order (mega_urban_coastal,
-    central_plains, arid_plains_desert) is preserved from Python 3.7+
-    dict ordering, matching METHODOLOGY.md's table order.
+    """The region thresholds come straight from REGIONAL_PROFILES, so the
+    page cannot disagree with the code. Order matches METHODOLOGY.md.
     """
     lang = get_lang()
     t = get_translation(lang)
@@ -924,12 +699,10 @@ def data_methodology():
     return render_template("data_methodology.html", t=t, lang=lang, regions=regions_for_template)
 
 
-# Turns plain-text source strings like "Dawn (https://x.com/a); PMD (https://y.org/b)"
-# into safe clickable links. Jinja's built-in urlize was tried first and
-# swallowed the closing ")" and ";" into the link (broken URL), so this
-# stops each URL at whitespace or ")" and strips trailing punctuation.
-# Each link is wrapped in <bdi> so a left-to-right URL cannot reorder the
-# surrounding Urdu/Sindhi (right-to-left) text.
+# Turns plain-text source strings with URLs into safe clickable links.
+# Jinja's urlize swallowed the closing ")" and ";" into the link, so this
+# stops each URL at whitespace or ")". Each link is wrapped in <bdi> so a
+# left-to-right URL does not scramble Urdu/Sindhi (right-to-left) text.
 _URL_RE = re.compile(r"https?://[^\s)<>\"]+")
 
 
@@ -947,27 +720,25 @@ def linkify(text):
     return Markup("").join(parts)
 
 
-# ---- Historical back-test replay ----
+# ---- Historical back-test ----
 #
 # /back-test lists every case in backtest_cases.py with the model's score
-# and outcome; /back-test/<case_id> replays one case. Everything shown is
-# computed here from backtest_cases.py + the SAME _compute_risk_core() the
-# live tool uses, so the page cannot drift from the back-test. All 9 cases
-# are shown, including false alarms and the skipped Jacobabad case - never
-# filter this list down to the hits.
+# and outcome. /back-test/<case_id> shows one case. Scores come from the
+# same _compute_risk_core() as the live tool. All cases are shown,
+# including false alarms and the skipped Jacobabad case. Never filter
+# the list down to the hits.
 #
-# Must match run_backtest.py: an "alert" is Moderate Risk or higher.
+# An "alert" is Moderate Risk or higher. This must match run_backtest.py.
 BACKTEST_ALERT_TIERS = {"Moderate Risk", "High Risk", "Very High Risk"}
 
-# Protocol section 7 baseline: alert if 72h rainfall >= this many mm, with
-# no terrain logic. Checked against BACKTEST_PROTOCOL.md section 7
-# ("50 mm or more", code uses >=) - it is not read from that file, so
-# re-check if the protocol ever changes.
+# Baseline from BACKTEST_PROTOCOL.md section 7: alert if 72h rainfall is
+# at least this many mm, with no terrain logic. This value is typed here,
+# not read from the file, so re-check it if the protocol ever changes.
 BACKTEST_BASELINE_MM = 50.0
 
 _BACKTEST_OUTCOME_KEYS = ["HIT", "MISS", "FALSE ALARM", "CORRECT (quiet)"]
 
-# CSS class for the outcome badge (reuses the existing risk-badge colors).
+# CSS class for each outcome badge
 _BACKTEST_BADGE_CLASS = {
     "HIT": "risk-low",
     "CORRECT (quiet)": "risk-low",
@@ -987,9 +758,8 @@ def _classify_backtest(actual_flood, alerted):
 
 
 def evaluate_backtest_case(case):
-    """Scores one back-test case. Returns a dict; core is None and outcome
-    is "SKIPPED" when the case has no rainfall figure (Jacobabad), same as
-    run_backtest.py.
+    """Scores one back-test case and returns a dict. If the case has no
+    rainfall figure (Jacobabad), core is None and outcome is "SKIPPED".
     """
     actual_flood = case["actual_outcome"] == "flood"
     rainfall = case["rainfall_mm"]
@@ -1015,13 +785,11 @@ def evaluate_backtest_case(case):
 
 @app.route("/back-test")
 def back_test():
-    """Back-test results page: verdict, live-computed results table (each
-    case links to its replay), baseline comparison, deviations and
-    limitations. Translated (en/ur/sd, strings under t["bt"] in
-    translations.py) and linked from the nav ("nav_back_test"). The
-    verdict, deviation and limitation text in templates/backtest.html is
-    written from BACKTEST_RESULTS.md - if the cases or protocol change,
-    update it.
+    """Back-test results page: verdict, results table (each row links to
+    its case), baseline comparison, deviations and limitations. Strings
+    are under t["bt"] in translations.py. The verdict and limitation text
+    in templates/backtest.html comes from BACKTEST_RESULTS.md, so update
+    it if the cases or protocol change.
     """
     lang = get_lang()
     t = get_translation(lang)
@@ -1039,13 +807,11 @@ def back_test():
 
 @app.route("/back-test/<case_id>")
 def back_test_case(case_id):
-    """Replay of one historical case: what the model scored with the
-    recorded rainfall, next to what actually happened. Unknown ids 404.
+    """Shows one historical case: the model's score next to what actually
+    happened. An unknown id returns 404.
 
-    case_i holds the caveat / impact / source text in the ACTIVE language
-    (ur/sd come from each case's "i18n" dict in backtest_cases.py, with
-    English as the fallback). The template must use case_i for these
-    three fields, not case.<field>.
+    case_i holds the caveat, impact and source text in the active
+    language. The template must use case_i for those three fields.
     """
     lang = get_lang()
     t = get_translation(lang)
@@ -1067,17 +833,13 @@ def back_test_case(case_id):
 
 _city_risk_cache = {}
 _cache_last_refreshed = None
-CACHE_TTL_SECONDS = 3600  # refresh hourly - forecast rainfall doesn't meaningfully shift minute to minute
+CACHE_TTL_SECONDS = 3600  # refresh hourly
 
 
 def get_all_city_risk_data(force_refresh=False):
-    """Numeric-only risk data for all map cities, cached and refreshed on a
-    TTL rather than fetched live per page view or per click.
-
-    Uses get_forecast_rainfall_by_coords() (not the name-based
-    get_forecast_rainfall()) since every entry in CITY_COORDINATES already
-    has a verified lat/lon - see that function's docstring for why the
-    name-based lookup was actually the bug for several Sindh towns.
+    """Risk data for all map cities, cached and refreshed hourly instead
+    of fetched on every page view. Uses the coordinate-based forecast
+    lookup, see get_forecast_rainfall_by_coords().
     """
     global _city_risk_cache, _cache_last_refreshed
     now = time.time()
@@ -1120,12 +882,8 @@ def map_view():
         item["city_display"] = localized_city(city, t)
         if entry.get("scored"):
             item["risk_level"] = t["risk_levels"][entry["risk_level_key"]]
-            # NOTE: entry["elevation_terrain_points"] (raw, unscaled) is
-            # passed here, not entry["elevation_points"] (rain-scaled) -
-            # build_plain_explanation's position_key wording describes the
-            # city's geography, which must not flip just because a given
-            # city's cached forecast happens to be dry right now. See
-            # build_plain_explanation()'s docstring.
+            # elevation_terrain_points (raw) is passed here, not the
+            # rain-scaled value, so the wording describes geography.
             item["plain_explanation"] = build_plain_explanation(
                 entry["rainfall_mm"], entry["elevation_used"], entry["elevation_terrain_points"],
                 entry["rainfall_points"], entry["risk_level_key"], city, item["risk_level"], t
@@ -1151,25 +909,19 @@ def result():
     elif not rainfall_valid:
         return render_template("check.html", error=t["error_rainfall"], t=t, lang=lang)
     elif not city_valid:
-        # NOTE: city_error_reason (missing_api_key/timeout/network_error/
-        # malformed_response/not_found/not_pakistan) is not yet surfaced as
-        # distinct user-facing messages - all still show error_city. Worth
-        # splitting further so "our weather service is down, try again" is
-        # distinguished from "that's not a real city" - flagged, not done
-        # yet.
+        # TODO: city_error_reason is not shown to the user yet. All
+        # failures show error_city. "Weather service is down" should be
+        # told apart from "not a real city".
         return render_template("check.html", error=t["error_city"], t=t, lang=lang)
 
     try:
         risk_result = check_risk(rainfall, city, t)
     except MapOnlyCityError:
-        # City is real and outside Sindh - shown on the map for national
-        # context only. Distinct message from a genuinely unrecognized city.
+        # A real city outside Sindh, shown on the map only.
         return render_template("check.html", error=t["error_city_outside_coverage"], t=t, lang=lang)
     except UnsupportedCityError:
-        # City passed the OpenWeatherMap validity check but isn't in this
-        # app's V1 model yet (typo, village, or a real Pakistani city not
-        # yet added) - refused rather than silently scored with a guessed
-        # profile.
+        # Passed the OpenWeatherMap check but is not in the model. Refused,
+        # not guessed.
         return render_template("check.html", error=t["error_city"], t=t, lang=lang)
     else:
         return _render_risk_result(risk_result, city, rainfall, "scenario", t, lang)
@@ -1187,10 +939,8 @@ def forecast():
     forecast_valid, forecast_rainfall, error_reason = get_forecast_rainfall(city)
 
     if not forecast_valid:
-        # error_reason splitting is still an open item app-wide (see the
-        # note in /result above) - collapsing to one message for now, but
-        # flagging the failure so check.html can point the user to
-        # scenario mode as a fallback.
+        # TODO: same as /result, error_reason is not shown separately yet.
+        # forecast_failed lets check.html point the user to scenario mode.
         return render_template(
             "check.html", error=t["error_city"], t=t, lang=lang,
             forecast_failed=True,
