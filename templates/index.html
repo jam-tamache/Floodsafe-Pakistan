@@ -10,29 +10,21 @@
     </div>
 
     <div class="home-card">
-        <!-- FIX (this session): the bare &#9888; renders as an oversized
-             color emoji on Android Chrome. &#xFE0E; forces text
-             presentation and .warn-icon sizes it to the surrounding text -
-             the same fix check.html already had. -->
+        <!-- &#xFE0E; forces text style, so the warning sign does not show
+             as a large emoji on Android Chrome. .warn-icon matches its
+             size to the text. -->
         <div class="disclaimer-banner">
             <span class="warn-icon">&#9888;&#xFE0E;</span> {{ t.disclaimer_banner }}
         </div>
 
-        <!-- Primary flow: 72h forecast (city only). Swapped to primary
-             per Hammad's explicit request (Sep 4) - forecast reflects
-             what's actually about to happen, scenario is the
-             hypothetical "what if" case and now sits below it. -->
+        <!-- Main form: 72h forecast, city only. -->
         <form action="{{ url_for('forecast') }}" method="GET" class="home-form">
             <input type="hidden" name="lang" value="{{ lang }}">
 
             <label for="forecast-city">{{ t.form_city_label }}</label>
-            <!-- Option value stays the canonical English city name (c) -
-                 risk_check.py's normalize_city()/_CITY_TO_PROFILE/
-                 _CITY_COORDS_LOOKUP all key off that string. Only the
-                 displayed label is translated, via t.city_names keyed by
-                 the lowercase form of c. Falls back to c itself if a city
-                 is somehow missing from city_names, rather than showing
-                 a blank option. -->
+            <!-- The option value stays the English city name, because
+                 risk_check.py looks cities up by that string. Only the
+                 shown label is translated. -->
             <select id="forecast-city" name="city" required>
                 <option value="" disabled selected>{{ t.form_city_placeholder }}</option>
                 {% for c in cities %}
@@ -43,12 +35,7 @@
             <button type="submit">{{ t.forecast_form_submit }}</button>
         </form>
 
-        <!-- Secondary flow: scenario (city + hypothetical rainfall).
-             Now correctly uses scenario_toggle_label / scenario_form_intro
-             - these already describe a typed rainfall amount, matching
-             what's actually in this form. forecast_toggle_label /
-             forecast_toggle_intro are now unused (were only correct while
-             this toggle wrapped the forecast form). -->
+        <!-- Second form: scenario, a city plus a typed rainfall amount. -->
         <details class="scenario-toggle">
             <summary>{{ t.scenario_toggle_label }}</summary>
             <p>{{ t.scenario_form_intro }}</p>
