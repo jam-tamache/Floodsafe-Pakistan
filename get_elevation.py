@@ -1,16 +1,14 @@
 """
 get_elevation.py
 
-Reads city_coordinates.csv (columns: city, region, lat, lon, status)
-and looks up ground elevation (meters) for each city.
+Reads city_coordinates.csv (columns: city, region, lat, lon, status) and
+looks up the ground elevation in metres for each city.
 
-Primary source : Open-Elevation (https://api.open-elevation.com)
-Fallback source: OpenTopoData  (https://api.opentopodata.org)
+Main source: Open-Elevation. Backup source: OpenTopoData.
 
-Writes city_elevation.csv with the original columns plus a new
-`elevation_m` column. If a city fails on both APIs after retries,
-elevation_m is left blank and the row is flagged in the console
-output so it can be manually checked later.
+Writes city_elevation.csv with the original columns plus elevation_m and
+elevation_source. If a city fails on both APIs, elevation_m is left blank
+and the city is listed in the console output.
 
 Usage:
     python get_elevation.py
@@ -31,7 +29,7 @@ OPEN_TOPO_DATA_URL = "https://api.opentopodata.org/v1/srtm90m?locations={lat},{l
 MAX_RETRIES = 3
 RETRY_DELAY_SECONDS = 2
 REQUEST_TIMEOUT_SECONDS = 10
-PAUSE_BETWEEN_CITIES_SECONDS = 1  # be polite to free API tiers
+PAUSE_BETWEEN_CITIES_SECONDS = 1  # go easy on the free APIs
 
 
 def fetch_json(url):
@@ -53,7 +51,7 @@ def get_elevation_opentopodata(lat, lon):
 
 
 def get_elevation_with_retries(lat, lon, city_name):
-    # Try Open-Elevation first, with retries
+    # Open-Elevation first, with retries
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             return get_elevation_open_elevation(lat, lon), "open-elevation"
@@ -62,7 +60,7 @@ def get_elevation_with_retries(lat, lon, city_name):
             if attempt < MAX_RETRIES:
                 time.sleep(RETRY_DELAY_SECONDS)
 
-    # Fall back to OpenTopoData, with retries
+    # Then OpenTopoData, with retries
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             return get_elevation_opentopodata(lat, lon), "opentopodata"
