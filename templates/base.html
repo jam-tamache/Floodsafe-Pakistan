@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- NEW: footer styles. Kept here (not in style.css) so this one file
-         is the whole change. The body/main rules keep the footer at the
+    <!-- Footer styles. The body and main rules keep the footer at the
          bottom of the window on short pages. -->
     <style>
         body {
@@ -26,8 +25,8 @@
             border-top: 1px solid #d6e6e3;
             padding-bottom: env(safe-area-inset-bottom, 0px);
         }
-        /* Also has the class .topbar-inner in the HTML, so its width and
-           side padding are exactly the navbar's. Only height is set here. */
+        /* This element also has .topbar-inner, so its width and side
+           padding match the navbar. Only height is set here. */
         .site-footer-inner {
             height: auto;
             min-height: 0;
@@ -101,13 +100,9 @@
             <span class="topbar-title">{{ t.app_title }}</span>
         </a>
 
-        <!-- Desktop nav: hidden below the mobile breakpoint, replaced by
-             the dropdown menu at the bottom of this file. Contact is
-             deliberately not here yet - no destination/action has been
-             decided for it, see base.html notes in chat history. About,
-             How It Works, and Data & Methodology are real routes (see
-             app.py) - not same-page anchors like they were in the old
-             sidebar. Order: About is last, by website convention. -->
+        <!-- Desktop nav. Hidden on mobile, where the dropdown below is
+             used instead. There is no Contact link because it has no
+             destination yet. -->
         <nav class="topbar-nav">
             <a href="{{ url_for('home', lang=lang) }}"
                class="topbar-link {{ 'topbar-link-active' if request.path == url_for('home') else '' }}">
@@ -121,19 +116,12 @@
                class="topbar-link {{ 'topbar-link-active' if request.path == url_for('data_methodology') else '' }}">
                {{ t.nav_data_methodology }}
             </a>
-            <!-- NEW: Back-test. translations.py has no nav_back_test key
-                 yet, so this falls back to the English label via
-                 t.get(...) instead of crashing. Active on /back-test and
-                 on every /back-test/<case_id> page. -->
+            <!-- Falls back to the English label if translations.py has no
+                 nav_back_test key. Active on /back-test and every case page. -->
             <a href="{{ url_for('back_test', lang=lang) }}"
                class="topbar-link {{ 'topbar-link-active' if request.path.startswith('/back-test') else '' }}">
                {{ t.get('nav_back_test', 'Back-test') }}
             </a>
-            <!-- Map is a real, working route the mockup's nav list didn't
-                 show - dropping it would remove access to a finished
-                 feature, so it stays in nav even though it wasn't in the
-                 reference image. Flag if you actually want it elsewhere
-                 (e.g. a button on the Home page instead of top nav). -->
             <a href="{{ url_for('map_view', lang=lang) }}"
                class="topbar-link {{ 'topbar-link-active' if request.path == url_for('map_view') else '' }}">
                &#128506; {{ t.nav_map }}
@@ -153,15 +141,9 @@
             </div>
             {% endblock %}
 
-            <!-- FIX: was a bare &#9776; (☰) Unicode character - on the
-                 device in Hammad's Sep 13 screenshot it rendered as a
-                 solid filled box instead of three lines, almost
-                 certainly a missing-glyph ("tofu") fallback, the same
-                 failure class as the oversized ⚠ warning icon fixed
-                 earlier this project. An inline SVG can't fail this way
-                 since it doesn't depend on the device's font having this
-                 character. currentColor keeps it using the button's
-                 existing text color (#0F5459) with no extra CSS. -->
+            <!-- Inline SVG instead of the ☰ character, which showed as a
+                 solid box on some phones. currentColor uses the button's
+                 text color. -->
             <button class="topbar-toggle" id="navToggle" aria-label="Toggle navigation">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M3 6H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -172,12 +154,9 @@
         </div>
     </div>
 
-    <!-- Mobile dropdown menu: same links as .topbar-nav above, shown only
-         under the mobile breakpoint when .topbar-menu-open is toggled on
-         .topbar. Kept as a separate list rather than reusing .topbar-nav
-         with a media query, since the two need different layout (row vs
-         stacked column) and duplicating the links is simpler than
-         fighting one element into two shapes. -->
+    <!-- Mobile dropdown. Same links as the desktop nav, shown when
+         .topbar-menu-open is set on .topbar. It is a separate list
+         because it stacks in a column instead of a row. -->
     <nav class="topbar-mobile-menu" id="mobileMenu">
         <a href="{{ url_for('home', lang=lang) }}" class="topbar-link">{{ t.nav_home }}</a>
         <a href="{{ url_for('how_it_works', lang=lang) }}" class="topbar-link">{{ t.nav_how_it_works }}</a>
@@ -185,17 +164,8 @@
         <a href="{{ url_for('back_test', lang=lang) }}" class="topbar-link">{{ t.get('nav_back_test', 'Back-test') }}</a>
         <a href="{{ url_for('map_view', lang=lang) }}" class="topbar-link">&#128506; {{ t.nav_map }}</a>
         <a href="{{ url_for('about', lang=lang) }}" class="topbar-link">{{ t.nav_about }}</a>
-        <!-- FIX: this row was completely missing before - the CSS for
-             .topbar-mobile-menu .lang-switch already existed in
-             style.css from the earlier session, written on the
-             assumption this markup existed, but it was never actually
-             added here. That's why the language switcher disappeared
-             entirely on mobile instead of moving into this menu as
-             intended. self.lang_switch() re-renders whatever this page's
-             lang_switch block contains (the plain version above, or
-             check.html's version with city/rainfall preserved in the
-             URL) rather than hardcoding a second, page-unaware copy
-             here. -->
+        <!-- Re-renders this page's lang_switch block, so check.html keeps
+             its city and rainfall in the URL. -->
         {{ self.lang_switch() }}
     </nav>
 </header>
@@ -204,9 +174,8 @@
     {% block content %}{% endblock %}
 </main>
 
-<!-- NEW: footer. Left: logo + name + year. Right: GitHub profile link.
-     The name uses t.app_title, so it follows the page language like the
-     navbar does. -->
+<!-- Footer. Left: logo, name, year. Right: GitHub link. The name follows
+     the page language like the navbar. -->
 <footer class="site-footer">
     <div class="topbar-inner site-footer-inner">
         <div class="footer-brand">
