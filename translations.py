@@ -1,4 +1,6 @@
 # English, Urdu, and Sindhi translations for FloodSafe Pakistan.
+# English is the reference text. The ur and sd text is unreviewed by a
+# native speaker (Sindhi is the weakest).
 
 TRANSLATIONS = {
     "en": {
@@ -15,18 +17,11 @@ TRANSLATIONS = {
         "nav_data_methodology": "Data & Methodology",
         "nav_map": "Map",
 
-        # NEW - map page title/intro were hardcoded English in map.html
-        # from the start, never wired to translations at all (unlike
-        # every other page). Unreviewed by a native speaker, same as the
-        # rest of the backlog.
+        # Map page
         "map_title": "FloodSafe Pakistan: Map",
         "map_intro": "Color-coded by current risk level. Click a marker for details. Grey pins are shown for map context only (outside Sindh, not risk-scored).",
 
-        # NEW - map legend labels (check.html + map.html). Reuses the same
-        # wording as risk_levels below for the 4 tiers, for consistency
-        # with badges elsewhere in the app. legend_not_scored mirrors
-        # about_callout's existing "not risk-scored" phrasing. Unreviewed
-        # by a native speaker in ur/sd, same as the rest of the backlog.
+        # Map legend. The four tiers use the same wording as risk_levels.
         "legend_low": "Low Risk",
         "legend_moderate": "Moderate Risk",
         "legend_high": "High Risk",
@@ -62,7 +57,7 @@ TRANSLATIONS = {
             "mithi": "Mithi",
             "umerkot": "Umerkot",
             "sanghar": "Sanghar",
-            # Non-Sindh MAP_ONLY_CITIES (added this session) - map popups/tooltips only.
+            # Cities outside Sindh, shown on the map only.
             "lahore": "Lahore",
             "islamabad": "Islamabad",
             "peshawar": "Peshawar",
@@ -103,20 +98,13 @@ TRANSLATIONS = {
         "forecast_error_unavailable": "We couldn't fetch a rainfall forecast right now. Try exploring a scenario instead.",
         "source_forecast": "Based on forecasted rainfall for the next {hours}h: {mm}mm expected.",
         "source_scenario": "Based on your hypothetical scenario of {mm}mm rainfall, not a real forecast.",
-        # FIXED this session: rainfall max was shown as /70, but the real
-        # rainfall ceiling is 54 (see RAINFALL_COMPONENT_MAX in app.py and
-        # the "4. Why is the risk..." card, which already showed /54).
+        # The rainfall maximum is 54 points and the elevation maximum is 30.
         "score_breakdown": "Score: {score}/100 (rainfall {rain}/54, elevation {elev}/30)",
         "how_calculated_toggle": "How is this calculated?",
         "explanation_with_elevation": "With {rainfall}mm of rain and {city} sitting on {elevation_position} compared to nearby areas, this adds up to {risk_level}.",
         "explanation_without_elevation": "With {rainfall}mm of rain expected for {city}, this adds up to {risk_level}.",
-        # UPDATED - the old wording said the risk level was "driven mainly by"
-        # terrain when rainfall is minimal. That described the pre-fix
-        # elevation bug (terrain alone could force Moderate Risk on a dry
-        # day) and is no longer true: elevation is now scaled by rainfall.
-        # Placeholders {city}, {rainfall}, {risk_level} only - the old
-        # {elevation_position} placeholder was dropped (extra kwargs passed
-        # to .format() are ignored, so callers do not need to change).
+        # Elevation is scaled by rainfall, so it counts for little on a dry
+        # day. The placeholders are {city}, {rainfall} and {risk_level}.
         "explanation_terrain_baseline": "With only {rainfall}mm of rain expected for {city}, this adds up to {risk_level}. Elevation counts for very little when there is almost no rain.",
         "elevation_position_low": "lower ground",
         "elevation_position_high": "higher ground",
@@ -159,13 +147,8 @@ TRANSLATIONS = {
                 "Follow evacuation guidance from PDMA Sindh / district administration - do not rely on this app for shelter locations",
             ],
         },
-        # NEW this session: shown INSTEAD of safety_tips[risk] when rainfall
-        # is negligible (see is_dry_conditions() in app.py). Deliberately
-        # generic - every item is sensible on any day and none implies a
-        # storm is coming. Applies to every city and every risk level.
-        # UPDATED: the old wording said the rating "reflects the area's
-        # terrain", which stopped being true once elevation was scaled by
-        # rainfall (terrain now contributes 0 points at 0mm).
+        # Shown instead of safety_tips when rainfall is negligible. The tips
+        # are general and fit any city and any risk level.
         "safety_tips_dry_note": "No significant rain is expected in this assessment, so there is no active flood threat. General preparedness tips:",
         "safety_tips_dry": [
             "Save emergency numbers: Rescue 1122 and PDMA Sindh (pdma.gos.pk)",
@@ -183,12 +166,8 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "Central Agricultural Plains",
             "Arid Plains & Deserts": "Arid Plains & Deserts",
         },
-        # UPDATED this session - reflects the elevation-rainfall scaling
-        # fix (see risk_check.py / METHODOLOGY.md): elevation points now
-        # only count in full once real rainfall is actually expected, so
-        # {points} can change day to day for the same city as the rainfall
-        # forecast changes, not just by which city was picked. Previously
-        # this note implied a fixed number tied only to terrain position.
+        # Elevation points only count in full once real rain is expected, so
+        # {points} changes with the forecast.
         "elevation_note_available": "{city} sits at {elevation}m. That is compared with other {profile} locations: the lower a city sits within its group, the more elevation points it can contribute (up to {max_points}). This only counts toward the score once real rainfall is expected. With little or no rain, elevation's contribution is scaled down, since low-lying terrain alone isn't a flood risk on a dry day. Right now it contributes {points} points. The bar above shows these points, not meters.",
         "elevation_note_unavailable": "Elevation data for {city} was not available - this score is based on rainfall alone.",
         "home_subtitle": "Get an estimate of flood risk for any supported Sindh city based on a live 72-hour rainfall forecast.",
@@ -197,16 +176,14 @@ TRANSLATIONS = {
         "about_warning_heading": "Not an Official Warning",
         "about_warning_body": "FloodSafe does not predict flooding with certainty and is not a substitute for official warnings from PDMA Sindh or your local authorities.",
         "about_callout": "Cities outside Sindh are shown on the map for geographic context only and are not risk-scored, for the same reason above: the model has only been back-tested on selected Sindh flood cases, so it has not been tested on their terrain.",
-        # NEW - About-page "why" section + link to the /floods-2022 page.
-        # The 70 percent figure is from the World Bank/UNDP PDNA (Oct 2022);
-        # it is cited on the floods_2022 page, which about_floods_link opens.
+        # About page "why" section. The 70 percent figure is from the World
+        # Bank/UNDP PDNA (Oct 2022) and is cited on the floods page.
         "about_why_heading": "Why I built FloodSafe",
         "about_why_body_1": "The 2022 floods hit Sindh harder than any other province, with close to 70 percent of Pakistan's total flood damages and economic losses. I experienced them firsthand: large parts of my city were flooded and our electricity was out for seven days. I kept asking one question: what if people had access to clearer flood-risk information early enough to prepare?",
         "about_why_body_2": "FloodSafe estimates a city's flood risk from a rainfall scenario or a live 72-hour forecast, using rainfall and the city's elevation relative to nearby areas. It explains the result and provides practical safety guidance in English, Urdu, and Sindhi. It is a planning aid and does not replace official warnings from NDMA or PDMA.",
         "about_floods_link": "Read what happened in the 2022 floods",
-        # NEW - full text of the /floods-2022 page (floods_2022.html). Figures are
-        # from the World Bank/UNDP PDNA, UN OCHA and Britannica (see the page's
-        # source list). English is the reference text; ur/sd are UNREVIEWED drafts.
+        # 2022 floods page (floods_2022.html). Figures are from the World
+        # Bank/UNDP PDNA, UN OCHA and Britannica (see the page's sources).
         "floods_title": "The 2022 Floods",
         "floods_lede": "Between June and October 2022, record monsoon rains and glacier melt flooded Pakistan. Sindh was the worst-affected province.",
         "floods_what_heading": "What happened",
@@ -219,13 +196,7 @@ TRANSLATIONS = {
         "floods_matters_body": "These are early assessments from October 2022 and the final figures may differ. FloodSafe is a planning aid that estimates flood risk from rainfall and elevation. It is not a forecast of flooding and does not replace official warnings from NDMA and PDMA.",
         "floods_sources_heading": "Sources",
         "how_it_works_title": "How It Works",
-        # UPDATED - "0–1 score" corrected to "out of 100" to match the rest of
-        # the app (score_breakdown, methodology page).
         "how_it_works_body_1": "FloodSafe estimates flood risk for Sindh cities from two factors: rainfall (either a live 72-hour forecast or a scenario you type in) and each city's elevation relative to nearby cities in the same terrain region. The two are combined into a single score out of 100, which maps to Low, Moderate, High, or Very High risk.",
-        # UPDATED - the old text said thresholds were "not sourced from an
-        # official government classification", which contradicted the
-        # methodology page (thresholds are anchored to the Flood Forecasting
-        # Division's 24-hour scale). Now consistent with methodology_rainfall_body_1.
         "how_it_works_body_2": "Rainfall thresholds are anchored to Pakistan's official Flood Forecasting Division 24-hour rainfall scale, scaled up to a 72-hour window using a standard rule of thumb. The exact spacing between terrain regions is the developer's own judgment and is documented, with reasoning, in the project's methodology notes. Elevation data comes from a public elevation API, looked up once per city.",
         "risk_map_heading": "Risk Map",
         "map_unavailable": "Map unavailable for this location.",
@@ -258,20 +229,12 @@ TRANSLATIONS = {
         "methodology_table_medium_header": "High risk starts around",
         "methodology_table_tier_note": "These two numbers mark where Moderate and High risk typically begin from rainfall alone. Very High Risk isn't a separate rainfall threshold. It only happens when the combined rainfall-plus-elevation score crosses 75 out of 100 (see below). All four levels (Low, Moderate, High, and Very High) are used the same way everywhere in the app: the home page results, the map, and this page.",
         "methodology_example_heading": "A worked example",
-        # UPDATED this session - matches the elevation-rainfall scaling fix
-        # (see risk_check.py / METHODOLOGY.md). Total changed from 45.6 to
-        # 34.4; classification (Moderate Risk) is unchanged. Previously this
-        # example gave elevation full weight regardless of how little rain
-        # was forecast, which is exactly the bug that was fixed.
         "methodology_example_body": "Say Karachi is forecast 25mm of rain over 72 hours. Its terrain type has a 40mm lower threshold, so 25mm scores about 15.6 of the rainfall component's first 25 points. If Karachi also happens to be the lowest-lying city in its terrain group, its elevation score would count for the full 30 points once rainfall reaches that same 40mm threshold, but at just 25mm, elevation's contribution is scaled down to about 18.8 of those 30 points, since low-lying terrain alone isn't treated as risky on a day with only light rain. Together, that's roughly 34.4 out of 100, which is enough to land in the Moderate Risk range.",
         "methodology_deadzone_heading": "Why very heavy rain doesn't always spike the score",
         "methodology_deadzone_body": "Once rainfall passes a region's higher threshold, the rainfall component doesn't jump straight to its ceiling. It climbs gradually, reaching its maximum only once rainfall roughly doubles that threshold. This is a deliberate choice to avoid over-reacting to one extreme number, not a bug, but it's also not independently validated, and the project may revisit it later.",
         "methodology_ceiling_heading": "Why a perfect score is rare",
         "methodology_ceiling_body": "Because the rainfall component tops out at 54 points, not 70, the highest score this model can actually produce is about 84 out of 100, not 100. Very High Risk (75-100) is still reachable, but only near the low end of that range. This is a real trade-off in how the score is built, not a bug.",
         "methodology_elevation_heading": "How elevation is scored",
-        # UPDATED - the old text described only the terrain ranking ("lowest
-        # city gets the most points") and said nothing about rainfall scaling,
-        # so it contradicted the result page's elevation note.
         "methodology_elevation_body": "A city's elevation is compared only to other cities with the same terrain type, not the whole country: 7 meters means something different on the coast than it does inland. The lowest city in a group gets the highest terrain score; the highest gets none. That terrain score only counts toward the total in proportion to how much rain is expected: with little or no rain it is scaled down, and it counts in full once rainfall reaches the region's lower threshold (see the table above). If elevation data isn't available for a city, the app says so directly and scores that city on rainfall alone, instead of guessing.",
         "methodology_not_modeled_heading": "What this model does not include",
         "methodology_not_modeled": [
@@ -291,8 +254,7 @@ TRANSLATIONS = {
         "methodology_validation_heading": "What \"back-tested\" means here",
         "methodology_validation_body": "In this project, the rainfall thresholds are tied to an official government classification through a stated method, and the scoring code is covered by automated tests. Separately, the model was historically back-tested on selected Sindh flood cases (and a few days with no flood), using a pass/fail rule written before the results. It caught every flood but gave false alarms on every no-flood day, so it failed that rule. This is a prototype, not a proven warning system. See the Back-test page for the full results.",
 
-        # Back-test page text (moved from templates/bt_strings.html).
-        # ur/sd are UNREVIEWED drafts: a native speaker must read them.
+        # Back-test page text
         "nav_back_test": "Back-test",
         "about_designed_heading": "Designed and calibrated for Sindh",
         "about_designed_body": "FloodSafe is built around the cities and terrain of Sindh. We tested it on past floods and quiet days, and it warns too often: it gave false alarms on days with no flood and failed our own pass/fail rule. Treat it as a prototype, not a proven warning system.",
@@ -392,16 +354,11 @@ TRANSLATIONS = {
         "nav_data_methodology": "ڈیٹا اور طریقہ کار",
         "nav_map": "نقشہ",
 
-        # NEW - map page title/intro were hardcoded English in map.html
-        # from the start, never wired to translations at all (unlike
-        # every other page). Unreviewed by a native speaker, same as the
-        # rest of the backlog.
+        # Map page
         "map_title": "فلڈ سیف پاکستان: نقشہ",
         "map_intro": "موجودہ خطرے کی سطح کے مطابق رنگ دیا گیا۔ تفصیلات کے لیے کسی نشان پر کلک کریں۔ سرمئی پن صرف نقشے کے تناظر کے لیے دکھائے گئے ہیں (سندھ سے باہر، خطرہ اسکور نہیں کیا گیا)۔",
 
-        # NEW - unreviewed by a native speaker, same as the rest of the
-        # translation backlog. Tier labels reuse risk_levels below for
-        # consistency; legend_not_scored mirrors about_callout's phrasing.
+        # Map legend
         "legend_low": "کم خطرہ",
         "legend_moderate": "درمیانہ خطرہ",
         "legend_high": "شدید خطرہ",
@@ -437,8 +394,7 @@ TRANSLATIONS = {
             "mithi": "مٹھی",
             "umerkot": "عمرکوٹ",
             "sanghar": "سانگھڑ",
-            # Non-Sindh MAP_ONLY_CITIES (added this session) - map popups/tooltips only.
-            # UNREVIEWED by a native speaker (draft), same as the rest of the backlog.
+            # Cities outside Sindh, shown on the map only.
             "lahore": "لاہور",
             "islamabad": "اسلام آباد",
             "peshawar": "پشاور",
@@ -479,14 +435,10 @@ TRANSLATIONS = {
         "forecast_error_unavailable": "ہم اس وقت بارش کی پیشگوئی حاصل نہیں کر سکے۔ براہ کرم اس کے بجائے ایک منظرنامہ آزمائیں۔",
         "source_forecast": "اگلے {hours} گھنٹوں کی پیشگوئی شدہ بارش پر مبنی: متوقع {mm} ملی میٹر۔",
         "source_scenario": "آپ کے فرضی منظرنامے پر مبنی جس میں {mm} ملی میٹر بارش شامل ہے - یہ حقیقی پیشگوئی نہیں ہے۔",
-        # FIXED this session: rainfall max was /70, real ceiling is 54.
         "score_breakdown": "اسکور: {score}/100 (بارش {rain}/54، بلندی {elev}/30)",
         "how_calculated_toggle": "یہ کیسے شمار کیا جاتا ہے؟",
         "explanation_with_elevation": "{rainfall} ملی میٹر بارش اور {city} کا آس پاس کے علاقوں کے مقابلے میں {elevation_position} پر ہونا، یہ مل کر {risk_level} بنتا ہے۔",
         "explanation_without_elevation": "{city} کے لیے متوقع {rainfall} ملی میٹر بارش کے ساتھ، یہ {risk_level} بنتا ہے۔",
-        # UPDATED - UNREVIEWED by a native speaker (draft). Mirrors the EN
-        # fix: the old wording said the risk level was driven mainly by
-        # terrain, which described the pre-fix elevation bug.
         "explanation_terrain_baseline": "{city} کے لیے صرف {rainfall} ملی میٹر بارش متوقع ہونے کے ساتھ، یہ {risk_level} بنتا ہے۔ تقریباً بارش نہ ہونے کی صورت میں بلندی کا حصہ بہت کم رہ جاتا ہے۔",
         "elevation_position_low": "نچلی زمین",
         "elevation_position_high": "اونچی زمین",
@@ -528,8 +480,7 @@ TRANSLATIONS = {
                 "PDMA سندھ / ضلعی انتظامیہ کی انخلا ہدایات پر عمل کریں - پناہ گاہ کی جگہ کے لیے صرف اس ایپ پر انحصار نہ کریں",
             ],
         },
-        # NEW this session - UNREVIEWED by a native speaker (draft).
-        # UPDATED: no longer says the rating "reflects the terrain" (see EN note).
+        # Shown instead of safety_tips on dry days.
         "safety_tips_dry_note": "اس تشخیص میں بارش نہ ہونے کے برابر ہے، اس لیے سیلاب کا کوئی فوری خطرہ نہیں۔ عمومی تیاری کی ہدایات:",
         "safety_tips_dry": [
             "ہنگامی نمبر محفوظ کر لیں: ریسکیو 1122 اور PDMA سندھ (pdma.gos.pk)",
@@ -547,9 +498,6 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "وسطی زرعی میدانی علاقے",
             "Arid Plains & Deserts": "خشک میدانی اور صحرائی علاقے",
         },
-        # UPDATED this session - UNREVIEWED by a native speaker (draft),
-        # same as the rest of the backlog. Mirrors the EN fix: elevation
-        # points now only count in full once real rainfall is expected.
         "elevation_note_available": "{city} کی بلندی {elevation} میٹر ہے۔ اس کا موازنہ دیگر {profile} مقامات سے کیا جاتا ہے: گروپ میں جتنی نچلی جگہ ہو، اتنے ہی زیادہ بلندی پوائنٹس (زیادہ سے زیادہ {max_points}) شامل ہو سکتے ہیں۔ لیکن یہ پوائنٹس اسکور میں تبھی پورے شامل ہوتے ہیں جب واقعی بارش متوقع ہو - کم یا نہ ہونے کے برابر بارش کی صورت میں بلندی کا حصہ کم کر دیا جاتا ہے، کیونکہ صرف نشیبی زمین خشک دن میں سیلابی خطرہ نہیں بنتی۔ اس وقت یہ {points} پوائنٹس شامل کر رہی ہے۔ اوپر کی پٹی میٹر نہیں بلکہ یہی پوائنٹس دکھاتی ہے۔",
         "elevation_note_unavailable": "{city} کے لیے بلندی کا ڈیٹا دستیاب نہیں تھا - یہ اسکور صرف بارش پر مبنی ہے۔",
         "home_subtitle": "کسی بھی معاون سندھ شہر کے لیے لائیو 72 گھنٹے کی بارش کی پیشگوئی کی بنیاد پر سیلاب کے خطرے کا اندازہ حاصل کریں۔",
@@ -558,16 +506,12 @@ TRANSLATIONS = {
         "about_warning_heading": "یہ کوئی سرکاری وارننگ نہیں ہے",
         "about_warning_body": "فلڈ سیف یقین کے ساتھ سیلاب کی پیشگوئی نہیں کرتا اور PDMA سندھ یا آپ کے مقامی حکام کی سرکاری وارننگز کا متبادل نہیں ہے۔",
         "about_callout": "سندھ سے باہر کے شہر صرف جغرافیائی حوالے کے لیے نقشے پر دکھائے گئے ہیں اور ان کا خطرہ اسکور نہیں کیا گیا - اسی وجہ سے جیسا کہ اوپر بتایا گیا، ماڈل کو صرف سندھ کے منتخب سیلابی کیسز پر بیک ٹیسٹ کیا گیا ہے، اس لیے ان کی زمینی خصوصیات پر اسے جانچا نہیں گیا۔",
-        # NEW - UNREVIEWED by a native speaker (my draft), same as the rest
-        # of the backlog.
+        # About page "why" section
         "about_why_heading": "میں نے فلڈ سیف کیوں بنایا",
         "about_why_body_1": "2022 کے سیلاب نے سندھ کو کسی بھی دوسرے صوبے سے زیادہ متاثر کیا؛ پاکستان کے کل سیلابی نقصانات اور معاشی خسارے کا تقریباً 70 فیصد سندھ میں ہوا۔ میں نے یہ سیلاب خود جھیلا: میرے شہر کے بڑے حصے زیرِ آب آ گئے اور ہماری بجلی سات دن تک بند رہی۔ میں ایک ہی سوال پوچھتا رہا: اگر لوگوں کو سیلاب کے خطرے کی واضح معلومات تیاری کے لیے کافی پہلے مل جاتیں تو کیا ہوتا؟",
         "about_why_body_2": "فلڈ سیف بارش کے کسی منظرنامے یا لائیو 72 گھنٹے کی پیشگوئی کی بنیاد پر، بارش اور آس پاس کے علاقوں کے مقابلے میں شہر کی بلندی کو استعمال کرتے ہوئے، شہر کے سیلابی خطرے کا اندازہ لگاتا ہے۔ یہ نتیجے کی وضاحت کرتا ہے اور انگریزی، اردو اور سندھی میں عملی حفاظتی ہدایات فراہم کرتا ہے۔ یہ منصوبہ بندی میں مدد کا ذریعہ ہے اور NDMA یا PDMA کی سرکاری وارننگز کا متبادل نہیں۔",
         "about_floods_link": "2022 کے سیلاب میں کیا ہوا، پڑھیں",
-        # NEW - full text of the /floods-2022 page (floods_2022.html). Figures are
-        # from the World Bank/UNDP PDNA, UN OCHA and Britannica (see the page's
-        # source list). ur/sd are UNREVIEWED drafts - check the numbers as well as
-        # the wording before relying on them.
+        # 2022 floods page. Check the numbers as well as the wording.
         "floods_title": "2022 کے سیلاب",
         "floods_lede": "جون سے اکتوبر 2022 کے دوران ریکارڈ مون سون بارشوں اور گلیشیئر پگھلنے سے پاکستان میں سیلاب آیا۔ سندھ سب سے زیادہ متاثر ہونے والا صوبہ تھا۔",
         "floods_what_heading": "کیا ہوا",
@@ -580,12 +524,7 @@ TRANSLATIONS = {
         "floods_matters_body": "یہ اکتوبر 2022 کے ابتدائی تخمینے ہیں اور حتمی اعداد و شمار مختلف ہو سکتے ہیں۔ فلڈ سیف منصوبہ بندی میں مدد کا ایک ذریعہ ہے جو بارش اور بلندی کی بنیاد پر سیلاب کے خطرے کا اندازہ لگاتا ہے۔ یہ سیلاب کی پیشگوئی نہیں ہے اور NDMA اور PDMA کی سرکاری وارننگز کا متبادل نہیں۔",
         "floods_sources_heading": "ذرائع",
         "how_it_works_title": "یہ کیسے کام کرتا ہے",
-        # UPDATED - UNREVIEWED by a native speaker (draft). "0-1 score"
-        # corrected to "out of 100" (see EN note).
         "how_it_works_body_1": "فلڈ سیف سندھ کے شہروں کے لیے دو عوامل سے سیلاب کے خطرے کا اندازہ لگاتا ہے: بارش (یا تو 72 گھنٹے کی لائیو پیشگوئی یا آپ کا درج کردہ منظرنامہ) اور ہر شہر کی بلندی اسی زمینی خطے کے قریبی شہروں کے مقابلے میں۔ یہ دونوں مل کر 100 میں سے ایک اسکور بناتے ہیں، جو کم، درمیانہ، شدید، یا انتہائی شدید خطرے میں تبدیل ہوتا ہے۔",
-        # UPDATED - UNREVIEWED by a native speaker (draft). Now consistent
-        # with methodology_rainfall_body_1 (thresholds are anchored to the
-        # Flood Forecasting Division scale).
         "how_it_works_body_2": "بارش کی حدیں پاکستان کے فلڈ فورکاسٹنگ ڈویژن کی سرکاری 24 گھنٹے کی بارش کی درجہ بندی سے منسلک ہیں، جنہیں ایک معیاری اصول کے ذریعے 72 گھنٹے کی مدت کے لیے بڑھایا گیا ہے۔ زمینی علاقوں کے درمیان درست فرق ڈویلپر کا اپنا فیصلہ ہے اور اس کی وجوہات منصوبے کے طریقہ کار کے نوٹس میں دستاویزی ہیں۔ بلندی کا ڈیٹا ایک عوامی بلندی API سے حاصل کیا جاتا ہے، جو ہر شہر کے لیے ایک بار حاصل کیا جاتا ہے۔",
         "risk_map_heading": "خطرے کا نقشہ",
         "map_unavailable": "اس مقام کے لیے نقشہ دستیاب نہیں۔",
@@ -618,17 +557,12 @@ TRANSLATIONS = {
         "methodology_table_medium_header": "شدید خطرہ یہاں سے شروع ہوتا ہے",
         "methodology_table_tier_note": "یہ دونوں نمبر ظاہر کرتے ہیں کہ صرف بارش کی بنیاد پر درمیانہ اور شدید خطرہ عام طور پر کہاں سے شروع ہوتا ہے۔ انتہائی شدید خطرہ کوئی الگ بارش کی حد نہیں ہے۔ یہ تب ہوتا ہے جب بارش اور بلندی کا مجموعی اسکور 100 میں سے 75 سے تجاوز کر جائے (نیچے دیکھیں)۔ چاروں سطحیں (کم، درمیانہ، شدید، اور انتہائی شدید) پوری ایپ میں ایک ہی طرح استعمال ہوتی ہیں: ہوم پیج کے نتائج، نقشہ، اور یہ صفحہ۔",
         "methodology_example_heading": "ایک مثال",
-        # UPDATED this session - UNREVIEWED by a native speaker (draft),
-        # same as the rest of the backlog. Matches the EN fix: total
-        # changed from 45.6 to 34.4, classification unchanged.
         "methodology_example_body": "فرض کریں کراچی کے لیے اگلے 72 گھنٹوں میں 25 ملی میٹر بارش کی پیشگوئی ہے۔ اس کی زمینی قسم کی نچلی حد 40 ملی میٹر ہے، تو 25 ملی میٹر بارش کے پہلے 25 پوائنٹس میں سے تقریباً 15.6 پوائنٹس بنتے ہیں۔ اگر کراچی اپنے زمینی گروپ میں سب سے نچلے مقام پر بھی ہو، تو اس کی بلندی کا اسکور اسی 40 ملی میٹر کی حد تک بارش پہنچنے پر ہی پورے 30 پوائنٹس شمار ہو گا - لیکن صرف 25 ملی میٹر پر، بلندی کا حصہ گھٹ کر تقریباً 18.8 پوائنٹس رہ جاتا ہے، کیونکہ ہلکی بارش والے دن میں صرف نشیبی زمین کو خطرناک نہیں سمجھا جاتا۔ ملا کر یہ 100 میں سے تقریباً 34.4 بنتا ہے - جو درمیانہ خطرے کی حد میں آنے کے لیے کافی ہے۔",
         "methodology_deadzone_heading": "شدید بارش ہمیشہ اسکور کو کیوں نہیں بڑھاتی",
         "methodology_deadzone_body": "جب بارش کسی علاقے کی بالائی حد سے تجاوز کر جائے، تو بارش کا حصہ فوری طور پر اپنی زیادہ سے زیادہ حد تک نہیں پہنچتا - یہ آہستہ آہستہ بڑھتا ہے، اور اپنی زیادہ سے زیادہ حد تک تب پہنچتا ہے جب بارش اس حد سے تقریباً دگنی ہو جائے۔ یہ ایک جان بوجھ کر کیا گیا فیصلہ ہے تاکہ ایک انتہائی نمبر پر حد سے زیادہ ردعمل نہ ہو، کوئی خرابی نہیں - لیکن یہ بھی آزادانہ طور پر تصدیق شدہ نہیں ہے، اور منصوبہ مستقبل میں اس پر نظرثانی کر سکتا ہے۔",
         "methodology_ceiling_heading": "ایک مکمل اسکور کیوں نایاب ہے",
         "methodology_ceiling_body": "چونکہ بارش کا حصہ 70 نہیں بلکہ 54 پوائنٹس پر ختم ہوتا ہے، اس ماڈل کا سب سے زیادہ ممکنہ اسکور تقریباً 100 میں سے 84 ہے، 100 نہیں۔ انتہائی شدید خطرہ (75-100) اب بھی حاصل کیا جا سکتا ہے، لیکن صرف اس حد کے نچلے سرے کے قریب۔ یہ اسکور بننے کے طریقے میں ایک حقیقی سمجھوتہ ہے، کوئی خرابی نہیں۔",
         "methodology_elevation_heading": "بلندی کیسے شمار کی جاتی ہے",
-        # UPDATED - UNREVIEWED by a native speaker (draft). Now mentions the
-        # rainfall scaling (see EN note).
         "methodology_elevation_body": "کسی شہر کی بلندی کا موازنہ صرف اسی طرح کی زمینی خصوصیات رکھنے والے دیگر شہروں سے کیا جاتا ہے، پورے ملک سے نہیں - ساحل پر 7 میٹر کا مطلب اندرون ملک سے مختلف ہوتا ہے۔ گروپ میں سب سے نچلے شہر کو سب سے زیادہ زمینی پوائنٹس ملتے ہیں؛ سب سے اونچے کو کوئی نہیں ملتا۔ یہ پوائنٹس مجموعی اسکور میں اتنے ہی شامل ہوتے ہیں جتنی بارش متوقع ہو: کم یا نہ ہونے کے برابر بارش میں انہیں کم کر دیا جاتا ہے، اور جب بارش علاقے کی نچلی حد (اوپر جدول دیکھیں) تک پہنچ جائے تو یہ پورے شامل ہوتے ہیں۔ اگر کسی شہر کے لیے بلندی کا ڈیٹا دستیاب نہ ہو، تو ایپ یہ واضح طور پر بتاتی ہے اور اس شہر کا اسکور صرف بارش پر بناتی ہے، اندازہ لگانے کے بجائے۔",
         "methodology_not_modeled_heading": "یہ ماڈل کیا شامل نہیں کرتا",
         "methodology_not_modeled": [
@@ -648,8 +582,7 @@ TRANSLATIONS = {
         "methodology_validation_heading": "یہاں \"بیک ٹیسٹ\" کا کیا مطلب ہے",
         "methodology_validation_body": "اس منصوبے میں بارش کی حدیں ایک بیان کردہ طریقے کے ذریعے ایک سرکاری درجہ بندی سے منسلک ہیں، اور اسکورنگ کوڈ خودکار ٹیسٹس سے ڈھکا ہوا ہے۔ اس کے علاوہ، ماڈل کو ماضی کے سندھ کے منتخب سیلابی کیسز (اور سیلاب کے بغیر چند دنوں) پر بیک ٹیسٹ کیا گیا، ایسے کامیابی اور ناکامی کے اصول کے ساتھ جو نتائج سے پہلے لکھا گیا تھا۔ اس نے ہر سیلاب پکڑا مگر سیلاب کے بغیر ہر دن پر غلط الارم دیا، اس لیے وہ اس اصول پر پورا نہیں اترا۔ یہ ایک تجرباتی نمونہ ہے، ثابت شدہ وارننگ سسٹم نہیں۔ مکمل نتائج کے لیے بیک ٹیسٹ صفحہ دیکھیں۔",
 
-        # Back-test page text (moved from templates/bt_strings.html).
-        # ur/sd are UNREVIEWED drafts: a native speaker must read them.
+        # Back-test page text
         "nav_back_test": "بیک ٹیسٹ",
         "about_designed_heading": "سندھ کے لیے ڈیزائن اور ترتیب دیا گیا",
         "about_designed_body": "فلڈ سیف سندھ کے شہروں اور زمین کو سامنے رکھ کر بنایا گیا ہے۔ ہم نے اسے ماضی کے سیلابوں اور پرسکون دنوں پر جانچا، اور یہ ضرورت سے زیادہ خبردار کرتا ہے: سیلاب کے بغیر دنوں پر بھی غلط الارم دیے اور ہمارے اپنے اصول پر پورا نہیں اترا۔ اسے ایک تجرباتی نمونہ سمجھیں، ثابت شدہ وارننگ سسٹم نہیں۔",
@@ -749,16 +682,11 @@ TRANSLATIONS = {
         "nav_data_methodology": "ڊيٽا ۽ طريقيڪار",
         "nav_map": "نقشو",
 
-        # NEW - map page title/intro were hardcoded English in map.html
-        # from the start, never wired to translations at all (unlike
-        # every other page). Unreviewed by a native speaker, same as the
-        # rest of the backlog.
+        # Map page
         "map_title": "فلڊ سيف پاڪستان: نقشو",
         "map_intro": "موجوده خطري جي سطح مطابق رنگ ڏنل. تفصيل لاءِ ڪنهن نشان تي ڪلڪ ڪريو. سرمائي پن رڳو نقشي جي حوالي لاءِ ڏيکاريا ويا آهن (سنڌ کان ٻاهر، خطرو اسڪور نه ڪيل).",
 
-        # NEW - unreviewed by a native speaker, same as the rest of the
-        # translation backlog. Tier labels reuse risk_levels below for
-        # consistency; legend_not_scored mirrors about_callout's phrasing.
+        # Map legend
         "legend_low": "گھٽ خطرو",
         "legend_moderate": "وچولو خطرو",
         "legend_high": "وڏو خطرو",
@@ -794,8 +722,7 @@ TRANSLATIONS = {
             "mithi": "مٺي",
             "umerkot": "عمرڪوٽ",
             "sanghar": "سانگھڙ",
-            # Non-Sindh MAP_ONLY_CITIES (added this session) - map popups/tooltips only.
-            # UNREVIEWED by a native speaker (draft), same as the rest of the backlog.
+            # Cities outside Sindh, shown on the map only.
             "lahore": "لاهور",
             "islamabad": "اسلام آباد",
             "peshawar": "پشاور",
@@ -836,14 +763,10 @@ TRANSLATIONS = {
         "forecast_error_unavailable": "اسان هن وقت برسات جي اڳڪٿي حاصل نه ڪري سگهياسين. مهرباني ڪري ان جي بدران هڪ منظرنامو آزمايو.",
         "source_forecast": "ايندڙ {hours} ڪلاڪن جي اڳڪٿي ٿيل برسات تي ٻڌل: متوقع {mm} ملي ميٽر.",
         "source_scenario": "توهان جي فرضي منظرنامي تي ٻڌل جنهن ۾ {mm} ملي ميٽر برسات شامل آهي - هي حقيقي اڳڪٿي ناهي.",
-        # FIXED this session: rainfall max was /70, real ceiling is 54.
         "score_breakdown": "اسڪور: {score}/100 (برسات {rain}/54، بلندي {elev}/30)",
         "how_calculated_toggle": "هي ڪيئن ڳڻيو ويندو آهي؟",
         "explanation_with_elevation": "{rainfall} ملي ميٽر برسات ۽ {city} جو ڀرپاسي وارن علائقن جي مقابلي ۾ {elevation_position} تي هجڻ، هي گڏجي {risk_level} ٿو ٺاهي.",
         "explanation_without_elevation": "{city} لاءِ متوقع {rainfall} ملي ميٽر برسات سان، هي {risk_level} ٿو ٺاهي.",
-        # UPDATED - UNREVIEWED by a native speaker (draft; my Sindhi is weaker
-        # than my Urdu). Mirrors the EN fix: the old wording said the risk
-        # level was driven mainly by terrain, which described the pre-fix bug.
         "explanation_terrain_baseline": "{city} لاءِ فقط {rainfall} ملي ميٽر برسات متوقع هجڻ سان، هي {risk_level} ٿو ٺاهي. لڳ ڀڳ برسات نه هجڻ جي صورت ۾ بلندي جو حصو تمام گھٽ رهجي وڃي ٿو.",
         "elevation_position_low": "هيٺاهين زمين",
         "elevation_position_high": "مٿاهين زمين",
@@ -885,8 +808,7 @@ TRANSLATIONS = {
                 "PDMA سنڌ / ضلعي انتظاميه جي لڏپلاڻ هدايتن تي عمل ڪريو - پناهگاهه جي جاءِ لاءِ رڳو هن ايپ تي ڀروسو نه ڪريو",
             ],
         },
-        # NEW this session - UNREVIEWED by a native speaker (draft).
-        # UPDATED: no longer says the rating "reflects the terrain" (see EN note).
+        # Shown instead of safety_tips on dry days.
         "safety_tips_dry_note": "هن جانچ ۾ برسات نه هجڻ جي برابر آهي، تنهنڪري سيلاب جو ڪو فوري خطرو ناهي. عام تياري جون هدايتون:",
         "safety_tips_dry": [
             "هنگامي نمبر محفوظ ڪريو: ريسڪيو 1122 ۽ PDMA سنڌ (pdma.gos.pk)",
@@ -904,10 +826,6 @@ TRANSLATIONS = {
             "Central Agricultural Plains": "مرڪزي زرعي ميدان",
             "Arid Plains & Deserts": "سڪل ميدان ۽ ريگستان",
         },
-        # UPDATED this session - UNREVIEWED by a native speaker (draft; my
-        # Sindhi is weaker than my Urdu), same as the rest of the backlog.
-        # Mirrors the EN fix: elevation points now only count in full once
-        # real rainfall is expected.
         "elevation_note_available": "{city} جي بلندي {elevation} ميٽر آهي. ان جو مقابلو ٻين {profile} هنڌن سان ڪيو ويندو آهي: گروپ ۾ جيترو هيٺاهون هجي، اوترا وڌيڪ بلندي پوائنٽ (وڌ ۾ وڌ {max_points}) شامل ٿي سگهن ٿا. پر هي پوائنٽ اسڪور ۾ تڏهن پورا شامل ٿين ٿا جڏهن واقعي برسات جي اميد هجي - گھٽ يا نه هجڻ جي برابر برسات جي صورت ۾ بلندي جو حصو گھٽايو ويندو آهي، ڇاڪاڻ ته فقط هيٺاهين زمين سڪل ڏينهن ۾ سيلابي خطرو نٿي بڻجي. هن وقت هي {points} پوائنٽ شامل ڪري رهي آهي. مٿي واري پٽي ميٽر نه پر اهي ئي پوائنٽ ڏيکاري ٿي.",
         "elevation_note_unavailable": "{city} لاءِ بلندي جو ڊيٽا موجود نه هو - هي اسڪور فقط برسات تي ٻڌل آهي.",
         "home_subtitle": "ڪنهن به سپورٽ ٿيل سنڌ جي شهر لاءِ لائيو 72 ڪلاڪن جي برسات جي اڳڪٿي جي بنياد تي سيلاب جي خطري جو اندازو حاصل ڪريو.",
@@ -916,18 +834,13 @@ TRANSLATIONS = {
         "about_warning_heading": "هي ڪا سرڪاري وارننگ ناهي",
         "about_warning_body": "فلڊ سيف يقين سان سيلاب جي اڳڪٿي نٿو ڪري ۽ PDMA سنڌ يا توهان جي مقامي اختيارين جي سرڪاري وارننگن جو متبادل ناهي.",
         "about_callout": "سنڌ کان ٻاهر جا شهر رڳو جاگرافيائي حوالي لاءِ نقشي تي ڏيکاريا ويا آهن ۽ انهن جو خطرو اسڪور نه ڪيو ويو آهي - ساڳئي سبب مطابق جيئن مٿي ٻڌايو ويو، ماڊل کي رڳو سنڌ جي چونڊيل سيلابي ڪيسن تي بيڪ ٽيسٽ ڪيو ويو آهي، تنهنڪري سندن زميني خاصيتن تي ان کي جاچيو نه ويو آهي.",
-        # NEW - UNREVIEWED by a native speaker (my draft; my Sindhi is weaker
-        # than my Urdu). Uses "سيلاب" for flood to match the rest of this
-        # file, although "ٻوڏ" is the more idiomatic Sindhi word - a native
-        # reviewer should decide.
+        # About page "why" section. "سيلاب" is used for flood here, but "ٻوڏ"
+        # is the more natural Sindhi word, so a native reviewer should decide.
         "about_why_heading": "مون فلڊ سيف ڇو ٺاهيو",
         "about_why_body_1": "2022 جي سيلاب سنڌ کي ٻين سڀني صوبن کان وڌيڪ متاثر ڪيو؛ پاڪستان جي ڪل سيلابي نقصانن ۽ معاشي خساري جو تقريباً 70 سيڪڙو سنڌ ۾ ٿيو. مون اهو سيلاب پاڻ ڏٺو: منهنجي شهر جا وڏا حصا پاڻيءَ هيٺ اچي ويا ۽ اسان جي بجلي ست ڏينهن بند رهي. مان هڪ ئي سوال پڇندو رهيس: جيڪڏهن ماڻهن کي سيلاب جي خطري بابت صاف معلومات تياريءَ لاءِ ڪافي اڳ ملي وڃي ها ته ڇا ٿئي ها؟",
         "about_why_body_2": "فلڊ سيف برسات جي ڪنهن منظرنامي يا لائيو 72 ڪلاڪن جي اڳڪٿي جي بنياد تي، برسات ۽ ڀرپاسي جي علائقن جي مقابلي ۾ شهر جي بلندي استعمال ڪندي، شهر جي سيلاب جي خطري جو اندازو لڳائي ٿو. هي نتيجي جي وضاحت ڪري ٿو ۽ انگريزي، اردو ۽ سنڌي ۾ عملي حفاظتي هدايتون ڏئي ٿو. هي منصوبابندي ۾ مدد جو ذريعو آهي ۽ NDMA يا PDMA جي سرڪاري وارننگن جو متبادل ناهي.",
         "about_floods_link": "2022 جي سيلاب ۾ ڇا ٿيو، پڙهو",
-        # NEW - full text of the /floods-2022 page (floods_2022.html). Figures are
-        # from the World Bank/UNDP PDNA, UN OCHA and Britannica (see the page's
-        # source list). ur/sd are UNREVIEWED drafts - check the numbers as well as
-        # the wording before relying on them.
+        # 2022 floods page. Check the numbers as well as the wording.
         "floods_title": "2022 جو سيلاب",
         "floods_lede": "جون کان آڪٽوبر 2022 دوران رڪارڊ مون سون برساتن ۽ گليشيئر جي ڳرڻ سبب پاڪستان ۾ سيلاب آيو. سنڌ سڀ کان وڌيڪ متاثر ٿيندڙ صوبو هو.",
         "floods_what_heading": "ڇا ٿيو",
@@ -940,11 +853,7 @@ TRANSLATIONS = {
         "floods_matters_body": "هي آڪٽوبر 2022 جا شروعاتي اندازا آهن ۽ حتمي انگ مختلف ٿي سگهن ٿا. فلڊ سيف منصوبابندي ۾ مدد جو هڪ ذريعو آهي جيڪو برسات ۽ بلندي جي بنياد تي سيلاب جي خطري جو اندازو لڳائي ٿو. هي سيلاب جي اڳڪٿي ناهي ۽ NDMA ۽ PDMA جي سرڪاري وارننگن جو متبادل ناهي.",
         "floods_sources_heading": "ماخذ",
         "how_it_works_title": "هي ڪيئن ڪم ڪري ٿو",
-        # UPDATED - UNREVIEWED by a native speaker (draft; my Sindhi is weaker
-        # than my Urdu). "0-1 score" corrected to "out of 100" (see EN note).
         "how_it_works_body_1": "فلڊ سيف سنڌ جي شهرن لاءِ ٻن عنصرن مان سيلاب جي خطري جو اندازو لڳائي ٿو: برسات (يا ته 72 ڪلاڪن جي لائيو اڳڪٿي يا توهان جو داخل ڪيل منظرنامو) ۽ هر شهر جي بلندي ساڳئي زميني علائقي جي ويجهن شهرن جي مقابلي ۾. ٻئي گڏجي 100 مان هڪ اسڪور ٺاهين ٿا، جيڪو گھٽ، وچولو، وڏو، يا تمام وڏو خطري ۾ تبديل ٿئي ٿو.",
-        # UPDATED - UNREVIEWED by a native speaker (draft; my Sindhi is weaker
-        # than my Urdu). Now consistent with methodology_rainfall_body_1.
         "how_it_works_body_2": "برسات جون حدون پاڪستان جي فلڊ فورڪاسٽنگ ڊويزن جي سرڪاري 24 ڪلاڪن جي برسات جي درجه بندي سان ڳنڍيل آهن، جن کي هڪ معياري اصول ذريعي 72 ڪلاڪن جي مدت لاءِ وڌايو ويو آهي. زميني علائقن جي وچ ۾ صحيح فرق ڊولپر جو پنهنجو فيصلو آهي ۽ ان جا دليل منصوبي جي طريقيڪار جي نوٽس ۾ دستاويز ٿيل آهن. بلندي جو ڊيٽا هڪ عوامي بلندي API مان حاصل ڪيو ويندو آهي، جيڪو هر شهر لاءِ هڪ ڀيرو حاصل ڪيو ويندو آهي.",
         "risk_map_heading": "خطري جو نقشو",
         "map_unavailable": "هن هنڌ لاءِ نقشو دستياب ناهي.",
@@ -977,18 +886,12 @@ TRANSLATIONS = {
         "methodology_table_medium_header": "وڏو خطرو هتان کان شروع ٿئي ٿو",
         "methodology_table_tier_note": "هي ٻئي انگ ڏيکارين ٿا ته رڳو برسات جي بنياد تي وچولو ۽ وڏو خطرو عام طور تي ڪٿان شروع ٿئي ٿو. تمام وڏو خطرو ڪا الڳ برسات جي حد ناهي. هي تڏهن ٿئي ٿو جڏهن برسات ۽ بلندي جو گڏيل اسڪور 100 مان 75 کان لنگهي وڃي (هيٺ ڏسو). چارئي سطحون (گھٽ، وچولو، وڏو، ۽ تمام وڏو) سڄي ايپ ۾ ساڳئي طرح استعمال ٿين ٿيون: هوم پيج جا نتيجا، نقشو، ۽ هي صفحو.",
         "methodology_example_heading": "هڪ مثال",
-        # UPDATED this session - UNREVIEWED by a native speaker (draft; my
-        # Sindhi is weaker than my Urdu), same as the rest of the backlog.
-        # Matches the EN fix: total changed from 45.6 to 34.4,
-        # classification unchanged.
         "methodology_example_body": "فرض ڪريو ڪراچي لاءِ ايندڙ 72 ڪلاڪن ۾ 25 ملي ميٽر برسات جي اڳڪٿي آهي. ان جي زميني قسم جي هيٺين حد 40 ملي ميٽر آهي، تنهنڪري 25 ملي ميٽر برسات جي پهرين 25 پوائنٽن مان تقريباً 15.6 پوائنٽ ٺهن ٿا. جيڪڏهن ڪراچي پنهنجي زميني گروپ ۾ سڀ کان هيٺاهين هنڌ تي به هجي، ته ان جي بلندي جو اسڪور ان ساڳئي 40 ملي ميٽر حد تائين برسات پهچڻ تي ئي پورا 30 پوائنٽ ٿيندو - پر فقط 25 ملي ميٽر تي، بلندي جو حصو گھٽجي تقريباً 18.8 پوائنٽ رهجي وڃي ٿو، ڇاڪاڻ ته هلڪي برسات وارن ڏينهن ۾ رڳو هيٺاهين زمين کي خطرناڪ نه سمجهيو ويندو آهي. گڏي هي 100 مان تقريباً 34.4 ٿئي ٿو - جيڪو وچولي خطري جي حد ۾ اچڻ لاءِ ڪافي آهي.",
         "methodology_deadzone_heading": "تمام وڏي برسات هميشه اسڪور کي ڇو نٿي وڌائي",
         "methodology_deadzone_body": "جڏهن برسات ڪنهن علائقي جي مٿينءَ حد کان لنگهي وڃي، ته برسات جو حصو سِڌو سنئون پنهنجي وڌ ۾ وڌ حد تائين نٿو پهچي - هي آهستي آهستي وڌي ٿو، ۽ پنهنجي وڌ ۾ وڌ حد تائين تڏهن پهچي ٿو جڏهن برسات ان حد کان تقريباً ٻيڻي ٿي وڃي. هي هڪ ڄاڻي واڻي ڪيل فيصلو آهي ته جيئن هڪ انتهائي انگ تي حد کان وڌيڪ ردعمل نه ٿئي، ڪا خرابي ناهي - پر هي پڻ آزاد طور تي تصديق ٿيل ناهي، ۽ منصوبو مستقبل ۾ ان تي نظرثاني ڪري سگهي ٿو.",
         "methodology_ceiling_heading": "هڪ مڪمل اسڪور ڇو ناياب آهي",
         "methodology_ceiling_body": "ڇاڪاڻ ته برسات جو حصو 70 نه پر 54 پوائنٽن تي ختم ٿئي ٿو، هن ماڊل جو وڌ ۾ وڌ ممڪن اسڪور تقريباً 100 مان 84 آهي، 100 ناهي. تمام وڏو خطرو (75-100) اڃا حاصل ٿي سگهي ٿو، پر رڳو ان حد جي هيٺين ڇيڙي جي ويجهو. هي اسڪور ٺهڻ جي طريقي ۾ هڪ حقيقي سمجهوتو آهي، ڪا خرابي ناهي.",
         "methodology_elevation_heading": "بلندي ڪيئن ڳڻي ويندي آهي",
-        # UPDATED - UNREVIEWED by a native speaker (draft; my Sindhi is weaker
-        # than my Urdu). Now mentions the rainfall scaling (see EN note).
         "methodology_elevation_body": "ڪنهن شهر جي بلندي جو مقابلو رڳو ساڳئي زميني خاصيتن وارن ٻين شهرن سان ڪيو ويندو آهي، سڄي ملڪ سان نه - ساحل تي 7 ميٽر جو مطلب اندرون ملڪ کان مختلف هوندو آهي. گروپ ۾ سڀ کان هيٺاهين شهر کي سڀ کان وڌيڪ زميني پوائنٽ ملن ٿا؛ سڀ کان مٿاهين کي ڪو نه ملي. اهي پوائنٽ ڪل اسڪور ۾ ايتري ئي حد تائين شامل ٿين ٿا جيتري برسات متوقع هجي: گھٽ يا نه هجڻ جي برابر برسات ۾ انهن کي گھٽايو ويندو آهي، ۽ جڏهن برسات علائقي جي هيٺين حد (مٿي جدول ڏسو) تائين پهچي ته اهي پورا شامل ٿين ٿا. جيڪڏهن ڪنهن شهر لاءِ بلندي جو ڊيٽا موجود نه هجي، ته ايپ اهو واضح طور تي ٻڌائي ٿي ۽ ان شهر جو اسڪور رڳو برسات تي ٺاهي ٿي، اندازو لڳائڻ جي بدران.",
         "methodology_not_modeled_heading": "هي ماڊل ڇا شامل نٿو ڪري",
         "methodology_not_modeled": [
@@ -1008,8 +911,7 @@ TRANSLATIONS = {
         "methodology_validation_heading": "هتي \"بيڪ ٽيسٽ\" جو مطلب ڇا آهي",
         "methodology_validation_body": "هن منصوبي ۾ برسات جون حدون هڪ ٻڌايل طريقي ذريعي هڪ سرڪاري درجه بندي سان ڳنڍيل آهن، ۽ اسڪورنگ ڪوڊ خودڪار ٽيسٽن سان ڍڪيل آهي. ان کان علاوه، ماڊل کي ماضي جي سنڌ جي چونڊيل سيلابي ڪيسن (۽ سيلاب کان سواءِ ڪجهه ڏينهن) تي بيڪ ٽيسٽ ڪيو ويو، هڪ اهڙي ڪامياب يا ناڪام ٿيڻ جي اصول سان جيڪو نتيجن کان اڳ لکيو ويو هو. هن هر سيلاب پڪڙيو پر سيلاب کان سواءِ هر ڏينهن تي غلط الارم ڏنو، تنهنڪري اهو ان اصول تي پورو نه لٿو. هي هڪ تجرباتي نمونو آهي، ثابت ٿيل وارننگ سسٽم نه. مڪمل نتيجن لاءِ بيڪ ٽيسٽ صفحو ڏسو.",
 
-        # Back-test page text (moved from templates/bt_strings.html).
-        # ur/sd are UNREVIEWED drafts: a native speaker must read them.
+        # Back-test page text
         "nav_back_test": "بيڪ ٽيسٽ",
         "about_designed_heading": "سنڌ لاءِ ٺاهيل ۽ ترتيب ڏنل",
         "about_designed_body": "فلڊ سيف سنڌ جي شهرن ۽ زمين کي سامهون رکي ٺاهيو ويو آهي. اسان ان کي ماضي جي سيلابن ۽ پرسڪون ڏينهن تي پرکيو، ۽ هي ضرورت کان وڌيڪ خبردار ڪري ٿو: سيلاب کان سواءِ ڏينهن تي به غلط الارم ڏنا ۽ اسان جي پنهنجي اصول تي پورو نه لٿو. ان کي تجرباتي نمونو سمجھو، ثابت ٿيل وارننگ سسٽم نه.",
