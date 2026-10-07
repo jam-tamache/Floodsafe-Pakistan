@@ -8,7 +8,7 @@ boundary" needs to be an answerable question, not an assumption.
 
 FloodSafe Pakistan's *architecture* is designed to generalize to any
 Pakistani location given coordinates, elevation, and a regional rainfall
-threshold. For V1, only Sindh locations are validated and scored. Cities
+threshold. For V1, only Sindh locations are supported and scored. Cities
 outside Sindh (Lahore, Islamabad, Peshawar, Quetta, and others - see
 `MAP_ONLY_CITIES` in `risk_check.py`) are shown on the map for national
 context only and explicitly refuse a risk score.
@@ -245,7 +245,7 @@ be updated together — the two must never drift apart again.
   not themselves been independently validated — only the baseline they're
   now applied to has a citable source.
 
-## Validation status
+## Back-test status
 
 "Designed and calibrated for Sindh" in this document means the
 thresholds are anchored to an official Pakistani rainfall classification
@@ -253,13 +253,19 @@ thresholds are anchored to an official Pakistani rainfall classification
 automated tests covering Low/Moderate/High/Very High classification,
 elevation edge cases (including the elevation-rainfall scaling fix
 above), and forecast aggregation (`test_risk_scoring.py`, 20/20 passing).
-It does **not** mean this model has been tested against historical flood
-outcomes in Sindh — that is explicitly a post-V1 item (comparing model
-output against documented real flood events, including cases where the
-model would be wrong). An initial historical back-test against
-documented flood events is planned; results will be published here once
-complete, with sample size and methodology stated plainly rather than
-described as full validation.
+It does **not** mean the model is validated.
+
+An initial historical back-test has been run against documented Sindh
+flood cases, using a protocol fixed in advance (`BACKTEST_PROTOCOL.md`,
+frozen, never edited after the fact). Results are in
+`BACKTEST_RESULTS.md` and on the site's Back-test page. In short: 8 cases
+were scored (Jacobabad was skipped for lack of a rainfall figure), giving
+5 hits, 0 misses, 3 false alarms and 0 correct quiet cases. The model
+catches the floods but over-warns, and on this sample it did not
+outperform a plain rainfall threshold. The sample is small, uses
+measured rather than forecast rainfall, and the result is not a
+statistical accuracy estimate. It is described as "back-tested", never as
+"validated".
 
 ## Open items
 
@@ -271,7 +277,10 @@ described as full validation.
   `medium_max`) is an open design decision, not yet made — see "The dead
   zone" section above. If changed, it must be changed in code and this
   doc together, with `test_risk_scoring.py` updated to match.
-- Historical validation against real flood events (post-V1, per roadmap).
+- Any Version 2 of the model (for example an antecedent-rainfall
+  variable) must not be scored on the 8 back-test cases above. It needs a
+  new `BACKTEST_PROTOCOL_v2.md` written first, and new cases, including
+  low-rain days with no flood.
 - The elevation_note shown to users (translations.py, en/ur/sd) now
   reflects the rain-scaled elevation contribution rather than the city's
   fixed terrain position, but the wording hasn't yet been reviewed to
