@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}FloodSafe Pakistan | Result{% endblock %}
+{% block title %}{{ t.app_title }}{% if city_display %} | {{ city_display }}{% endif %}{% endblock %}
 
 {% block head_extra %}
 {% if city_lat and city_lon %}
@@ -27,9 +27,9 @@
 
 {% block lang_switch %}
 <div class="lang-switch">
-    <a href="?lang=en{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
-    <a href="?lang=ur{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
-    <a href="?lang=sd{% if city %}&city={{ city }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
+    <a href="?lang=en{% if city %}&city={{ city|urlencode }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'en' else '' }}">English</a>
+    <a href="?lang=ur{% if city %}&city={{ city|urlencode }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'ur' else '' }}">اردو</a>
+    <a href="?lang=sd{% if city %}&city={{ city|urlencode }}&rainfall={{ rainfall }}{% endif %}" class="{{ 'lang-active' if lang == 'sd' else '' }}">سنڌي</a>
 </div>
 {% endblock %}
 
@@ -52,8 +52,7 @@
     </div>
     {% else %}
 
-    <!-- Row 1: input, risk result (gauge), risk map. The map shows one
-         marker per city. -->
+    {# Row 1: input, risk result (gauge), risk map. The map shows one marker per city. #}
     <div class="result-grid">
         <div class="result-card">
             <h3 class="result-card-heading">1. {{ t.city_label.rstrip(':') }} / {{ t.rainfall_label.rstrip(':') }}</h3>
@@ -87,10 +86,8 @@
             <h3 class="result-card-heading">3. {{ t.risk_map_heading }}</h3>
             {% if city_lat and city_lon %}
             <div id="result-map"></div>
-            <!-- Legend with four tiers and no "not scored" swatch, since
-                 this page only shows one scored city. The colors must
-                 match RISK_COLORS in risk_check.py (see .map-legend-dot-*
-                 in style.css). -->
+            {# Four tiers, no "not scored" swatch, since this page shows one scored city. #}
+            {# Colors must match RISK_COLORS in risk_check.py (see .map-legend-dot-* in style.css). #}
             <div class="map-legend map-legend-compact">
                 <span class="map-legend-item map-legend-item-low">
                     <span class="map-legend-dot map-legend-dot-low"></span>{{ t.legend_low }}
@@ -111,15 +108,15 @@
         </div>
     </div>
 
-    <!-- Row 2: why this risk, safety tips, key information. -->
+    {# Row 2: why this risk, safety tips, key information. #}
     <div class="result-grid result-grid-secondary">
         <div class="result-card">
             <h3 class="result-card-heading">4. {{ t.why_risk_heading.format(risk_level=risk_level) }}</h3>
-            <!-- terrain_warning is empty on dry days, so guard it to avoid
-                 an empty paragraph. -->
+            {# terrain_warning is empty on dry days, so guard it to avoid an empty paragraph. #}
             {% if terrain_warning %}
             <p class="terrain-warning">{{ terrain_warning }}</p>
             {% endif %}
+            {# The 54 and 30 below must match the point maximums in risk_check.py and translations.py. #}
             <div class="impact-bar-row">
                 <span class="impact-bar-label">{{ t.impact_rainfall_label }}</span>
                 <div class="impact-bar-track">
@@ -127,7 +124,6 @@
                 </div>
                 <span class="impact-bar-value">{{ rainfall_points }}/54 {{ t.impact_points_unit }}</span>
             </div>
-            <!-- elevation_used comes from risk_check.py's render_template call. -->
             {% if elevation_used %}
             <div class="impact-bar-row">
                 <span class="impact-bar-label">{{ t.impact_elevation_label }}</span>
@@ -142,9 +138,7 @@
 
         <div class="result-card">
             <h3 class="result-card-heading">5. {{ t.safety_tips_heading }}</h3>
-            <!-- On dry days the tips are general preparedness, and the note
-                 explains why the rating comes from terrain. Both are
-                 guarded so the card is never a bare heading. -->
+            {# On dry days the tips are general preparedness and the note says why. Both are guarded so the card is never a bare heading. #}
             {% if safety_tips_note %}
             <p class="elevation-note safety-tips-note">{{ safety_tips_note }}</p>
             {% endif %}
@@ -157,8 +151,7 @@
             {% endif %}
         </div>
 
-        <!-- Assessment type and shelter message only. City, rainfall and
-             terrain are already in panel 1. -->
+        {# Assessment type and shelter message only. City, rainfall and terrain are already in panel 1. #}
         <div class="result-card">
             <h3 class="result-card-heading">6. {{ t.key_information_heading }}</h3>
             <p><strong>{{ t.assessment_type_label }}</strong> {{ t.assessment_type_forecast if mode == 'forecast' else t.assessment_type_scenario }}</p>
