@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}FloodSafe Pakistan{% endblock %}
+{% block title %}{{ t.app_title }}{% endblock %}
 
 {% block content %}
 <div class="home-hero">
@@ -10,21 +10,17 @@
     </div>
 
     <div class="home-card">
-        <!-- &#xFE0E; forces text style, so the warning sign does not show
-             as a large emoji on Android Chrome. .warn-icon matches its
-             size to the text. -->
+        {# &#xFE0E; forces text style, so the warning sign does not show as a large emoji on Android Chrome. .warn-icon matches its size to the text. #}
         <div class="disclaimer-banner">
             <span class="warn-icon">&#9888;&#xFE0E;</span> {{ t.disclaimer_banner }}
         </div>
 
-        <!-- Main form: 72h forecast, city only. -->
+        {# Main form: 72h forecast, city only. #}
         <form action="{{ url_for('forecast') }}" method="GET" class="home-form">
             <input type="hidden" name="lang" value="{{ lang }}">
 
             <label for="forecast-city">{{ t.form_city_label }}</label>
-            <!-- The option value stays the English city name, because
-                 risk_check.py looks cities up by that string. Only the
-                 shown label is translated. -->
+            {# The option value stays the English city name, because risk_check.py looks cities up by that string. Only the shown label is translated. #}
             <select id="forecast-city" name="city" required>
                 <option value="" disabled selected>{{ t.form_city_placeholder }}</option>
                 {% for c in cities %}
@@ -35,7 +31,7 @@
             <button type="submit">{{ t.forecast_form_submit }}</button>
         </form>
 
-        <!-- Second form: scenario, a city plus a typed rainfall amount. -->
+        {# Second form: scenario, a city plus a typed rainfall amount. #}
         <details class="scenario-toggle">
             <summary>{{ t.scenario_toggle_label }}</summary>
             <p>{{ t.scenario_form_intro }}</p>
