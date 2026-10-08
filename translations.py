@@ -297,7 +297,7 @@ TRANSLATIONS = {
             "lim": "How far to trust this test",
             "d1": "Read before relying on these results",
             "lims": [
-                "There are few cases: we planned 10 to 12 and scored 9, with 3 no-flood days instead of 5. No percentage here is reliable.",
+                "There are few cases: we planned 10 to 12 and scored 8, with 3 no-flood days instead of 5. No percentage here is reliable.",
                 "Rain comes from Pakistani government sources (three 2026 cases from Dawn reporting), not the satellite data we planned to use. We decided this before running the model.",
                 "Big floods are better recorded than quiet days, which favors the flood cases.",
                 "We used measured rain, not forecasts. Real forecasts are less accurate, so real results would be worse.",
@@ -625,7 +625,7 @@ TRANSLATIONS = {
             "lim": "اس ٹیسٹ پر کتنا بھروسا کریں",
             "d1": "نتائج پر بھروسا کرنے سے پہلے پڑھیں",
             "lims": [
-                "کیسز کم ہیں: منصوبہ 10 سے 12 کا تھا، اسکور 9 کا ہوا، اور بغیر سیلاب کے 5 کی جگہ 3 دن ملے۔ یہاں کوئی فیصد قابلِ بھروسا نہیں۔",
+                "کیسز کم ہیں: منصوبہ 10 سے 12 کا تھا، اسکور 8 کا ہوا، اور بغیر سیلاب کے 5 کی جگہ 3 دن ملے۔ یہاں کوئی فیصد قابلِ بھروسا نہیں۔",
                 "بارش کا ڈیٹا پاکستانی سرکاری ذرائع سے ہے (2026 کے تین کیسز Dawn کی رپورٹنگ سے)، اس سیٹلائٹ ڈیٹا سے نہیں جو ہم نے سوچا تھا۔ یہ فیصلہ ماڈل چلانے سے پہلے کیا گیا۔",
                 "بڑے سیلاب پرسکون دنوں سے بہتر ریکارڈ ہوتے ہیں، اس سے سیلاب والے کیسز کو فائدہ ملتا ہے۔",
                 "ہم نے ناپی گئی بارش استعمال کی، پیشگوئی نہیں۔ حقیقی پیشگوئی کم درست ہوتی ہے، اس لیے اصل نتیجہ اس سے بدتر ہوگا۔",
@@ -954,7 +954,7 @@ TRANSLATIONS = {
             "lim": "هن ٽيسٽ تي ڪيترو ڀروسو ڪجي",
             "d1": "نتيجن تي ڀروسو ڪرڻ کان اڳ پڙهو",
             "lims": [
-                "ڪيس ٿورا آهن: منصوبو 10 کان 12 جو هو، اسڪور 9 جو ٿيو، ۽ سيلاب کان سواءِ 5 جي بدران 3 ڏينهن مليا. هتي ڪو به سيڪڙو ڀروسي جوڳو ناهي.",
+                "ڪيس ٿورا آهن: منصوبو 10 کان 12 جو هو، اسڪور 8 جو ٿيو، ۽ سيلاب کان سواءِ 5 جي بدران 3 ڏينهن مليا. هتي ڪو به سيڪڙو ڀروسي جوڳو ناهي.",
                 "برسات جو ڊيٽا پاڪستان جي سرڪاري ذريعن مان آهي (2026 جا ٽي ڪيس Dawn جي رپورٽنگ مان)، ان سيٽلائيٽ ڊيٽا مان نه جيڪو اسان سوچيو هو. اهو فيصلو ماڊل هلائڻ کان اڳ ڪيو ويو.",
                 "وڏا سيلاب پرسڪون ڏينهن کان بهتر رڪارڊ ٿيندا آهن، ان سان سيلاب وارن ڪيسن کي فائدو ملي ٿو.",
                 "اسان ماپيل برسات استعمال ڪئي، اڳڪٿي نه. حقيقي اڳڪٿي گھٽ صحيح هوندي آهي، تنهنڪري اصل نتيجو ان کان خراب هوندو.",
