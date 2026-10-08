@@ -196,7 +196,7 @@ FLOOD_CASES = [
         "rainfall_mm": 89.0,
         "rainfall_caveat": None,
         "actual_outcome": "flood",
-        "impact": "Part of a multi-district event; 8 deaths province-wide (see nawabshah/umerkot entries for shared context)",
+        "impact": "Part of a multi-district rain event across Sindh; 8 deaths province-wide (Dawn, 3 Aug 2026)",
         "source": (
             "Dawn, 3 Aug 2026, 'Sindh CM Murad orders emergency steps as downpour "
             "wreaks havoc in several districts' (https://www.dawn.com/news/2020214) "
@@ -204,7 +204,7 @@ FLOOD_CASES = [
         ),
         "i18n": {
             "ur": {
-                "impact": "کئی اضلاع میں پھیلے واقعے کا حصہ؛ پورے صوبے میں 8 اموات (مشترکہ پس منظر کے لیے نوابشاہ/عمرکوٹ کے اندراجات دیکھیں)",
+                "impact": "سندھ بھر میں کئی اضلاع میں پھیلے بارشی واقعے کا حصہ؛ پورے صوبے میں 8 اموات (Dawn، 3 اگست 2026)",
                 "source": (
                     "Dawn، 3 اگست 2026، 'Sindh CM Murad orders emergency steps as downpour "
                     "wreaks havoc in several districts' (https://www.dawn.com/news/2020214) "
@@ -212,7 +212,7 @@ FLOOD_CASES = [
                 ),
             },
             "sd": {
-                "impact": "ڪيترن ضلعن ۾ پکڙيل واقعي جو حصو؛ سڄي صوبي ۾ 8 موت (گڏيل پس منظر لاءِ نوابشاهه/عمرڪوٽ جا اندراج ڏسو)",
+                "impact": "سڄي سنڌ ۾ ڪيترن ضلعن ۾ پکڙيل برسات واري واقعي جو حصو؛ سڄي صوبي ۾ 8 موت (Dawn، 3 آگسٽ 2026)",
                 "source": (
                     "Dawn، 3 آگسٽ 2026، 'Sindh CM Murad orders emergency steps as downpour "
                     "wreaks havoc in several districts' (https://www.dawn.com/news/2020214) "
@@ -231,15 +231,15 @@ FLOOD_CASES = [
         "rainfall_mm": 111.0,
         "rainfall_caveat": None,
         "actual_outcome": "flood",
-        "impact": "Part of the same multi-district event as hyderabad_aug2026/umerkot_aug2026",
+        "impact": "Part of the same multi-district rain event across Sindh as the Hyderabad and Umerkot cases",
         "source": "Dawn, 3 Aug 2026 (https://www.dawn.com/news/2020214)",
         "i18n": {
             "ur": {
-                "impact": "اسی کئی اضلاع والے واقعے کا حصہ جس میں hyderabad_aug2026 اور umerkot_aug2026 شامل ہیں",
+                "impact": "سندھ بھر میں پھیلے اسی کئی اضلاع والے بارشی واقعے کا حصہ جس میں حیدرآباد اور عمرکوٹ کے کیسز شامل ہیں",
                 "source": "Dawn، 3 اگست 2026 (https://www.dawn.com/news/2020214)",
             },
             "sd": {
-                "impact": "ساڳئي ڪيترن ضلعن وارو واقعو جنهن ۾ hyderabad_aug2026 ۽ umerkot_aug2026 شامل آهن",
+                "impact": "سڄي سنڌ ۾ پکڙيل ساڳئي ڪيترن ضلعن وارو برسات وارو واقعو جنهن ۾ حيدرآباد ۽ عمرڪوٽ جا ڪيس شامل آهن",
                 "source": "Dawn، 3 آگسٽ 2026 (https://www.dawn.com/news/2020214)",
             },
         },
@@ -254,15 +254,15 @@ FLOOD_CASES = [
         "rainfall_mm": 169.0,
         "rainfall_caveat": None,
         "actual_outcome": "flood",
-        "impact": "Highest rainfall in Sindh this event; 1 death by drowning; part of the same multi-district event",
+        "impact": "Highest 24-hour rainfall reported in Sindh (PDMA, 169 mm); 1 death by drowning; part of the same multi-district event",
         "source": "Dawn, 3 Aug 2026 (https://www.dawn.com/news/2020214)",
         "i18n": {
             "ur": {
-                "impact": "اس واقعے میں سندھ کی سب سے زیادہ بارش؛ ڈوبنے سے 1 موت؛ اسی کئی اضلاع والے واقعے کا حصہ",
+                "impact": "سندھ میں 24 گھنٹوں کی سب سے زیادہ بارش (PDMA، 169 ملی میٹر)؛ ڈوبنے سے 1 موت؛ اسی کئی اضلاع والے واقعے کا حصہ",
                 "source": "Dawn، 3 اگست 2026 (https://www.dawn.com/news/2020214)",
             },
             "sd": {
-                "impact": "هن واقعي ۾ سنڌ جي سڀ کان وڌيڪ برسات؛ ٻڏڻ سبب 1 موت؛ ساڳئي ڪيترن ضلعن وارو واقعو",
+                "impact": "سنڌ ۾ 24 ڪلاڪن جي سڀ کان وڌيڪ برسات (PDMA، 169 ملي ميٽر)؛ ٻڏڻ سبب 1 موت؛ ساڳئي ڪيترن ضلعن وارو واقعو",
                 "source": "Dawn، 3 آگسٽ 2026 (https://www.dawn.com/news/2020214)",
             },
         },
