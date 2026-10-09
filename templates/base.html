@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- Footer styles. The body and main rules keep the footer at the
-         bottom of the window on short pages. -->
+    {# Footer styles. The body and main rules keep the footer at the bottom of the window on short pages. #}
     <style>
         body {
             min-height: 100vh;
@@ -100,9 +99,7 @@
             <span class="topbar-title">{{ t.app_title }}</span>
         </a>
 
-        <!-- Desktop nav. Hidden on mobile, where the dropdown below is
-             used instead. There is no Contact link because it has no
-             destination yet. -->
+        {# Desktop nav. Hidden on mobile, where the dropdown below is used instead. There is no Contact link because it has no destination yet. #}
         <nav class="topbar-nav">
             <a href="{{ url_for('home', lang=lang) }}"
                class="topbar-link {{ 'topbar-link-active' if request.path == url_for('home') else '' }}">
@@ -116,8 +113,7 @@
                class="topbar-link {{ 'topbar-link-active' if request.path == url_for('data_methodology') else '' }}">
                {{ t.nav_data_methodology }}
             </a>
-            <!-- Falls back to the English label if translations.py has no
-                 nav_back_test key. Active on /back-test and every case page. -->
+            {# Falls back to the English label if translations.py has no nav_back_test key. Active on /back-test and every case page. #}
             <a href="{{ url_for('back_test', lang=lang) }}"
                class="topbar-link {{ 'topbar-link-active' if request.path.startswith('/back-test') else '' }}">
                {{ t.get('nav_back_test', 'Back-test') }}
@@ -141,10 +137,8 @@
             </div>
             {% endblock %}
 
-            <!-- Inline SVG instead of the ☰ character, which showed as a
-                 solid box on some phones. currentColor uses the button's
-                 text color. -->
-            <button class="topbar-toggle" id="navToggle" aria-label="Toggle navigation">
+            {# Inline SVG instead of the ☰ character, which showed as a solid box on some phones. currentColor uses the button's text color. #}
+            <button class="topbar-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M3 6H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M3 12H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -154,9 +148,7 @@
         </div>
     </div>
 
-    <!-- Mobile dropdown. Same links as the desktop nav, shown when
-         .topbar-menu-open is set on .topbar. It is a separate list
-         because it stacks in a column instead of a row. -->
+    {# Mobile dropdown. Same links as the desktop nav, shown when .topbar-menu-open is set on .topbar. It is a separate list because it stacks in a column instead of a row. #}
     <nav class="topbar-mobile-menu" id="mobileMenu">
         <a href="{{ url_for('home', lang=lang) }}" class="topbar-link">{{ t.nav_home }}</a>
         <a href="{{ url_for('how_it_works', lang=lang) }}" class="topbar-link">{{ t.nav_how_it_works }}</a>
@@ -164,8 +156,7 @@
         <a href="{{ url_for('back_test', lang=lang) }}" class="topbar-link">{{ t.get('nav_back_test', 'Back-test') }}</a>
         <a href="{{ url_for('map_view', lang=lang) }}" class="topbar-link">&#128506; {{ t.nav_map }}</a>
         <a href="{{ url_for('about', lang=lang) }}" class="topbar-link">{{ t.nav_about }}</a>
-        <!-- Re-renders this page's lang_switch block, so check.html keeps
-             its city and rainfall in the URL. -->
+        {# Re-renders this page's lang_switch block, so check.html keeps its city and rainfall in the URL. #}
         {{ self.lang_switch() }}
     </nav>
 </header>
@@ -174,14 +165,13 @@
     {% block content %}{% endblock %}
 </main>
 
-<!-- Footer. Left: logo, name, year. Right: GitHub link. The name follows
-     the page language like the navbar. -->
+{# Footer. Left: logo, name, year. Right: GitHub link. The name follows the page language like the navbar. The year is 2026 in the HTML and is replaced by the visitor's current year in the script below. #}
 <footer class="site-footer">
     <div class="topbar-inner site-footer-inner">
         <div class="footer-brand">
             <span class="footer-logo">&#127754;</span>
             <strong>{{ t.app_title }}</strong>
-            <span class="footer-copy">&copy; 2026</span>
+            <span class="footer-copy">&copy; <span id="footerYear">2026</span></span>
         </div>
         <a class="footer-github"
            href="https://github.com/jam-tamache"
@@ -197,9 +187,12 @@
 
 <script>
     const topbar = document.querySelector('.topbar');
-    document.getElementById('navToggle').addEventListener('click', function () {
-        topbar.classList.toggle('topbar-menu-open');
+    const navToggle = document.getElementById('navToggle');
+    navToggle.addEventListener('click', function () {
+        const open = topbar.classList.toggle('topbar-menu-open');
+        navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
 </script>
 {% block scripts %}{% endblock %}
 </body>
