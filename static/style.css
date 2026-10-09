@@ -2,7 +2,9 @@
     box-sizing: border-box;
 }
 
-html, body {
+/* overflow-x is set on body only. If html has it too, body becomes its
+   own scroll container and position: sticky on .topbar stops working. */
+body {
     overflow-x: hidden;
 }
 
@@ -31,8 +33,7 @@ body {
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    row-gap: 8px;
-    gap: 24px;
+    gap: 8px 24px;
     padding: 14px 24px;
 }
 
