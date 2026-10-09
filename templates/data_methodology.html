@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ t.methodology_title }} - FloodSafe Pakistan{% endblock %}
+{% block title %}{{ t.app_title }} | {{ t.methodology_title }}{% endblock %}
 
 {% block content %}
 <style>
@@ -74,6 +74,7 @@
     <section class="dm-card">
         <h2>{{ t.methodology_how_heading }}</h2>
         <p>{{ t.methodology_how_body }}</p>
+        {# Bar widths 54, 30 and 16 must match the point maximums in risk_check.py. The marks are the tier cutoffs at 25, 50 and 75. #}
         <div class="dm-barwrap dm-ltr">
             <div class="dm-bar">
                 <i class="r">{{ t.impact_rainfall_label }} &middot; 54 {{ t.impact_points_unit }}</i>
@@ -81,6 +82,7 @@
                 <i class="x"></i>
             </div>
             <div class="dm-mark" style="--p:25%"><span>25</span></div>
+            <div class="dm-mark" style="--p:50%"><span>50</span></div>
             <div class="dm-mark" style="--p:75%"><span>75</span></div>
         </div>
         <div class="dm-tiers">
