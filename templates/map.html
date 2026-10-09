@@ -16,7 +16,7 @@
 ></script>
 <style>
     #map {
-        height: 600px;
+        height: min(600px, 70vh);
         width: 100%;
         border-radius: 8px;
     }
@@ -24,16 +24,16 @@
 {% endblock %}
 
 {% block content %}
-<!-- One container so the heading, intro, legend and map share the same
-     left and right edges. -->
+{# One container so the heading, intro, legend and map share the same
+   left and right edges. #}
 <div class="map-page">
     <h1>{{ t.map_title }}</h1>
     <p class="map-intro">{{ t.map_intro }}</p>
 
-    <!-- Legend for the five marker states: four risk levels plus grey for
-         cities that are not scored. The colors must match RISK_COLORS in
-         risk_check.py and MAP_ONLY_COLOR in the script below. Change them
-         in style.css (.map-legend-dot-*), not here. -->
+    {# Legend for the five marker states: four risk levels plus grey for
+       cities that are not scored. The colors must match RISK_COLORS in
+       risk_check.py and MAP_ONLY_COLOR in the script below. Change them
+       in style.css (.map-legend-dot-*), not here. #}
     <div class="map-legend map-legend-full">
         <span class="map-legend-item map-legend-item-low">
             <span class="map-legend-dot map-legend-dot-low"></span>{{ t.legend_low }}
@@ -52,7 +52,7 @@
         </span>
     </div>
 
-    <div id="map"></div>
+    <div id="map" role="region" aria-label="{{ t.map_title }}"></div>
 </div>
 {% endblock %}
 
@@ -66,10 +66,27 @@
     }).addTo(map);
 
     const MAP_ONLY_COLOR = '#7f8c8d';
-
+    const NOT_SCORED_TEXT = {{ t.legend_not_scored | tojson }};
     const cities = {{ cities | tojson }};
 
+    // Popups are built as DOM nodes with textContent, so no city name or
+    // explanation can ever be read as HTML.
+    function popupFor(name, lines) {
+        const box = document.createElement('div');
+        const title = document.createElement('strong');
+        title.textContent = name;
+        box.appendChild(title);
+        lines.forEach(function (line) {
+            if (!line) { return; }
+            box.appendChild(document.createElement('br'));
+            box.appendChild(document.createTextNode(line));
+        });
+        return box;
+    }
+
     cities.forEach(function (c) {
+        if (typeof c.lat !== 'number' || typeof c.lon !== 'number') { return; }
+
         // city_display is the translated name sent by map_view() in
         // risk_check.py. Falls back to the English name.
         const cityName = c.city_display || c.city;
@@ -83,10 +100,11 @@
                 fillOpacity: 0.85
             })
             .addTo(map)
-            .bindPopup(`<strong>${cityName}</strong><br>{{ t.legend_not_scored }}`)
+            .bindPopup(popupFor(cityName, [NOT_SCORED_TEXT]))
             .bindTooltip(cityName, { permanent: false });
             return;
         }
+
         // risk_color is worked out once on the server (RISK_COLORS in
         // risk_check.py), so it is used as sent. Do not add a second
         // color mapping in this file.
@@ -98,7 +116,8 @@
             fillOpacity: 0.95
         })
         .addTo(map)
-        .bindPopup(`<strong>${cityName}</strong><br>${c.risk_level}<br>${c.plain_explanation}`);
+        .bindPopup(popupFor(cityName, [c.risk_level, c.plain_explanation]))
+        .bindTooltip(cityName, { permanent: false });
     });
 </script>
 {% endblock %}
