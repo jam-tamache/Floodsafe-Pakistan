@@ -194,7 +194,10 @@ FLOOD_CASES = [
         "lon": 68.3613456,
         "date_window": "2026-08-02 to 2026-08-03",
         "rainfall_mm": 89.0,
-        "rainfall_caveat": None,
+        "rainfall_caveat": (
+            "89mm is a PDMA 24-hour figure for Hyderabad City (Dawn, 3 Aug "
+            "2026), not a 72-hour total."
+        ),
         "actual_outcome": "flood",
         "impact": "Part of a multi-district rain event across Sindh; 8 deaths province-wide (Dawn, 3 Aug 2026)",
         "source": (
@@ -204,6 +207,10 @@ FLOOD_CASES = [
         ),
         "i18n": {
             "ur": {
+                "rainfall_caveat": (
+                    "89 ملی میٹر حیدرآباد شہر کے لیے PDMA کا 24 گھنٹے کا عدد ہے "
+                    "(Dawn، 3 اگست 2026)، 72 گھنٹے کا کل نہیں۔"
+                ),
                 "impact": "سندھ بھر میں کئی اضلاع میں پھیلے بارشی واقعے کا حصہ؛ پورے صوبے میں 8 اموات (Dawn، 3 اگست 2026)",
                 "source": (
                     "Dawn، 3 اگست 2026، 'Sindh CM Murad orders emergency steps as downpour "
@@ -212,6 +219,10 @@ FLOOD_CASES = [
                 ),
             },
             "sd": {
+                "rainfall_caveat": (
+                    "89 ملي ميٽر حيدرآباد شهر لاءِ PDMA جو 24 ڪلاڪن جو انگ آهي "
+                    "(Dawn، 3 آگسٽ 2026)، 72 ڪلاڪن جو ڪل ناهي."
+                ),
                 "impact": "سڄي سنڌ ۾ ڪيترن ضلعن ۾ پکڙيل برسات واري واقعي جو حصو؛ سڄي صوبي ۾ 8 موت (Dawn، 3 آگسٽ 2026)",
                 "source": (
                     "Dawn، 3 آگسٽ 2026، 'Sindh CM Murad orders emergency steps as downpour "
@@ -229,16 +240,27 @@ FLOOD_CASES = [
         "lon": 69.0112387,
         "date_window": "2026-08-02 to 2026-08-03",
         "rainfall_mm": 111.0,
-        "rainfall_caveat": None,
+        "rainfall_caveat": (
+            "111mm is a PDMA 24-hour figure for Mirpurkhas City (Dawn, 3 Aug "
+            "2026), not a 72-hour total."
+        ),
         "actual_outcome": "flood",
         "impact": "Part of the same multi-district rain event across Sindh as the Hyderabad and Umerkot cases",
         "source": "Dawn, 3 Aug 2026 (https://www.dawn.com/news/2020214)",
         "i18n": {
             "ur": {
+                "rainfall_caveat": (
+                    "111 ملی میٹر میرپورخاص شہر کے لیے PDMA کا 24 گھنٹے کا عدد ہے "
+                    "(Dawn، 3 اگست 2026)، 72 گھنٹے کا کل نہیں۔"
+                ),
                 "impact": "سندھ بھر میں پھیلے اسی کئی اضلاع والے بارشی واقعے کا حصہ جس میں حیدرآباد اور عمرکوٹ کے کیسز شامل ہیں",
                 "source": "Dawn، 3 اگست 2026 (https://www.dawn.com/news/2020214)",
             },
             "sd": {
+                "rainfall_caveat": (
+                    "111 ملي ميٽر ميرپورخاص شهر لاءِ PDMA جو 24 ڪلاڪن جو انگ آهي "
+                    "(Dawn، 3 آگسٽ 2026)، 72 ڪلاڪن جو ڪل ناهي."
+                ),
                 "impact": "سڄي سنڌ ۾ پکڙيل ساڳئي ڪيترن ضلعن وارو برسات وارو واقعو جنهن ۾ حيدرآباد ۽ عمرڪوٽ جا ڪيس شامل آهن",
                 "source": "Dawn، 3 آگسٽ 2026 (https://www.dawn.com/news/2020214)",
             },
@@ -252,16 +274,27 @@ FLOOD_CASES = [
         "lon": 69.7401257,
         "date_window": "2026-08-02 to 2026-08-03",
         "rainfall_mm": 169.0,
-        "rainfall_caveat": None,
+        "rainfall_caveat": (
+            "169mm is a PDMA 24-hour figure for Umerkot taluka (Dawn, 3 Aug "
+            "2026), not a 72-hour total."
+        ),
         "actual_outcome": "flood",
         "impact": "Highest 24-hour rainfall reported in Sindh (PDMA, 169 mm); 1 death by drowning; part of the same multi-district event",
         "source": "Dawn, 3 Aug 2026 (https://www.dawn.com/news/2020214)",
         "i18n": {
             "ur": {
+                "rainfall_caveat": (
+                    "169 ملی میٹر عمرکوٹ تعلقہ کے لیے PDMA کا 24 گھنٹے کا عدد ہے "
+                    "(Dawn، 3 اگست 2026)، 72 گھنٹے کا کل نہیں۔"
+                ),
                 "impact": "سندھ میں 24 گھنٹوں کی سب سے زیادہ بارش (PDMA، 169 ملی میٹر)؛ ڈوبنے سے 1 موت؛ اسی کئی اضلاع والے واقعے کا حصہ",
                 "source": "Dawn، 3 اگست 2026 (https://www.dawn.com/news/2020214)",
             },
             "sd": {
+                "rainfall_caveat": (
+                    "169 ملي ميٽر عمرڪوٽ تعلقي لاءِ PDMA جو 24 ڪلاڪن جو انگ آهي "
+                    "(Dawn، 3 آگسٽ 2026)، 72 ڪلاڪن جو ڪل ناهي."
+                ),
                 "impact": "سنڌ ۾ 24 ڪلاڪن جي سڀ کان وڌيڪ برسات (PDMA، 169 ملي ميٽر)؛ ٻڏڻ سبب 1 موت؛ ساڳئي ڪيترن ضلعن وارو واقعو",
                 "source": "Dawn، 3 آگسٽ 2026 (https://www.dawn.com/news/2020214)",
             },
