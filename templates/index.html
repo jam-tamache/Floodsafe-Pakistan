@@ -7,6 +7,8 @@
     <div class="home-intro">
         <h1 class="home-title">{{ t.app_title }}</h1>
         <p class="home-subtitle">{{ t.home_subtitle }}</p>
+        {# Decorative picture, so alt is empty on purpose. Hidden on phones in style.css so the form stays near the top. #}
+        <img class="home-art" src="{{ url_for('static', filename='home-flood.jpg') }}" alt="" width="960" height="705">
     </div>
 
     <div class="home-card">

@@ -158,34 +158,70 @@ body {
 
 /* ---- Home page hero (index.html) ---- */
 
+/* Two equal columns in a grid. Both columns stretch to the same height,
+   so the picture ends on the same line as the bottom of the form card.
+   direction: ltr keeps the text column on the left in every language;
+   the text itself switches direction below for ur/sd. */
 .home-hero {
     max-width: 1000px;
     margin: 20px auto 0;
-    display: flex;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
     gap: 40px;
-    flex-wrap: wrap;
+    direction: ltr;
 }
 
 .home-intro {
-    flex: 1 1 320px;
-    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
+/* margin-top is 0 so the heading starts on the same line as the top
+   edge of the card on the right. */
 .home-title {
     text-align: left;
     font-size: 2.2rem;
+    margin: 0 0 10px;
 }
 
+/* margin is set to 0 because .home-intro is a flex column, where
+   margins do not collapse and the default gaps would add up. */
 .home-subtitle {
     font-size: 1.05rem;
     color: #4A5B5C;
     line-height: 1.5;
+    margin: 0;
+}
+
+/* Decorative picture under the subtitle, like the reference layout: no
+   frame, sitting on the page color, left edge aligned with the heading
+   and bottom edge aligned with the bottom of the form card. It fills
+   the height left in the left column (flex: 1 1 0 with height: 0, so
+   its own size never makes the row taller) and object-fit: contain
+   shows the whole picture. The picture file already has the page color
+   (#D8F4EF) as its background and rounded corners baked in, so it needs
+   no frame or blend mode here. If the page color changes, the picture
+   file must be remade. Hidden on phones so the form stays near the
+   top. */
+.home-art {
+    display: block;
+    width: 100%;
+    flex: 1 1 0;
+    height: 0;
+    min-height: 220px;
+    margin-top: 10px;
+    object-fit: contain;
+    object-position: 0% 100%;
+}
+
+html[dir="rtl"] .home-art {
+    object-position: 100% 100%;
 }
 
 .home-card {
-    flex: 1 1 340px;
-    min-width: 300px;
+    min-width: 0;
     background-color: #F4FBFA;
     border-radius: 12px;
     padding: 24px 28px;
@@ -220,6 +256,12 @@ html[dir="rtl"] .home-card select {
     margin-top: -6px;
 }
 
+@media (max-width: 800px) {
+    .home-hero {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 700px) {
     .home-title {
         text-align: center;
@@ -227,6 +269,10 @@ html[dir="rtl"] .home-card select {
 
     .home-intro {
         text-align: center;
+    }
+
+    .home-art {
+        display: none;
     }
 }
 
@@ -639,8 +685,9 @@ html[dir="rtl"] .lang-switch {
     direction: ltr;
 }
 
-html[dir="rtl"] .home-hero {
-    flex-direction: row-reverse;
+html[dir="rtl"] .home-intro,
+html[dir="rtl"] .home-card {
+    direction: rtl;
 }
 
 html[dir="rtl"] .home-title,
