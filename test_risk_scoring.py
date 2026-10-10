@@ -17,6 +17,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 import risk_check
+from translations import get_translation
 
 
 # ---------------------------------------------------------------------------
@@ -30,8 +31,6 @@ import risk_check
 class TestRainfallClassification(unittest.TestCase):
 
     def setUp(self):
-        self.t = risk_check.get_translation("en") if hasattr(risk_check, "get_translation") else None
-        from translations import get_translation
         self.t = get_translation("en")
         self.patcher = patch("elevation_data.get_elevation", return_value=None)
         self.patcher.start()
@@ -49,7 +48,7 @@ class TestRainfallClassification(unittest.TestCase):
             (85.0, "Moderate Risk"),
             (120.0, "Moderate Risk"),  # boundary: <= medium_max
             (121.0, "Moderate Risk"),  # still Moderate, see the dead-zone test
-            (185.0, "High Risk"),      # first value that reaches High here
+            (185.0, "High Risk"),      # a value that reaches High here
         ]
         for rainfall, expected in cases:
             result = risk_check.check_risk(rainfall, "nawabshah", self.t)
@@ -98,20 +97,20 @@ class TestRainfallClassification(unittest.TestCase):
     def test_DEAD_ZONE_medium_max_does_not_gate_high_risk(self):
         """
         Going past a region's medium_max does not jump straight to High Risk.
-        The rainfall points rise gradually and only reach the top of their
-        scale at 2 * medium_max. So a few mm past medium_max is still not High.
+        One mm past medium_max the rainfall points are 50.0, which is still
+        Moderate: High Risk starts only above 50 points.
         """
         profile = risk_check.REGIONAL_PROFILES["central_plains"]
-        medium_max = profile["medium_max"]
+        just_past = profile["medium_max"] + 1
 
-        just_past = medium_max + 1
-        rain_pts_just_past = risk_check.rainfall_component(just_past, profile)
-        self.assertLess(rain_pts_just_past, 65,
-                         "if this ever fails, the dead zone has been fixed — good, delete this test")
+        rain_pts = risk_check.rainfall_component(just_past, profile)
+        self.assertLessEqual(
+            rain_pts, 50,
+            "if this ever fails, the dead zone has been fixed. Good, delete this test"
+        )
 
-        true_high_threshold = medium_max * 1.5
-        rain_pts_at_threshold = risk_check.rainfall_component(true_high_threshold, profile)
-        self.assertLessEqual(rain_pts_at_threshold, 65)
+        result = risk_check.check_risk(just_past, "nawabshah", self.t)
+        self.assertEqual(result["risk_level_key"], "Moderate Risk")
 
 
 # ---------------------------------------------------------------------------
@@ -172,7 +171,6 @@ class TestElevationRainfallScaling(unittest.TestCase):
 
     def setUp(self):
         self._orig_ranges = dict(risk_check._REGION_ELEVATION_RANGES)
-        from translations import get_translation
         self.t = get_translation("en")
 
     def tearDown(self):
@@ -222,14 +220,10 @@ class TestElevationRainfallScaling(unittest.TestCase):
     def test_karachi_worked_example_matches_updated_methodology(self):
         # Matches the worked example in METHODOLOGY.md: karachi at 25mm
         # (low_max=40), lowest in its region (9m to 26m in city_elevation.csv).
-        self._orig_mega = risk_check._REGION_ELEVATION_RANGES.get("mega_urban_coastal")
+        # tearDown restores the original ranges.
         risk_check._REGION_ELEVATION_RANGES["mega_urban_coastal"] = (9, 26)
-        try:
-            with patch("elevation_data.get_elevation", return_value=9):
-                result = risk_check.check_risk(25.0, "karachi", self.t)
-        finally:
-            if self._orig_mega is not None:
-                risk_check._REGION_ELEVATION_RANGES["mega_urban_coastal"] = self._orig_mega
+        with patch("elevation_data.get_elevation", return_value=9):
+            result = risk_check.check_risk(25.0, "karachi", self.t)
 
         self.assertEqual(result["rainfall_points"], 15.6)
         self.assertEqual(result["elevation_terrain_points"], 30.0)
@@ -292,16 +286,17 @@ class TestForecastAggregation(unittest.TestCase):
         self.assertTrue(valid)
         self.assertEqual(total, 8.0)
 
-    def test_produces_a_medium_risk_scale_total(self):
-        # A storm-sized forecast total. This only checks the mm total from
-        # get_forecast_rainfall(), not a risk level.
+    def test_storm_sized_forecast_adds_up_to_exact_total(self):
+        # Checks the mm total from get_forecast_rainfall() only, not a risk
+        # level (levels are tested in section 1).
+        # 24 entries at 1h, 4h, ... 70h, all inside the 72h window.
         now = time.time()
-        entries = [{"dt": now + h * 3600, "rain": {"3h": 6.0}} for h in range(0, 72, 3)]
-        # 24 entries * 6.0mm = 144mm over 72h
+        entries = [{"dt": now + h * 3600, "rain": {"3h": 6.0}} for h in range(1, 72, 3)]
         with patch("risk_check.requests.get", return_value=_fake_forecast_response(entries)):
             valid, total, err = risk_check.get_forecast_rainfall("nawabshah")
         self.assertTrue(valid)
-        self.assertGreater(total, 120.0)  # past nawabshah's medium_max
+        self.assertEqual(len(entries), 24)
+        self.assertEqual(total, 144.0)  # 24 * 6.0mm
 
     def test_string_cod_is_handled(self):
         # In the forecast endpoint "cod" is a string, unlike the current-weather
@@ -310,6 +305,7 @@ class TestForecastAggregation(unittest.TestCase):
         with patch("risk_check.requests.get", return_value=_fake_forecast_response(entries, cod="200")):
             valid, total, err = risk_check.get_forecast_rainfall("karachi")
         self.assertTrue(valid)
+        self.assertEqual(total, 1.0)
 
     def test_not_pakistan_rejected(self):
         entries = [{"dt": time.time() + 3600, "rain": {"3h": 1.0}}]
