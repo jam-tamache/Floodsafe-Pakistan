@@ -28,6 +28,8 @@
         <h3>{{ t.about_why_heading }}</h3>
         <p>{{ t.about_why_body_1 }}</p>
         <p>{{ t.about_why_body_2 }}</p>
+        {# Uses t.about_builder if translations.py has it, otherwise the English text. #}
+        <p>{{ t.get('about_builder', 'FloodSafe Pakistan was built by a student in Nawabshah, Sindh.') }}</p>
         <p class="info-card-action">
             <a href="{{ url_for('floods_2022', lang=lang) }}" class="info-link-btn">{{ t.about_floods_link }}</a>
         </p>
