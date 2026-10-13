@@ -11,7 +11,10 @@ value is missing, the city is simply left out and the app does not guess.
 import csv
 import os
 
-ELEVATION_FILE = "city_elevation.csv"
+# Full path, so it works on any server. A bare file name is looked up in
+# the server's working folder, which is not this folder on PythonAnywhere.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ELEVATION_FILE = os.path.join(BASE_DIR, "city_elevation.csv")
 
 # Filled by _load(). Keys are lowercase city names, values are floats.
 ELEVATIONS = {}
