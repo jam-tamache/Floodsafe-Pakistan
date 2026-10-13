@@ -56,6 +56,16 @@
             direction: ltr;
             unicode-bidi: isolate;
         }
+        /* Disclaimer sits on its own row under the brand and GitHub link. */
+        .footer-disclaimer {
+            flex: 1 0 100%;
+            margin: 0;
+            padding-top: 10px;
+            border-top: 1px solid #e3efed;
+            color: #4b6b6e;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
         .footer-github {
             display: inline-flex;
             align-items: center;
@@ -165,7 +175,7 @@
     {% block content %}{% endblock %}
 </main>
 
-{# Footer. Left: logo, name, year. Right: GitHub link. The name follows the page language like the navbar. The year is 2026 in the HTML and is replaced by the visitor's current year in the script below. #}
+{# Footer. Left: logo, name, year. Right: GitHub link. Bottom row: disclaimer. The name follows the page language like the navbar. The year is 2026 in the HTML and is replaced by the visitor's current year in the script below. The disclaimer uses t.footer_disclaimer if translations.py has it, otherwise the English text. #}
 <footer class="site-footer">
     <div class="topbar-inner site-footer-inner">
         <div class="footer-brand">
@@ -182,6 +192,7 @@
             </svg>
             <span>GitHub</span>
         </a>
+        <p class="footer-disclaimer">{{ t.get('footer_disclaimer', 'FloodSafe Pakistan is an educational project. It is not an official warning. For real alerts, follow PMD and NDMA, and call Rescue 1122 in an emergency.') }}</p>
     </div>
 </footer>
 
