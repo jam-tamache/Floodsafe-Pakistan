@@ -16,6 +16,7 @@ TRANSLATIONS = {
         "nav_how_it_works": "How It Works",
         "nav_data_methodology": "Data & Methodology",
         "nav_map": "Map",
+        "footer_disclaimer": "FloodSafe Pakistan is an educational project. It is not an official warning. For real alerts, follow PMD and NDMA, and call Rescue 1122 in an emergency.",
 
         # Map page
         "map_title": "FloodSafe Pakistan: Map",
@@ -181,6 +182,7 @@ TRANSLATIONS = {
         "about_why_heading": "Why I built FloodSafe",
         "about_why_body_1": "The 2022 floods hit Sindh harder than any other province, with close to 70 percent of Pakistan's total flood damages and economic losses. I experienced them firsthand: large parts of my city were flooded and our electricity was out for seven days. I kept asking one question: what if people had access to clearer flood-risk information early enough to prepare?",
         "about_why_body_2": "FloodSafe estimates a city's flood risk from a rainfall scenario or a live 72-hour forecast, using rainfall and the city's elevation relative to nearby areas. It explains the result and provides practical safety guidance in English, Urdu, and Sindhi. It is a planning aid and does not replace official warnings from NDMA or PDMA.",
+        "about_builder": "FloodSafe Pakistan was built by a student in Nawabshah, Sindh.",
         "about_floods_link": "Read what happened in the 2022 floods",
         # 2022 floods page (floods_2022.html). Figures are from the World
         # Bank/UNDP PDNA, UN OCHA and Britannica (see the page's sources).
@@ -353,6 +355,7 @@ TRANSLATIONS = {
         "nav_how_it_works": "یہ کیسے کام کرتا ہے",
         "nav_data_methodology": "ڈیٹا اور طریقہ کار",
         "nav_map": "نقشہ",
+        "footer_disclaimer": "فلڈ سیف پاکستان ایک تعلیمی منصوبہ ہے۔ یہ سرکاری وارننگ نہیں ہے۔ حقیقی الرٹس کے لیے PMD اور NDMA کو فالو کریں، اور ہنگامی صورت میں ریسکیو 1122 پر کال کریں۔",
 
         # Map page
         "map_title": "فلڈ سیف پاکستان: نقشہ",
@@ -510,6 +513,7 @@ TRANSLATIONS = {
         "about_why_heading": "میں نے فلڈ سیف کیوں بنایا",
         "about_why_body_1": "2022 کے سیلاب نے سندھ کو کسی بھی دوسرے صوبے سے زیادہ متاثر کیا؛ پاکستان کے کل سیلابی نقصانات اور معاشی خسارے کا تقریباً 70 فیصد سندھ میں ہوا۔ میں نے یہ سیلاب خود جھیلا: میرے شہر کے بڑے حصے زیرِ آب آ گئے اور ہماری بجلی سات دن تک بند رہی۔ میں ایک ہی سوال پوچھتا رہا: اگر لوگوں کو سیلاب کے خطرے کی واضح معلومات تیاری کے لیے کافی پہلے مل جاتیں تو کیا ہوتا؟",
         "about_why_body_2": "فلڈ سیف بارش کے کسی منظرنامے یا لائیو 72 گھنٹے کی پیشگوئی کی بنیاد پر، بارش اور آس پاس کے علاقوں کے مقابلے میں شہر کی بلندی کو استعمال کرتے ہوئے، شہر کے سیلابی خطرے کا اندازہ لگاتا ہے۔ یہ نتیجے کی وضاحت کرتا ہے اور انگریزی، اردو اور سندھی میں عملی حفاظتی ہدایات فراہم کرتا ہے۔ یہ منصوبہ بندی میں مدد کا ذریعہ ہے اور NDMA یا PDMA کی سرکاری وارننگز کا متبادل نہیں۔",
+        "about_builder": "فلڈ سیف پاکستان سندھ کے شہر نوابشاہ کے ایک طالب علم نے بنایا ہے۔",
         "about_floods_link": "2022 کے سیلاب میں کیا ہوا، پڑھیں",
         # 2022 floods page. Check the numbers as well as the wording.
         "floods_title": "2022 کے سیلاب",
@@ -681,6 +685,7 @@ TRANSLATIONS = {
         "nav_how_it_works": "هي ڪيئن ڪم ڪري ٿو",
         "nav_data_methodology": "ڊيٽا ۽ طريقيڪار",
         "nav_map": "نقشو",
+        "footer_disclaimer": "فلڊ سيف پاڪستان هڪ تعليمي منصوبو آهي. هي سرڪاري وارننگ ناهي. حقيقي الرٽس لاءِ PMD ۽ NDMA کي فالو ڪريو، ۽ هنگامي حالت ۾ ريسڪيو 1122 تي ڪال ڪريو.",
 
         # Map page
         "map_title": "فلڊ سيف پاڪستان: نقشو",
@@ -839,6 +844,7 @@ TRANSLATIONS = {
         "about_why_heading": "مون فلڊ سيف ڇو ٺاهيو",
         "about_why_body_1": "2022 جي سيلاب سنڌ کي ٻين سڀني صوبن کان وڌيڪ متاثر ڪيو؛ پاڪستان جي ڪل سيلابي نقصانن ۽ معاشي خساري جو تقريباً 70 سيڪڙو سنڌ ۾ ٿيو. مون اهو سيلاب پاڻ ڏٺو: منهنجي شهر جا وڏا حصا پاڻيءَ هيٺ اچي ويا ۽ اسان جي بجلي ست ڏينهن بند رهي. مان هڪ ئي سوال پڇندو رهيس: جيڪڏهن ماڻهن کي سيلاب جي خطري بابت صاف معلومات تياريءَ لاءِ ڪافي اڳ ملي وڃي ها ته ڇا ٿئي ها؟",
         "about_why_body_2": "فلڊ سيف برسات جي ڪنهن منظرنامي يا لائيو 72 ڪلاڪن جي اڳڪٿي جي بنياد تي، برسات ۽ ڀرپاسي جي علائقن جي مقابلي ۾ شهر جي بلندي استعمال ڪندي، شهر جي سيلاب جي خطري جو اندازو لڳائي ٿو. هي نتيجي جي وضاحت ڪري ٿو ۽ انگريزي، اردو ۽ سنڌي ۾ عملي حفاظتي هدايتون ڏئي ٿو. هي منصوبابندي ۾ مدد جو ذريعو آهي ۽ NDMA يا PDMA جي سرڪاري وارننگن جو متبادل ناهي.",
+        "about_builder": "فلڊ سيف پاڪستان سنڌ جي شهر نوابشاهه جي هڪ شاگرد پاران ٺاهيو ويو آهي.",
         "about_floods_link": "2022 جي سيلاب ۾ ڇا ٿيو، پڙهو",
         # 2022 floods page. Check the numbers as well as the wording.
         "floods_title": "2022 جو سيلاب",
