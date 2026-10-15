@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.app_title }} | {{ error_title }}{% endblock %}
+
+{% block head_extra %}
+<style>
+    .error-wrap {
+        text-align: center;
+        align-items: center;
+        padding: 56px 0 32px;
+    }
+    .error-code {
+        direction: ltr;
+        unicode-bidi: isolate;
+        font-size: clamp(5rem, 22vw, 9rem);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        color: #0F5459;
+        background: linear-gradient(180deg, #0F5459 0%, #7fd6cf 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .error-wave {
+        display: block;
+        width: min(260px, 70%);
+        height: 24px;
+        margin: 8px auto 20px;
+    }
+    .error-wrap .info-lede {
+        max-width: 34rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="info-page">
+    <div class="info-stack error-wrap">
+        <div class="error-code" aria-hidden="true">{{ error_code }}</div>
+        <svg class="error-wave" viewBox="0 0 260 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M2 12 Q 18 0 34 12 T 66 12 T 98 12 T 130 12 T 162 12 T 194 12 T 226 12 T 258 12"
+                  stroke="#0F5459" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M2 20 Q 18 8 34 20 T 66 20 T 98 20 T 130 20 T 162 20 T 194 20 T 226 20 T 258 20"
+                  stroke="#7fd6cf" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </svg>
+        <h1>{{ error_title }}</h1>
+        <p class="info-lede">{{ error_body }}</p>
+        <p class="info-card-action">
+            <a href="{{ url_for('home', lang=lang) }}" class="info-link-btn">{{ t.get('err_home_link', 'Back to home') }}</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

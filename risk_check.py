@@ -1,7 +1,7 @@
 import os
 import re
 import time
-from flask import Flask, abort, jsonify, render_template, request
+from flask import Flask, abort, jsonify, render_template, request, send_from_directory
 import requests
 import csv
 from markupsafe import Markup, escape
@@ -914,6 +914,58 @@ def forecast():
         return render_template("check.html", error=t["error_city"], t=t, lang=lang)
     else:
         return _render_risk_result(risk_result, city, forecast_rainfall, "forecast", t, lang, forecast_hours=72)
+
+
+@app.route("/favicon.ico")
+def favicon():
+    """Browsers ask for /favicon.ico on their own. Serve the PNG so it
+    does not land in the 404 log.
+    """
+    return send_from_directory(
+        os.path.join(BASE_DIR, "static"), "favicon-32.png", mimetype="image/png"
+    )
+
+
+def _error_page(code, title_key, body_key, en_title, en_body):
+    """Renders error.html. If that fails too (for example a broken
+    template caused the 500), falls back to plain HTML.
+    """
+    try:
+        lang = get_lang()
+        t = get_translation(lang)
+        page = render_template(
+            "error.html", t=t, lang=lang, error_code=code,
+            error_title=t.get(title_key, en_title),
+            error_body=t.get(body_key, en_body),
+        )
+        return page, code
+    except Exception:
+        page = (
+            "<!DOCTYPE html><html><head><meta charset='utf-8'>"
+            "<title>FloodSafe Pakistan</title></head>"
+            "<body style='font-family:sans-serif;text-align:center;padding:48px'>"
+            f"<h1>{code}</h1><p>{en_title}</p>"
+            "<p><a href='/'>FloodSafe Pakistan</a></p></body></html>"
+        )
+        return page, code
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return _error_page(
+        404, "err_404_title", "err_404_body",
+        "Page not found",
+        "This page does not exist or has moved. Check the address, or go back to the home page.",
+    )
+
+
+@app.errorhandler(500)
+def server_error(error):
+    return _error_page(
+        500, "err_500_title", "err_500_body",
+        "Something went wrong",
+        "The server had a problem. This is not your fault. Please try again in a minute.",
+    )
 
 
 if __name__ == "__main__":

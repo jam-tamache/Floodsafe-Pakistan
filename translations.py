@@ -17,6 +17,11 @@ TRANSLATIONS = {
         "nav_data_methodology": "Data & Methodology",
         "nav_map": "Map",
         "footer_disclaimer": "FloodSafe Pakistan is an educational project. It is not an official warning. For real alerts, follow PMD and NDMA, and call Rescue 1122 in an emergency.",
+        "err_404_title": "Page not found",
+        "err_404_body": "This page does not exist or has moved. Check the address, or go back to the home page.",
+        "err_500_title": "Something went wrong",
+        "err_500_body": "The server had a problem. This is not your fault. Please try again in a minute.",
+        "err_home_link": "Back to home",
 
         # Map page
         "map_title": "FloodSafe Pakistan: Map",
@@ -356,6 +361,11 @@ TRANSLATIONS = {
         "nav_data_methodology": "ڈیٹا اور طریقہ کار",
         "nav_map": "نقشہ",
         "footer_disclaimer": "فلڈ سیف پاکستان ایک تعلیمی منصوبہ ہے۔ یہ سرکاری وارننگ نہیں ہے۔ حقیقی الرٹس کے لیے PMD اور NDMA کو فالو کریں، اور ہنگامی صورت میں ریسکیو 1122 پر کال کریں۔",
+        "err_404_title": "صفحہ نہیں ملا",
+        "err_404_body": "یہ صفحہ موجود نہیں ہے یا منتقل ہو چکا ہے۔ ایڈریس چیک کریں، یا ہوم پیج پر واپس جائیں۔",
+        "err_500_title": "کچھ غلط ہو گیا",
+        "err_500_body": "سرور میں مسئلہ آ گیا۔ اس میں آپ کا قصور نہیں ہے۔ براہ کرم ایک منٹ بعد دوبارہ کوشش کریں۔",
+        "err_home_link": "ہوم پیج پر واپس جائیں",
 
         # Map page
         "map_title": "فلڈ سیف پاکستان: نقشہ",
@@ -686,6 +696,11 @@ TRANSLATIONS = {
         "nav_data_methodology": "ڊيٽا ۽ طريقيڪار",
         "nav_map": "نقشو",
         "footer_disclaimer": "فلڊ سيف پاڪستان هڪ تعليمي منصوبو آهي. هي سرڪاري وارننگ ناهي. حقيقي الرٽس لاءِ PMD ۽ NDMA کي فالو ڪريو، ۽ هنگامي حالت ۾ ريسڪيو 1122 تي ڪال ڪريو.",
+        "err_404_title": "صفحو نه مليو",
+        "err_404_body": "هي صفحو موجود ناهي يا هليو ويو آهي. ايڊريس چيڪ ڪريو، يا گهر واري صفحي تي واپس وڃو.",
+        "err_500_title": "ڪا شيءِ غلط ٿي وئي",
+        "err_500_body": "سرور ۾ مسئلو آيو. ان ۾ توهان جو ڪو قصور ناهي. مهرباني ڪري هڪ منٽ کانپوءِ ٻيهر ڪوشش ڪريو.",
+        "err_home_link": "گهر واري صفحي تي واپس وڃو",
 
         # Map page
         "map_title": "فلڊ سيف پاڪستان: نقشو",
