@@ -8,7 +8,7 @@ This is a student project. It is not a warning system and it is not a proven way
 
 ## Why I made it
 
-I live in Nawabshah. During the 2022 floods it rained for about two days, and our power was out for around a week.
+I live in Nawabshah. During the 2022 floods it rained for about two days. Most of the city was flooded, though some parts much less than others. Even the grid station was flooded, and our power was out for around a week.
 
 After that I kept wondering if a simple tool could tell people, before the rain arrives, how bad it might get where they live. FloodSafe is my attempt to find out.
 
