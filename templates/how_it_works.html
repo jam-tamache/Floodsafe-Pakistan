@@ -2,15 +2,218 @@
 
 {% block title %}{{ t.app_title }} | {{ t.how_it_works_title }}{% endblock %}
 
-{% block content %}
-<div class="container">
-    <h1>{{ t.how_it_works_title }}</h1>
+{% block head_extra %}
+<style>
+    .hiw {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 48px 20px 64px;
+        box-sizing: border-box;
+    }
+    .hiw-hero {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .hiw-hero h1 {
+        margin: 0 0 16px;
+        font-size: 2.4rem;
+        color: #0F5459;
+    }
+    .hiw-hero p {
+        max-width: 720px;
+        margin: 0 auto;
+        font-size: 1.08rem;
+        line-height: 1.75;
+        color: #2f4a4d;
+    }
+    .hiw-heading {
+        text-align: center;
+        margin: 0 0 20px;
+        font-size: 1.35rem;
+        color: #0F5459;
+    }
+    .hiw-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 18px;
+        margin-bottom: 44px;
+    }
+    .hiw-card {
+        position: relative;
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 28px 22px 24px;
+        text-align: center;
+        box-shadow: 0 6px 22px rgba(15, 84, 89, 0.10);
+        animation: hiw-rise 0.5s ease both;
+    }
+    .hiw-card:nth-child(2) { animation-delay: 0.1s; }
+    .hiw-card:nth-child(3) { animation-delay: 0.2s; }
+    .hiw-step {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        margin-bottom: 14px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0F5459 0%, #187378 100%);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    .hiw-number {
+        direction: ltr;
+        unicode-bidi: isolate;
+        font-size: 3.2rem;
+        font-weight: 800;
+        line-height: 1;
+        color: #187378;
+    }
+    .hiw-unit {
+        margin-top: 4px;
+        font-size: 0.85rem;
+        color: #6b8587;
+    }
+    .hiw-label {
+        margin-top: 12px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0F5459;
+    }
+    .hiw-tiers {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        margin-bottom: 44px;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 6px 22px rgba(15, 84, 89, 0.10);
+    }
+    .hiw-tier {
+        padding: 18px 8px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #ffffff;
+    }
+    .hiw-tier-low { background: #2e8b57; }
+    .hiw-tier-moderate { background: #c99a1e; }
+    .hiw-tier-high { background: #d9731f; }
+    .hiw-tier-very-high { background: #b83227; }
+    .hiw-note {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        margin-bottom: 28px;
+        padding: 18px 20px;
+        background: #fff4d6;
+        border-radius: 14px;
+        color: #5a4a12;
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+    .hiw-note-icon {
+        flex-shrink: 0;
+        font-size: 1.3rem;
+        line-height: 1.4;
+    }
+    .hiw-method {
+        margin-bottom: 32px;
+        padding: 24px 26px;
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 6px 22px rgba(15, 84, 89, 0.08);
+        color: #2f4a4d;
+        font-size: 1rem;
+        line-height: 1.75;
+    }
+    .hiw-method p { margin: 0; }
+    .hiw-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
+    .hiw-link {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 999px;
+        border: 1.5px solid #187378;
+        color: #0F5459;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.18s ease, color 0.18s ease;
+    }
+    .hiw-link:hover,
+    .hiw-link:focus-visible {
+        background: #0F5459;
+        color: #ffffff;
+    }
+    @keyframes hiw-rise {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .hiw-card { animation: none; }
+    }
+    @media (max-width: 560px) {
+        .hiw { padding: 32px 16px 48px; }
+        .hiw-hero h1 { font-size: 1.9rem; }
+        .hiw-tiers { grid-template-columns: repeat(2, 1fr); }
+    }
+</style>
+{% endblock %}
 
-    <section class="results">
+{% block content %}
+<div class="hiw">
+    <section class="hiw-hero">
+        <h1>{{ t.how_it_works_title }}</h1>
         <p>{{ t.how_it_works_body_1 }}</p>
+    </section>
+
+    <h2 class="hiw-heading">{{ t.methodology_how_heading }}</h2>
+    <section class="hiw-steps">
+        <div class="hiw-card">
+            <span class="hiw-step">1</span>
+            <div class="hiw-number">54</div>
+            <div class="hiw-unit">{{ t.impact_points_unit }}</div>
+            <div class="hiw-label">{{ t.impact_rainfall_label }}</div>
+        </div>
+        <div class="hiw-card">
+            <span class="hiw-step">2</span>
+            <div class="hiw-number">30</div>
+            <div class="hiw-unit">{{ t.impact_points_unit }}</div>
+            <div class="hiw-label">{{ t.impact_elevation_label }}</div>
+        </div>
+        <div class="hiw-card">
+            <span class="hiw-step">3</span>
+            <div class="hiw-number">100</div>
+            <div class="hiw-unit">{{ t.impact_points_unit }}</div>
+            <div class="hiw-label">{{ t.risk_level_label | replace(':', '') }}</div>
+        </div>
+    </section>
+
+    <section class="hiw-tiers">
+        <div class="hiw-tier hiw-tier-low">{{ t.legend_low }}</div>
+        <div class="hiw-tier hiw-tier-moderate">{{ t.legend_moderate }}</div>
+        <div class="hiw-tier hiw-tier-high">{{ t.legend_high }}</div>
+        <div class="hiw-tier hiw-tier-very-high">{{ t.legend_very_high }}</div>
+    </section>
+
+    <section class="hiw-method">
         <p>{{ t.how_it_works_body_2 }}</p>
     </section>
 
-    <a href="{{ url_for('home', lang=lang) }}" class="back-link">{{ t.back_link }}</a>
+    <section class="hiw-note">
+        <span class="hiw-note-icon">&#9888;&#65039;</span>
+        <span>{{ t.disclaimer_banner }}</span>
+    </section>
+
+    <nav class="hiw-links">
+        <a href="{{ url_for('data_methodology', lang=lang) }}" class="hiw-link">{{ t.nav_data_methodology }}</a>
+        <a href="{{ url_for('back_test', lang=lang) }}" class="hiw-link">{{ t.nav_back_test }}</a>
+        <a href="{{ url_for('home', lang=lang) }}" class="hiw-link">{{ t.back_link }}</a>
+    </nav>
 </div>
 {% endblock %}
