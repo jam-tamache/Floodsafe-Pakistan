@@ -22,6 +22,19 @@
             flex: 1 0 auto;
             width: 100%;
             box-sizing: border-box;
+            animation: page-in 0.45s ease backwards;
+        }
+        /* Fade and rise on every page. Backwards fill, so no transform stays after it ends. */
+        @keyframes page-in {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .page-content {
+                animation: none;
+            }
         }
         .site-footer {
             flex-shrink: 0;
