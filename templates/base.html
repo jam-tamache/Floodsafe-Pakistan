@@ -18,6 +18,10 @@
             display: flex;
             flex-direction: column;
         }
+        /* Leaflet panes and controls use z-index up to 1000. The navbar must sit above them. */
+        .topbar {
+            z-index: 2000;
+        }
         .page-content {
             flex: 1 0 auto;
             width: 100%;
