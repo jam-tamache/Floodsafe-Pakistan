@@ -187,7 +187,7 @@ TRANSLATIONS = {
         "about_why_heading": "Why I built FloodSafe",
         "about_why_body_1": "The 2022 floods hit Sindh harder than any other province. Close to 70 percent of Pakistan's total flood damages and economic losses were in Sindh. I live in Nawabshah. It rained for about two days. Most of the city was flooded, some parts much less than others. Even the grid station was flooded, and our power was out for around a week. After that I kept wondering if people could get clearer flood risk information early enough to prepare.",
         "about_why_body_2": "FloodSafe estimates a city's flood risk from a rainfall scenario or a live 72-hour forecast, using rainfall and the city's elevation relative to nearby areas. It explains the result and provides practical safety guidance in English, Urdu, and Sindhi. It is a planning aid and does not replace official warnings from NDMA or PDMA.",
-        "about_builder": "FloodSafe Pakistan was built by a student in Nawabshah, Sindh.",
+        "about_builder": "FloodSafe Pakistan was built by Jam Tamache, a student in Nawabshah, Sindh.",
         "about_floods_link": "Read what happened in the 2022 floods",
         # 2022 floods page (floods_2022.html). Figures are from the World
         # Bank/UNDP PDNA, UN OCHA and Britannica (see the page's sources).
@@ -523,7 +523,7 @@ TRANSLATIONS = {
         "about_why_heading": "میں نے فلڈ سیف کیوں بنایا",
         "about_why_body_1": "2022 کے سیلاب نے سندھ کو کسی بھی دوسرے صوبے سے زیادہ متاثر کیا۔ پاکستان کے کل سیلابی نقصانات اور معاشی خسارے کا تقریباً 70 فیصد سندھ میں ہوا۔ میں نوابشاہ میں رہتا ہوں۔ تقریباً دو دن بارش ہوتی رہی۔ شہر کا زیادہ تر حصہ زیرِ آب آ گیا، کچھ حصے باقی حصوں سے بہت کم متاثر ہوئے۔ گرڈ اسٹیشن تک میں پانی بھر گیا، اور ہماری بجلی تقریباً ایک ہفتہ بند رہی۔ اس کے بعد میں سوچتا رہا کہ لوگوں کو سیلاب کے خطرے کی واضح معلومات اتنی جلدی مل سکیں کہ وہ تیاری کر سکیں۔",
         "about_why_body_2": "فلڈ سیف بارش کے کسی منظرنامے یا لائیو 72 گھنٹے کی پیشگوئی کی بنیاد پر، بارش اور آس پاس کے علاقوں کے مقابلے میں شہر کی بلندی کو استعمال کرتے ہوئے، شہر کے سیلابی خطرے کا اندازہ لگاتا ہے۔ یہ نتیجے کی وضاحت کرتا ہے اور انگریزی، اردو اور سندھی میں عملی حفاظتی ہدایات فراہم کرتا ہے۔ یہ منصوبہ بندی میں مدد کا ذریعہ ہے اور NDMA یا PDMA کی سرکاری وارننگز کا متبادل نہیں۔",
-        "about_builder": "فلڈ سیف پاکستان سندھ کے شہر نوابشاہ کے ایک طالب علم نے بنایا ہے۔",
+        "about_builder": "فلڈ سیف پاکستان جام تماچے نے بنایا ہے، جو سندھ کے شہر نوابشاہ کے طالب علم ہیں۔",
         "about_floods_link": "2022 کے سیلاب میں کیا ہوا، پڑھیں",
         # 2022 floods page. Check the numbers as well as the wording.
         "floods_title": "2022 کے سیلاب",
@@ -859,7 +859,7 @@ TRANSLATIONS = {
         "about_why_heading": "مون فلڊ سيف ڇو ٺاهيو",
         "about_why_body_1": "2022 جي سيلاب سنڌ کي ٻين سڀني صوبن کان وڌيڪ متاثر ڪيو. پاڪستان جي ڪل سيلابي نقصانن ۽ معاشي خساري جو تقريباً 70 سيڪڙو سنڌ ۾ ٿيو. مان نوابشاهه ۾ رهان ٿو. تقريباً ٻه ڏينهن برسات پئي. شهر جو گهڻو حصو پاڻيءَ هيٺ اچي ويو، ڪجهه حصا ٻين کان تمام گهٽ متاثر ٿيا. گرڊ اسٽيشن ۾ به پاڻي ڀرجي ويو، ۽ اسان جي بجلي لڳ ڀڳ هڪ هفتو بند رهي. ان کانپوءِ مان سوچيندو رهيس ته ماڻهن کي سيلاب جي خطري بابت صاف معلومات ايتري جلدي ملي سگهي جو اهي تياري ڪري سگهن.",
         "about_why_body_2": "فلڊ سيف برسات جي ڪنهن منظرنامي يا لائيو 72 ڪلاڪن جي اڳڪٿي جي بنياد تي، برسات ۽ ڀرپاسي جي علائقن جي مقابلي ۾ شهر جي بلندي استعمال ڪندي، شهر جي سيلاب جي خطري جو اندازو لڳائي ٿو. هي نتيجي جي وضاحت ڪري ٿو ۽ انگريزي، اردو ۽ سنڌي ۾ عملي حفاظتي هدايتون ڏئي ٿو. هي منصوبابندي ۾ مدد جو ذريعو آهي ۽ NDMA يا PDMA جي سرڪاري وارننگن جو متبادل ناهي.",
-        "about_builder": "فلڊ سيف پاڪستان سنڌ جي شهر نوابشاهه جي هڪ شاگرد پاران ٺاهيو ويو آهي.",
+        "about_builder": "فلڊ سيف پاڪستان جام تماچي پاران ٺاهيو ويو آهي، جيڪو سنڌ جي شهر نوابشاهه جو شاگرد آهي.",
         "about_floods_link": "2022 جي سيلاب ۾ ڇا ٿيو، پڙهو",
         # 2022 floods page. Check the numbers as well as the wording.
         "floods_title": "2022 جو سيلاب",
