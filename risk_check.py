@@ -690,8 +690,8 @@ def linkify(text):
 #
 # /back-test lists the cases in backtest_cases.py with the model's score
 # and outcome. /back-test/<case_id> shows one case. Scores come from
-# _compute_risk_core(), same as the live tool. Never hide false alarms
-# or the skipped Jacobabad case.
+# _compute_risk_core(), same as the live tool. Never hide false alarms.
+# Jacobabad has no rainfall figure, so it is skipped and not scored.
 #
 # An "alert" is Moderate Risk or higher. Must match run_backtest.py.
 BACKTEST_ALERT_TIERS = {"Moderate Risk", "High Risk", "Very High Risk"}
