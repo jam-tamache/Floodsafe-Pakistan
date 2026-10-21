@@ -174,6 +174,7 @@ FLOOD_CASES = [
         "rainfall_caveat": (
             "89mm is a PDMA 24-hour figure for Hyderabad City (Dawn, 3 Aug "
             "2026), not a 72-hour total."
+            " The flood label rests on one Dawn photo of water at the railway station. PDMA's 3 Aug report lists no incident for Hyderabad."
         ),
         "actual_outcome": "flood",
         "impact": "Part of a multi-district rain event across Sindh; 8 deaths province-wide (Dawn, 3 Aug 2026)",
@@ -183,6 +184,7 @@ FLOOD_CASES = [
                 "rainfall_caveat": (
                     "89 ملی میٹر حیدرآباد شہر کے لیے PDMA کا 24 گھنٹے کا عدد ہے "
                     "(Dawn، 3 اگست 2026)، 72 گھنٹے کا کل نہیں۔"
+                    " سیلاب کا لیبل Dawn کی ایک تصویر پر مبنی ہے جس میں ریلوے اسٹیشن پر پانی ہے۔ PDMA کی 3 اگست کی رپورٹ میں حیدرآباد کا کوئی واقعہ درج نہیں۔"
                 ),
                 "impact": "سندھ بھر میں کئی اضلاع میں پھیلے بارشی واقعے کا حصہ؛ پورے صوبے میں 8 اموات (Dawn، 3 اگست 2026)",
                 "source": "Dawn، 3 اگست 2026، 'Sindh CM Murad orders emergency steps as downpour wreaks havoc in several districts' (https://www.dawn.com/news/2020214)",
@@ -191,6 +193,7 @@ FLOOD_CASES = [
                 "rainfall_caveat": (
                     "89 ملي ميٽر حيدرآباد شهر لاءِ PDMA جو 24 ڪلاڪن جو انگ آهي "
                     "(Dawn، 3 آگسٽ 2026)، 72 ڪلاڪن جو ڪل ناهي."
+                    " سيلاب جو ليبل Dawn جي هڪ تصوير تي ٻڌل آهي جنهن ۾ ريلوي اسٽيشن تي پاڻي آهي. PDMA جي 3 آگسٽ جي رپورٽ ۾ حيدرآباد جو ڪو واقعو درج ناهي."
                 ),
                 "impact": "سڄي سنڌ ۾ ڪيترن ضلعن ۾ پکڙيل برسات واري واقعي جو حصو؛ سڄي صوبي ۾ 8 موت (Dawn، 3 آگسٽ 2026)",
                 "source": "Dawn، 3 آگسٽ 2026، 'Sindh CM Murad orders emergency steps as downpour wreaks havoc in several districts' (https://www.dawn.com/news/2020214)",
@@ -208,6 +211,7 @@ FLOOD_CASES = [
         "rainfall_caveat": (
             "111mm is a PDMA 24-hour figure for Mirpurkhas City (Dawn, 3 Aug "
             "2026), not a 72-hour total."
+            " No source names flooding in the city. PDMA's 3 Aug report lists canal breaches in the district only."
         ),
         "actual_outcome": "flood",
         "impact": "Part of the same Sindh rain event as the Hyderabad and Umerkot cases",
@@ -217,6 +221,7 @@ FLOOD_CASES = [
                 "rainfall_caveat": (
                     "111 ملی میٹر میرپورخاص شہر کے لیے PDMA کا 24 گھنٹے کا عدد ہے "
                     "(Dawn، 3 اگست 2026)، 72 گھنٹے کا کل نہیں۔"
+                    " کسی ذریعے نے شہر میں سیلاب کا نام نہیں لیا۔ PDMA کی 3 اگست کی رپورٹ میں صرف ضلع کی نہروں میں شگاف درج ہیں۔"
                 ),
                 "impact": "سندھ کے اسی بارشی واقعے کا حصہ جس میں حیدرآباد اور عمرکوٹ کے کیسز شامل ہیں",
                 "source": "Dawn، 3 اگست 2026 (https://www.dawn.com/news/2020214)",
@@ -225,6 +230,7 @@ FLOOD_CASES = [
                 "rainfall_caveat": (
                     "111 ملي ميٽر ميرپورخاص شهر لاءِ PDMA جو 24 ڪلاڪن جو انگ آهي "
                     "(Dawn، 3 آگسٽ 2026)، 72 ڪلاڪن جو ڪل ناهي."
+                    " ڪنهن ذريعي شهر ۾ سيلاب جو نالو ناهي ورتو. PDMA جي 3 آگسٽ جي رپورٽ ۾ رڳو ضلعي جي واهن ۾ ڏار درج آهن."
                 ),
                 "impact": "سنڌ جي ساڳئي برسات واري واقعي جو حصو جنهن ۾ حيدرآباد ۽ عمرڪوٽ جا ڪيس شامل آهن",
                 "source": "Dawn، 3 آگسٽ 2026 (https://www.dawn.com/news/2020214)",
