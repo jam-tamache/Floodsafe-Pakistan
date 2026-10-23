@@ -47,6 +47,7 @@ Limits of the test:
 
 - Eight cases is very small. None was a dry spell.
 - Three of the five floods are one storm (2 to 3 August 2026), so they are not independent.
+- Two of the five flood labels are weak (Hyderabad City and Mirpurkhas City). I kept both in. The case pages say how weak the evidence is.
 - All eight rainfall figures are 24-hour readings, not 72-hour totals.
 - It used past rainfall, not live forecasts, so it says nothing about how accurate the live forecast is.
 
@@ -58,6 +59,18 @@ Every scored case, including the false alarms, is on the [back-test page](https:
 - It only uses rain and relative elevation. It does not know about drains, land use, canals or rivers.
 - It does not cover river floods from broken embankments or glacier lake floods.
 - Do not use it for emergency decisions.
+
+## Run it yourself
+
+You need Python 3.
+
+1. Download the project from GitHub.
+2. Open a terminal in the project folder.
+3. Run `pip install -r requirements.txt`
+4. Get a free key from OpenWeatherMap.
+5. Make a file named `.env` and write `OPENWEATHER_API_KEY=your_key` in it.
+6. Run `python risk_check.py`
+7. Open `http://127.0.0.1:5000` in your browser.
 
 ## Built with
 
