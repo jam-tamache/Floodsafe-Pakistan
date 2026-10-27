@@ -31,9 +31,9 @@
     <p class="map-intro">{{ t.map_intro }}</p>
 
     {# Legend for the five marker states: four risk levels plus grey for
-       cities that are not scored. The colors must match RISK_COLORS in
-       risk_check.py and MAP_ONLY_COLOR in the script below. Change them
-       in style.css (.map-legend-dot-*), not here. #}
+       cities that are not scored. The risk colors must match RISK_COLORS
+       in risk_check.py. The grey is set only in style.css
+       (.map-legend-dot-unscored). The script below reads it from there. #}
     <div class="map-legend map-legend-full">
         <span class="map-legend-item map-legend-item-low">
             <span class="map-legend-dot map-legend-dot-low"></span>{{ t.legend_low }}
@@ -65,7 +65,12 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    const MAP_ONLY_COLOR = '#7f8c8d';
+    // The grey for unscored cities is read from the legend dot, so it is
+    // set in one place only (style.css). 'gray' is used if the dot is missing.
+    const unscoredDot = document.querySelector('.map-legend-dot-unscored');
+    const MAP_ONLY_COLOR = unscoredDot
+        ? getComputedStyle(unscoredDot).backgroundColor
+        : 'gray';
     const NOT_SCORED_TEXT = {{ t.legend_not_scored | tojson }};
     const cities = {{ cities | tojson }};
 
