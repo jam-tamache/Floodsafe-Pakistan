@@ -14,7 +14,10 @@
     --bt-hit: #2e7d5b;
     --bt-false: #c4561f;
     --bt-miss: #b3261e;
-    --bt-skip: #7a8b8e;
+    /* Dark enough for white text (contrast about 5.5 to 1). */
+    --bt-skip: #5b6b6e;
+    /* Where the warning line sits on every bar. Change it here only. */
+    --bt-warn: 25%;
 
     max-width: 980px;
     margin: 0 auto;
@@ -137,7 +140,7 @@ html[dir="ltr"] .bt-ltr-text { text-align: start; }
 .bt-axis-track span { position: absolute; top: 0; white-space: nowrap; }
 .bt-axis-min { left: 0; }
 .bt-axis-max { right: 0; }
-.bt-axis-line { left: 25%; transform: translateX(-50%); color: #a35a07; font-weight: 700; }
+.bt-axis-line { left: var(--bt-warn); transform: translateX(-50%); color: #a35a07; font-weight: 700; }
 
 .bt-row {
     text-decoration: none;
@@ -160,7 +163,7 @@ html[dir="ltr"] .bt-ltr-text { text-align: start; }
     animation: bt-grow 0.9s ease-out both;
 }
 .bt-tick {
-    position: absolute; left: 25%; top: -6px; bottom: -6px;
+    position: absolute; left: var(--bt-warn); top: -6px; bottom: -6px;
     width: 0; border-left: 2px dashed var(--bt-amber);
 }
 
@@ -286,7 +289,7 @@ html[dir="ltr"] .bt-ltr-text { text-align: start; }
 .bt-seg-only { border-radius: 13px; }
 .bt-stack .bt-tick { top: -8px; bottom: -8px; }
 .bt-stack-label {
-    position: absolute; top: -30px; left: 25%;
+    position: absolute; top: -30px; left: var(--bt-warn);
     transform: translateX(-50%);
     font-size: 0.78rem; font-weight: 700; color: #a35a07; white-space: nowrap;
 }
