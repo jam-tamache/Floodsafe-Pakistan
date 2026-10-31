@@ -28,15 +28,28 @@
     }
     .hiw-heading {
         text-align: center;
-        margin: 0 0 20px;
+        margin: 0 0 8px;
         font-size: 1.35rem;
         color: #0F5459;
     }
+    .hiw-caption {
+        text-align: center;
+        margin: 0 0 20px;
+        font-size: 1rem;
+        color: #2f4a4d;
+    }
     .hiw-steps {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 18px;
-        margin-bottom: 44px;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+    .hiw-op {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0F5459;
+        text-align: center;
     }
     .hiw-card {
         position: relative;
@@ -47,8 +60,8 @@
         box-shadow: 0 6px 22px rgba(15, 84, 89, 0.10);
         animation: hiw-rise 0.5s ease both;
     }
-    .hiw-card:nth-child(2) { animation-delay: 0.1s; }
-    .hiw-card:nth-child(3) { animation-delay: 0.2s; }
+    .hiw-card:nth-child(3) { animation-delay: 0.1s; }
+    .hiw-card:nth-child(5) { animation-delay: 0.2s; }
     .hiw-step {
         display: inline-flex;
         align-items: center;
@@ -73,13 +86,31 @@
     .hiw-unit {
         margin-top: 4px;
         font-size: 0.85rem;
-        color: #6b8587;
+        color: #4f6b6e;
     }
     .hiw-label {
         margin-top: 12px;
         font-size: 1.05rem;
         font-weight: 700;
         color: #0F5459;
+    }
+    .hiw-explain {
+        margin: 0 0 44px;
+        padding: 22px 26px;
+        list-style: none;
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 6px 22px rgba(15, 84, 89, 0.08);
+        color: #2f4a4d;
+        font-size: 1rem;
+        line-height: 1.75;
+    }
+    .hiw-explain li + li { margin-top: 12px; }
+    .hiw-explain .hiw-max {
+        padding-top: 12px;
+        border-top: 1px solid #d3e6e3;
+        color: #4f6b6e;
+        font-size: 0.95rem;
     }
     .hiw-tiers {
         display: grid;
@@ -157,6 +188,11 @@
     }
     @media (prefers-reduced-motion: reduce) {
         .hiw-card { animation: none; }
+        .hiw-link { transition: none; }
+    }
+    @media (max-width: 700px) {
+        .hiw-steps { grid-template-columns: 1fr; gap: 8px; }
+        .hiw-op { font-size: 1.6rem; }
     }
     @media (max-width: 560px) {
         .hiw { padding: 32px 16px 48px; }
@@ -174,26 +210,36 @@
     </section>
 
     <h2 class="hiw-heading">{{ t.methodology_how_heading }}</h2>
+    <p class="hiw-caption">{{ t.hiw_example_heading }}. {{ t.hiw_example_note }}</p>
     <section class="hiw-steps">
         <div class="hiw-card">
             <span class="hiw-step">1</span>
-            <div class="hiw-number">54</div>
+            <div class="hiw-number">15.6</div>
             <div class="hiw-unit">{{ t.impact_points_unit }}</div>
             <div class="hiw-label">{{ t.impact_rainfall_label }}</div>
         </div>
+        <div class="hiw-op" aria-hidden="true">+</div>
         <div class="hiw-card">
             <span class="hiw-step">2</span>
-            <div class="hiw-number">30</div>
+            <div class="hiw-number">18.8</div>
             <div class="hiw-unit">{{ t.impact_points_unit }}</div>
             <div class="hiw-label">{{ t.impact_elevation_label }}</div>
         </div>
+        <div class="hiw-op" aria-hidden="true">=</div>
         <div class="hiw-card">
             <span class="hiw-step">3</span>
-            <div class="hiw-number">100</div>
+            <div class="hiw-number">34.4</div>
             <div class="hiw-unit">{{ t.impact_points_unit }}</div>
-            <div class="hiw-label">{{ t.risk_level_label | replace(':', '') }}</div>
+            <div class="hiw-label">{{ t.hiw_total_label }}</div>
         </div>
     </section>
+
+    <ul class="hiw-explain">
+        <li>{{ t.hiw_step_rain }}</li>
+        <li>{{ t.hiw_step_elev }}</li>
+        <li>{{ t.hiw_step_total }}</li>
+        <li class="hiw-max">{{ t.hiw_max_note }}</li>
+    </ul>
 
     <section class="hiw-tiers">
         <div class="hiw-tier hiw-tier-low">{{ t.legend_low }}</div>
