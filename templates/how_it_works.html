@@ -26,9 +26,53 @@
         line-height: 1.75;
         color: #2f4a4d;
     }
+    .hiw-block {
+        position: relative;
+        margin-bottom: 28px;
+        padding: 26px 28px;
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 6px 22px rgba(15, 84, 89, 0.08);
+        color: #2f4a4d;
+        font-size: 1rem;
+        line-height: 1.75;
+    }
+    .hiw-block h2 {
+        margin: 0 0 12px;
+        font-size: 1.35rem;
+        color: #0F5459;
+    }
+    .hiw-block p { margin: 0; }
+    .hiw-block p + p { margin-top: 12px; }
+    .hiw-tablewrap {
+        margin-top: 18px;
+        overflow-x: auto;
+    }
+    .hiw-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+    }
+    .hiw-table th,
+    .hiw-table td {
+        padding: 12px 14px;
+        text-align: start;
+        border-bottom: 1px solid #d3e6e3;
+    }
+    .hiw-table th {
+        color: #0F5459;
+        font-weight: 700;
+        background: #eef8f6;
+    }
+    .hiw-table td.hiw-num {
+        direction: ltr;
+        unicode-bidi: isolate;
+        font-weight: 700;
+        color: #187378;
+    }
     .hiw-heading {
         text-align: center;
-        margin: 0 0 8px;
+        margin: 40px 0 8px;
         font-size: 1.35rem;
         color: #0F5459;
     }
@@ -106,17 +150,11 @@
         line-height: 1.75;
     }
     .hiw-explain li + li { margin-top: 12px; }
-    .hiw-explain .hiw-max {
-        padding-top: 12px;
-        border-top: 1px solid #d3e6e3;
-        color: #4f6b6e;
-        font-size: 0.95rem;
-    }
     .hiw-tiers {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 0;
-        margin-bottom: 44px;
+        margin-top: 18px;
         border-radius: 14px;
         overflow: hidden;
         box-shadow: 0 6px 22px rgba(15, 84, 89, 0.10);
@@ -133,6 +171,20 @@
     .hiw-tier-moderate { background: #FFC107; }
     .hiw-tier-high { background: #FD7E14; }
     .hiw-tier-very-high { background: #DC3545; color: #ffffff; }
+    .hiw-ticks {
+        display: flex;
+        justify-content: space-between;
+        direction: ltr;
+        margin-top: 6px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #4f6b6e;
+    }
+    .hiw-levels-note {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: #4f6b6e;
+    }
     .hiw-note {
         display: flex;
         gap: 14px;
@@ -150,17 +202,6 @@
         font-size: 1.3rem;
         line-height: 1.4;
     }
-    .hiw-method {
-        margin-bottom: 32px;
-        padding: 24px 26px;
-        background: #ffffff;
-        border-radius: 18px;
-        box-shadow: 0 6px 22px rgba(15, 84, 89, 0.08);
-        color: #2f4a4d;
-        font-size: 1rem;
-        line-height: 1.75;
-    }
-    .hiw-method p { margin: 0; }
     .hiw-links {
         display: flex;
         flex-wrap: wrap;
@@ -197,7 +238,8 @@
     @media (max-width: 560px) {
         .hiw { padding: 32px 16px 48px; }
         .hiw-hero h1 { font-size: 1.9rem; }
-        .hiw-tiers { grid-template-columns: repeat(2, 1fr); }
+        .hiw-block { padding: 22px 18px; }
+        .hiw-tier { padding: 14px 4px; font-size: 0.8rem; }
     }
 </style>
 {% endblock %}
@@ -209,46 +251,96 @@
         <p>{{ t.how_it_works_body_1 }}</p>
     </section>
 
-    <h2 class="hiw-heading">{{ t.methodology_how_heading }}</h2>
-    <p class="hiw-caption">{{ t.hiw_example_heading }}. {{ t.hiw_example_note }}</p>
+    <section class="hiw-block">
+        <h2>{{ t.hiw_rain_heading }}</h2>
+        <p>{{ t.hiw_rain_text }}</p>
+        <div class="hiw-tablewrap">
+            <table class="hiw-table">
+                <thead>
+                    <tr>
+                        <th>{{ t.hiw_th_terrain }}</th>
+                        <th>{{ t.hiw_th_p25 }}</th>
+                        <th>{{ t.hiw_th_p50 }}</th>
+                        <th>{{ t.hiw_th_p54 }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ t.terrain_profile_labels['Mega-Urban & Coastal'] }}</td>
+                        <td class="hiw-num">40 {{ t.unit_mm }}</td>
+                        <td class="hiw-num">100 {{ t.unit_mm }}</td>
+                        <td class="hiw-num">200 {{ t.unit_mm }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ t.terrain_profile_labels['Central Agricultural Plains'] }}</td>
+                        <td class="hiw-num">50 {{ t.unit_mm }}</td>
+                        <td class="hiw-num">120 {{ t.unit_mm }}</td>
+                        <td class="hiw-num">240 {{ t.unit_mm }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ t.terrain_profile_labels['Arid Plains & Deserts'] }}</td>
+                        <td class="hiw-num">70 {{ t.unit_mm }}</td>
+                        <td class="hiw-num">140 {{ t.unit_mm }}</td>
+                        <td class="hiw-num">280 {{ t.unit_mm }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="hiw-block">
+        <h2>{{ t.hiw_elev_heading }}</h2>
+        <p>{{ t.hiw_elev_text }}</p>
+    </section>
+
+    <section class="hiw-block">
+        <h2>{{ t.hiw_total_heading }}</h2>
+        <p>{{ t.hiw_total_text }}</p>
+        <div class="hiw-tiers">
+            <div class="hiw-tier hiw-tier-low">{{ t.legend_low }}</div>
+            <div class="hiw-tier hiw-tier-moderate">{{ t.legend_moderate }}</div>
+            <div class="hiw-tier hiw-tier-high">{{ t.legend_high }}</div>
+            <div class="hiw-tier hiw-tier-very-high">{{ t.legend_very_high }}</div>
+        </div>
+        <div class="hiw-ticks" aria-hidden="true">
+            <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+        </div>
+        <p class="hiw-levels-note">{{ t.hiw_levels_note }}</p>
+    </section>
+
+    <h2 class="hiw-heading">{{ t.hiw_ex_heading }}</h2>
+    <p class="hiw-caption">{{ t.hiw_ex_note }}</p>
     <section class="hiw-steps">
         <div class="hiw-card">
             <span class="hiw-step">1</span>
-            <div class="hiw-number">15.6</div>
+            <div class="hiw-number">12.5</div>
             <div class="hiw-unit">{{ t.impact_points_unit }}</div>
             <div class="hiw-label">{{ t.impact_rainfall_label }}</div>
         </div>
         <div class="hiw-op" aria-hidden="true">+</div>
         <div class="hiw-card">
             <span class="hiw-step">2</span>
-            <div class="hiw-number">18.8</div>
+            <div class="hiw-number">13.7</div>
             <div class="hiw-unit">{{ t.impact_points_unit }}</div>
             <div class="hiw-label">{{ t.impact_elevation_label }}</div>
         </div>
         <div class="hiw-op" aria-hidden="true">=</div>
         <div class="hiw-card">
             <span class="hiw-step">3</span>
-            <div class="hiw-number">34.4</div>
+            <div class="hiw-number">26.2</div>
             <div class="hiw-unit">{{ t.impact_points_unit }}</div>
             <div class="hiw-label">{{ t.hiw_total_label }}</div>
         </div>
     </section>
 
     <ul class="hiw-explain">
-        <li>{{ t.hiw_step_rain }}</li>
-        <li>{{ t.hiw_step_elev }}</li>
-        <li>{{ t.hiw_step_total }}</li>
-        <li class="hiw-max">{{ t.hiw_max_note }}</li>
+        <li>{{ t.hiw_ex_rain }}</li>
+        <li>{{ t.hiw_ex_elev }}</li>
+        <li>{{ t.hiw_ex_total }}</li>
     </ul>
 
-    <section class="hiw-tiers">
-        <div class="hiw-tier hiw-tier-low">{{ t.legend_low }}</div>
-        <div class="hiw-tier hiw-tier-moderate">{{ t.legend_moderate }}</div>
-        <div class="hiw-tier hiw-tier-high">{{ t.legend_high }}</div>
-        <div class="hiw-tier hiw-tier-very-high">{{ t.legend_very_high }}</div>
-    </section>
-
-    <section class="hiw-method">
+    <section class="hiw-block">
+        <h2>{{ t.methodology_rainfall_heading }}</h2>
         <p>{{ t.how_it_works_body_2 }}</p>
     </section>
 
