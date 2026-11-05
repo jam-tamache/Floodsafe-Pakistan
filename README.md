@@ -45,7 +45,7 @@ I also compared it with a plain rule: raise an alarm when 50 mm or more of rain 
 
 Limits of the test:
 
-- Eight cases is very small. None was a dry spell.
+- None of the cases was a dry spell.
 - Three of the five floods are one storm (2 to 3 August 2026), so they are not independent.
 - Two of the five flood labels are weak (Hyderabad City and Mirpurkhas City). I kept both in. The case pages say how weak the evidence is.
 - All eight rainfall figures are 24-hour readings, not 72-hour totals.
