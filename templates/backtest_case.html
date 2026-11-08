@@ -18,7 +18,7 @@
 
     <section class="bt-case-hero">
         <h1>{{ cname }}</h1>
-        <p class="bt-case-dates bt-ltr">{{ case.date_window|replace(' to ', ' – ') }}</p>
+        <p class="bt-case-dates bt-ltr">{{ case.date_window }}</p>
         <div class="bt-case-verdict">
             <span class="bt-badge bt-o-{{ oc }}">{{ labels[row.outcome] }}</span>
             <span>
