@@ -437,7 +437,7 @@ button:hover {
     color: #2E3A3B;
 }
 
-/* ---- Gauge (0-1 score ring, SVG) ---- */
+/* ---- Gauge (0 to 1 score ring, SVG) ---- */
 
 .gauge-wrap {
     display: flex;
@@ -449,7 +449,7 @@ button:hover {
 .gauge-svg {
     width: 140px;
     height: 140px;
-    /* Keeps the "0 - 1" label from flipping in right-to-left pages. */
+    /* Keeps the "0 to 1" label from flipping in right-to-left pages. */
     direction: ltr;
 }
 
@@ -1089,10 +1089,11 @@ html[dir="rtl"] .methodology-table td {
 }
 
 /* ---- Risk legend (map.html and check.html) ----
-   The pill colors match the .risk-* classes above. The dot colors
-   should match RISK_COLORS in risk_check.py and MAP_ONLY_COLOR in
-   map.html. If the tiers change, update only the rules below. The
-   labels come from the legend_* keys in translations.py. */
+   The pill colors match the .risk-* classes above. The colors of the
+   four risk dots should match RISK_COLORS in risk_check.py. The grey
+   dot is for places that are not risk-scored. If the tiers change,
+   update only the rules below. The labels come from the legend_* keys
+   in translations.py. */
 .map-legend {
     display: flex;
     flex-wrap: wrap;
