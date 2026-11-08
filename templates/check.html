@@ -73,7 +73,7 @@
                         style="stroke: {{ risk_color }}; stroke-dasharray: {{ (score_0_1 * 339.292)|round(1) }} 339.292;"
                     />
                     <text x="70" y="66" class="gauge-score-text">{{ score_0_1 }}</text>
-                    <text x="70" y="84" class="gauge-scale-text">0 &ndash; 1</text>
+                    <text x="70" y="84" class="gauge-scale-text">0 to 1</text>
                 </svg>
                 <div class="risk-badge risk-{{ risk_slug }}">
                     <span class="warn-icon">&#9888;&#xFE0E;</span> {{ risk_level }}
