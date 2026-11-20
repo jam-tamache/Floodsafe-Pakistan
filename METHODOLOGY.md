@@ -27,9 +27,8 @@ a **72-hour total**, not a single day. This matters and used to be
 undefined: forecast mode always summed a 72-hour window, but scenario
 mode's input field never stated a duration, meaning identical-looking
 numbers from the two modes weren't necessarily comparable. Both modes now
-mean the same thing. (Action item for the UI: scenario mode's rainfall
-label should read "Rainfall over the next 72 hours (mm)" to make this
-explicit to the user, not just to the code.)
+mean the same thing. (Scenario mode's rainfall label now reads "Rainfall
+over 72 hours (mm)", so the UI says this too.)
 
 ## The risk score
 
@@ -155,7 +154,7 @@ treated as a hypothetical: **7 of ~29 scored cities** were affected
 across all three regions — Karachi (9m) and Umerkot (17m), each the
 lowest-elevation city in their region; Mirpurkhas (17m) and Tando
 Muhammad Khan (18m) in the Central Plains; Kotri and Jamshoro (23m each,
-tied); and Tando Allahyar (26m, scoring 27.3/30 — just over the
+tied); and Tando Allahyar (26m, scoring 25.9/30 — just over the
 25-point Moderate line). A quarter of all scored cities reading
 "Moderate Risk" during dry weather was a model defect, not an isolated
 edge case.
@@ -261,8 +260,10 @@ frozen, never edited after the fact). Results are in
 `BACKTEST_RESULTS.md` and on the site's Back-test page. In short: 8 cases
 were scored (Jacobabad was skipped for lack of a rainfall figure), giving
 5 hits, 0 misses, 3 false alarms and 0 correct quiet cases. The model
-catches the floods but over-warns, and on this sample it did not
-outperform a plain rainfall threshold. The sample is small, uses
+catches the floods but over-warns, and on this sample it did
+slightly worse than a plain 50 mm rule (5 hits and 3 false alarms, against
+5 hits and 2 false alarms). All eight rainfall figures are 24-hour
+readings, scored against 72-hour thresholds, so the comparison is rough. The sample is small, uses
 measured rather than forecast rainfall, and the result is not a
 statistical accuracy estimate. It is described as "back-tested", never as
 "validated".
@@ -271,8 +272,6 @@ statistical accuracy estimate. It is described as "back-tested", never as
 
 - Terrain-adjustment ratios between regions are still developer judgment,
   not independently sourced — a real improvement target post-V1.
-- Update the scenario-mode rainfall input label to say "72 hours"
-  explicitly, matching forecast mode.
 - Whether to narrow the dead-zone saturation distance (currently 100% of
   `medium_max`) is an open design decision, not yet made — see "The dead
   zone" section above. If changed, it must be changed in code and this
