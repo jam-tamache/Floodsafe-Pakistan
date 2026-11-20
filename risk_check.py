@@ -1,6 +1,7 @@
 import os
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from flask import Flask, abort, jsonify, render_template, request, send_from_directory
 import requests
 import csv
@@ -796,39 +797,72 @@ def back_test_case(case_id):
 
 _city_risk_cache = {}
 _cache_last_refreshed = None
-CACHE_TTL_SECONDS = 3600  # refresh hourly
+_cache_next_refresh = 0
+CACHE_TTL_SECONDS = 3600  # full refresh every hour
+RETRY_AFTER_FAILURE_SECONDS = 300  # cities that failed are retried after 5 minutes
+MAP_FETCH_WORKERS = 6
+
+
+def _build_city_entry(coord):
+    city = coord["city"]
+    entry = {**coord, "scored": False}
+    try:
+        forecast_valid, rainfall_mm, error_reason = get_forecast_rainfall_by_coords(
+            coord["lat"], coord["lon"]
+        )
+        if not forecast_valid:
+            entry["error"] = error_reason
+        else:
+            entry.update(_compute_risk_core(city, rainfall_mm))
+            entry["scored"] = True
+    except MapOnlyCityError:
+        pass
+    except UnsupportedCityError:
+        entry["error"] = "unsupported_city"
+    except Exception as exc:
+        print(f"ERROR: {city} -> {exc}")
+        entry["error"] = "unexpected_error"
+    return entry
+
+
+def _needs_retry(entry):
+    return not entry.get("scored") and entry.get("error") not in (None, "unsupported_city")
 
 
 def get_all_city_risk_data(force_refresh=False):
-    """Risk data for all map cities. Cached, refreshed hourly. Uses
-    get_forecast_rainfall_by_coords().
+    """Risk data for all map cities. Cities are fetched in parallel and
+    cached for an hour. Cities that failed are retried after 5 minutes.
     """
-    global _city_risk_cache, _cache_last_refreshed
+    global _city_risk_cache, _cache_last_refreshed, _cache_next_refresh
     now = time.time()
-    if force_refresh or _cache_last_refreshed is None or (now - _cache_last_refreshed) > CACHE_TTL_SECONDS:
-        fresh = {}
-        for coord in CITY_COORDINATES:
-            city = coord["city"]
-            entry = {**coord, "scored": False}
-            try:
-                forecast_valid, rainfall_mm, error_reason = get_forecast_rainfall_by_coords(
-                    coord["lat"], coord["lon"]
-                )
-                if not forecast_valid:
-                    entry["error"] = error_reason
-                else:
-                    entry.update(_compute_risk_core(city, rainfall_mm))
-                    entry["scored"] = True
-            except MapOnlyCityError:
-                pass
-            except UnsupportedCityError:
-                entry["error"] = "unsupported_city"
-            fresh[city] = entry
+    if not force_refresh and now < _cache_next_refresh:
+        return _city_risk_cache
 
-            if not entry.get("scored") and city.lower() not in MAP_ONLY_CITIES:
-                print(f"UNSCORED: {city} -> {entry.get('error')}")
-        _city_risk_cache = fresh
+    full = (
+        force_refresh
+        or _cache_last_refreshed is None
+        or (now - _cache_last_refreshed) >= CACHE_TTL_SECONDS
+    )
+    if full:
+        targets = list(CITY_COORDINATES)
+        fresh = {}
+    else:
+        targets = [c for c in CITY_COORDINATES if _needs_retry(_city_risk_cache.get(c["city"], {}))]
+        fresh = dict(_city_risk_cache)
+
+    with ThreadPoolExecutor(max_workers=MAP_FETCH_WORKERS) as pool:
+        entries = list(pool.map(_build_city_entry, targets))
+
+    for entry in entries:
+        fresh[entry["city"]] = entry
+        if not entry.get("scored") and entry["city"].lower() not in MAP_ONLY_CITIES:
+            print(f"UNSCORED: {entry['city']} -> {entry.get('error')}")
+
+    _city_risk_cache = fresh
+    if full:
         _cache_last_refreshed = now
+    failed = any(_needs_retry(e) for e in fresh.values())
+    _cache_next_refresh = now + (RETRY_AFTER_FAILURE_SECONDS if failed else CACHE_TTL_SECONDS)
     return _city_risk_cache
 
 
