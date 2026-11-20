@@ -232,6 +232,9 @@ TRANSLATIONS = {
         "assessment_type_label": "Assessment Type:",
         "assessment_type_forecast": "Forecast (72h)",
         "assessment_type_scenario": "Scenario (not current rainfall)",
+        "results_note_relative": "This score compares your city with others in its region, so a Moderate result on high ground can still mean real flood danger.",
+        "results_note_official": "Official alerts take priority over this score:",
+        "results_note_link": "Flood Forecasting Division (PMD)",
 
         "methodology_title": "Data & Methodology",
         "methodology_lede": "How a flood risk score actually gets calculated, in plain language, including what the model leaves out and where its limits are.",
@@ -585,6 +588,9 @@ TRANSLATIONS = {
         "assessment_type_label": "تشخیص کی قسم:",
         "assessment_type_forecast": "پیشگوئی (72 گھنٹے)",
         "assessment_type_scenario": "منظرنامہ (موجودہ بارش نہیں)",
+        "results_note_relative": "یہ اسکور آپ کے شہر کا موازنہ اسی علاقے کے دوسرے شہروں سے کرتا ہے، اس لیے اونچی زمین پر درمیانہ خطرہ ہونے کے باوجود سیلاب کا حقیقی خطرہ ہو سکتا ہے۔",
+        "results_note_official": "سرکاری الرٹس اس اسکور پر مقدم ہیں:",
+        "results_note_link": "فلڈ فورکاسٹنگ ڈویژن (PMD)",
 
         "methodology_title": "ڈیٹا اور طریقہ کار",
         "methodology_lede": "سیلاب کے خطرے کا اسکور دراصل کیسے شمار کیا جاتا ہے، سادہ زبان میں، بشمول اس کے کہ ماڈل کیا شامل نہیں کرتا اور اس کی حدود کہاں ہیں۔",
@@ -939,6 +945,9 @@ TRANSLATIONS = {
         "assessment_type_label": "جانچ جو قسم:",
         "assessment_type_forecast": "اڳڪٿي (72 ڪلاڪ)",
         "assessment_type_scenario": "منظرنامو (موجوده برسات ناهي)",
+        "results_note_relative": "هي اسڪور توهان جي شهر جو مقابلو ساڳئي علائقي جي ٻين شهرن سان ڪري ٿو، تنهنڪري مٿاهين زمين تي وچولو خطرو هجڻ باوجود سيلاب جو حقيقي خطرو ٿي سگهي ٿو.",
+        "results_note_official": "سرڪاري الرٽس کي هن اسڪور تي ترجيح حاصل آهي:",
+        "results_note_link": "فلڊ فورڪاسٽنگ ڊويزن (PMD)",
 
         "methodology_title": "ڊيٽا ۽ طريقيڪار",
         "methodology_lede": "سيلاب جي خطري جو اسڪور اصل ۾ ڪيئن ڳڻيو ويندو آهي، سادي ٻولي ۾، بشمول ان جي ته ماڊل ۾ ڇا شامل ناهي ۽ ان جون حدون ڪٿي آهن.",
